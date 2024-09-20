@@ -18,6 +18,34 @@ void write_prompt(void)
     write(1, "\033[0m", 4); // Reset text color to default
 }
 
+void ft_strtrim(char *str)
+{
+    int i = 0;
+    int j = 0;
+
+    // Skip leading whitespaces
+    while (str[i] == ' ' || str[i] == '\t')
+        i++;
+
+    // Remove extra whitespaces in between words
+    while (str[i])
+    {
+        if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') || (j > 0 && !(str[j - 1] == ' ' || str[j - 1] == '\t' || str[i] == '\n')))
+        {
+            str[j++] = str[i];
+        }
+        i++;
+    }
+    str[j] = '\0';
+
+    // Remove trailing whitespaces
+    j--;
+    while (j >= 0 && (str[j] == ' ' || str[j] == '\t'))
+    {
+        str[j] = '\0';
+        j--;
+    }
+}
 
 char *get_input(int fd)
 {
@@ -26,6 +54,7 @@ char *get_input(int fd)
 	write_prompt();
 	line = get_next_line(fd);
 	// trim line
+	ft_strtrim(line);
 	// add line to history
 	return (line);
 }
