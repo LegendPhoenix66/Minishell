@@ -11,11 +11,19 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+void write_prompt(void)
+{
+    write(1, "\033[0;32m", 7); // Set text color to green
+    write(1, "minishell$ ", 11); // Print prompt
+    write(1, "\033[0m", 4); // Reset text color to default
+}
+
 
 char *get_input(int fd)
 {
 	char *line;
 
+	write_prompt();
 	line = get_next_line(fd);
 	// trim line
 	// add line to history
