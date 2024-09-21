@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-void write_prompt(void)
 
 char *get_prompt(void)
 {
@@ -72,7 +71,7 @@ int	main(int argc, char *argv[])
 	while (input && ft_strcmp(input, "exit") != 0) {
 		// parse input
 		free(input);
-		input = get_next_line(1);
+		input = get_input(1);
 	}
 	free(input);
 	return (0);
