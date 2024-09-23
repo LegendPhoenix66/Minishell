@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "../include/minishell.h"
 
 char *get_prompt(void)
 {
