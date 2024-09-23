@@ -10,69 +10,76 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "../include/minishell.h"
 
 char *get_prompt(void)
 {
-    char *prompt;
+	char *prompt;
 
-    prompt = malloc(20); // Allocate memory for the prompt
-    if (!prompt)
-        return (NULL);
-    strcpy(prompt, "\033[0;32mminishell$ \033[0m"); // Construct the prompt
-    return (prompt);
+	prompt = malloc(20); // Allocate memory for the prompt
+	if (!prompt)
+		return (NULL);
+	ft_strlcpy(prompt, "\033[0;32mminishell> \033[0m", 20); // Copy the prompt to the allocated memory
+	return (prompt);
 }
 
 void ft_strtrim(char *str)
 {
-    int i = 0;
-    int j = 0;
+	int i = 0;
+	int j = 0;
 
-    // Skip leading whitespaces
-    while (str[i] == ' ' || str[i] == '\t')
-        i++;
+	// Skip leading whitespaces
+	while (str[i] == ' ' || str[i] == '\t')
+		i++;
 
-    // Remove extra whitespaces in between words
-    while (str[i])
-    {
-        if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') || (j > 0 && !(str[j - 1] == ' ' || str[j - 1] == '\t' || str[i] == '\n')))
-        {
-            str[j++] = str[i];
-        }
-        i++;
-    }
-    str[j] = '\0';
+	// Remove extra whitespaces in between words
+	while (str[i]) {
+		if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') ||
+			(j > 0 && !(str[j - 1] == ' ' || str[j - 1] == '\t' || str[i] == '\n'))) {
+			str[j++] = str[i];
+		}
+		i++;
+	}
+	str[j] = '\0';
 
-    // Remove trailing whitespaces
-    j--;
-    while (j >= 0 && (str[j] == ' ' || str[j] == '\t'))
-    {
-        str[j] = '\0';
-        j--;
-    }
+	// Remove trailing whitespaces
+	j--;
+	while (j >= 0 && (str[j] == ' ' || str[j] == '\t')) {
+		str[j] = '\0';
+		j--;
+	}
 }
 
-char *get_input(int fd)
+char *get_input()
 {
 	char *line;
+	char *prompt;
 
-	line = readline(get_prompt());
+	prompt = get_prompt();
+	line = readline(prompt);
+	free(prompt);
+	if (line == NULL) // Handle ctrl-D (EOF)
+	{
+		write(1, "exit\n", 5); // Display "exit" on ctrl-D like bash
+		return (NULL);
+	}
 	// trim line
 	ft_strtrim(line);
-	// add line to history
+	// add line to history (if it's not an empty line)
+	if (*line)
+		add_history(line);
 	return (line);
 }
 
-int	main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-	char		*input;
+	char *input;
 
-	input = get_input(1);
-	while (input && ft_strcmp(input, "exit") != 0) {
+	input = get_input();
+	while (input && ft_strncmp(input, "exit", 4) != 0) {
 		// parse input
 		free(input);
-		input = get_input(1);
+		input = get_input();
 	}
 	free(input);
 	return (0);

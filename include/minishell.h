@@ -16,6 +16,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 
 
 #endif //MINISHELL_MINISHELL_H
