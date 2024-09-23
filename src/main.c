@@ -6,20 +6,25 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:27 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/16 19:33:15 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/09/23 18:27:59 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
+#define COLOR_RESET "\033[0m"
+#define COLOR_GREEN "\033[0;32m"
+
 char *get_prompt(void)
 {
 	char *prompt;
 
-	prompt = malloc(20); // Allocate memory for the prompt
+	prompt = malloc(30); // Allocate enough memory for the prompt including escape sequences
 	if (!prompt)
 		return (NULL);
-	ft_strlcpy(prompt, "\033[0;32mminishell> \033[0m", 20); // Copy the prompt to the allocated memory
+	ft_strlcpy(prompt, COLOR_GREEN, 30);
+	ft_strlcat(prompt, "minishell> ", 30);
+	ft_strlcat(prompt, COLOR_RESET, 30);
 	return (prompt);
 }
 
