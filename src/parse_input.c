@@ -1,26 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   parse_input.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/16 19:30:38 by lhopp            ###   ########.fr       */
+/*   Created: 2024/09/24 20:46:54 by lhopp             #+#    #+#             */
+/*   Updated: 2024/09/24 20:46:59 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_MINISHELL_H
-# define MINISHELL_MINISHELL_H
+#include "../include/minishell.h"
 
-# include <stdlib.h>
-# include <stdio.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <sys/wait.h>
+// Function to execute commands (either built-in or external)
+void execute_command(char **args)
+{
 
-char **parse_input(char *input);
-void execute_command(char **args);
+}
 
-#endif //MINISHELL_MINISHELL_H
+// Example parsing input into tokens
+char **parse_input(char *input)
+{
+    return ft_split(input, ' ');  // Use your ft_split function to split the input by spaces
+}

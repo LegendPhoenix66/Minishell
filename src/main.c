@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:27 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/23 18:27:59 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/09/24 20:51:53 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,14 @@ char *get_input()
 int main(int argc, char *argv[])
 {
 	char *input;
+	char **args;
 
 	input = get_input();
 	while (input && ft_strncmp(input, "exit", 4) != 0) {
-		// parse input
+		args = parse_input(input);  // Parse input into command and arguments
+		execute_command(args);  // Execute the parsed command
 		free(input);
+		free(args);
 		input = get_input();
 	}
 	free(input);
