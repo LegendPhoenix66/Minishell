@@ -76,17 +76,14 @@ char *get_input()
 	return (line);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	char *input;
-	char **args;
 
 	input = get_input();
 	while (input && ft_strncmp(input, "exit", 4) != 0) {
-		args = parse_input(input);  // Parse input into command and arguments
-		execute_command(args);  // Execute the parsed command
+		parse_input(input);
 		free(input);
-		free(args);
 		input = get_input();
 	}
 	free(input);

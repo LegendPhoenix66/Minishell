@@ -107,7 +107,11 @@ void execute_command(char **args)
 }
 
 // Example parsing input into tokens
-char **parse_input(char *input)
+void **parse_input(char *input)
 {
-    return ft_split(input, ' ');  // Use your ft_split function to split the input by spaces
+	char **args;
+
+    args = ft_split(input, ' ');  // Use your ft_split function to split the input by spaces
+	execute_command(args);  // Execute the command with the arguments
+	free_split(args);  // Custom function to free memory of ft_split
 }
