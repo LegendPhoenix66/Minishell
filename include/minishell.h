@@ -6,21 +6,21 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/16 19:30:38 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/09/30 16:52:46 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_MINISHELL_H
-# define MINISHELL_MINISHELL_H
+#ifndef MINISHELL_H
+# define MINISHELL_H
 
 # include <stdlib.h>
 # include <stdio.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <sys/wait.h>
+# include <unistd.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <sys/wait.h>
 
-void parse_input(char *input);
-void execute_command(char **args);
+void	parse_input(char *input);
+void	execute_command(char **args);
 
-#endif //MINISHELL_MINISHELL_H
+#endif //MINISHELL_H
