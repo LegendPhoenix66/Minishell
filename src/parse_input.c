@@ -32,14 +32,16 @@ void free_split(char **split)
 char *join_path_command(const char *path, const char *cmd)
 {
     char *full_path;
-    size_t len = strlen(path) + strlen(cmd) + 2;  // +2 for '/' and '\0'
+    size_t len = ft_strlen(path) + ft_strlen(cmd) + 2;  // +2 for '/' and '\0'
 
     full_path = malloc(len);
     if (!full_path)
         return NULL;
 
-    snprintf(full_path, len, "%s/%s", path, cmd);
-    return full_path;
+    ft_strlcpy(full_path, path, len);
+    ft_strlcat(full_path, "/", len);
+    ft_strlcat(full_path, cmd, len);
+	return full_path;
 }
 
 // Search command in PATH and return a full path or NULL
