@@ -20,8 +20,7 @@
 #include <readline/history.h>
 #include <sys/wait.h>
 
-char **parse_input(char *input);
-void **parse_input(char *input);
+void parse_input(char *input);
 void execute_command(char **args);
 
 #endif //MINISHELL_MINISHELL_H
