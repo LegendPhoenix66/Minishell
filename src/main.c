@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:27 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/24 20:51:53 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/09/30 14:59:08 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,36 @@
 #define COLOR_RESET "\033[0m"
 #define COLOR_GREEN "\033[0;32m"
 
+size_t calculate_size(char **elements)
+{
+	int i = 0;
+	size_t size = 0;
+
+	while (elements[i])
+	{
+		size += ft_strlen(elements[i]);
+		i++;
+	}
+	return (size) + 1;
+}
+
 char *get_prompt(void)
 {
 	char *prompt;
+	char *elements[] = {COLOR_GREEN, "minishell> ", COLOR_RESET, NULL};
+	size_t size = calculate_size(elements);
+	int i;
 
-	prompt = malloc(30); // Allocate enough memory for the prompt including escape sequences
+	prompt = malloc(size); // Allocate enough memory for the prompt including escape sequences
 	if (!prompt)
 		return (NULL);
-	ft_strlcpy(prompt, COLOR_GREEN, 30);
-	ft_strlcat(prompt, "minishell> ", 30);
-	ft_strlcat(prompt, COLOR_RESET, 30);
+	i = 1;
+	ft_strlcpy(prompt, elements[0], size);
+	while (elements[i])
+	{
+		ft_strlcat(prompt, elements[i], size);
+		i++;
+	}
 	return (prompt);
 }
 
