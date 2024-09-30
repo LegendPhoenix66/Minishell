@@ -107,7 +107,7 @@ void execute_command(char **args)
 }
 
 // Example parsing input into tokens
-void **parse_input(char *input)
+void parse_input(char *input)
 {
 	char **args;
 
