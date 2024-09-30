@@ -66,6 +66,32 @@ char *find_command_in_path(char *cmd)
     return NULL;
 }
 
+void execute_external_command(char **args)
+{
+	char *cmd_path = find_command_in_path(args[0]);
+	if (cmd_path == NULL)
+	{
+		write(2, "Command not found\n", 18);
+		return;
+	}
+
+	pid_t pid = fork();
+	if (pid == 0)  // Child process
+	{
+		if (execve(cmd_path, args, environ) == -1)  // Use execve to execute the command
+		{
+			perror("execve error");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else if (pid > 0)  // Parent process
+	{
+		waitpid(pid, NULL, 0);  // Wait for the child process to finish
+	}
+
+	free(cmd_path);  // Free the full path allocated
+}
+
 // Function to execute commands (either built-in or external)
 void execute_command(char **args)
 {
@@ -73,37 +99,16 @@ void execute_command(char **args)
         return;
 
     // Built-in 'cd' command
-    if (strcmp(args[0], "cd") == 0)
+	if (strcmp(args[0], "cd") == 0)
+	{
+		const char *dir = (args[1] == NULL) ? getenv("HOME") : args[1];
+		if (dir == NULL || chdir(dir) != 0)
+			perror("cd error");
+	}
+	else
     {
-        if (args[1] == NULL || chdir(args[1]) != 0)
-            perror("cd error");
-    }
-    else
-    {
-        // External command
-        char *cmd_path = find_command_in_path(args[0]);
-        if (cmd_path == NULL)
-        {
-            write(2, "Command not found\n", 18);
-            return;
-        }
-
-        pid_t pid = fork();
-        if (pid == 0)  // Child process
-        {
-            if (execve(cmd_path, args, environ) == -1)  // Use execve to execute the command
-            {
-                perror("execve error");
-                exit(EXIT_FAILURE);
-            }
-        }
-        else if (pid > 0)  // Parent process
-        {
-            waitpid(pid, NULL, 0);  // Wait for the child process to finish
-        }
-
-        free(cmd_path);  // Free the full path allocated
-    }
+		execute_external_command(args);
+	}
 }
 
 // Example parsing input into tokens
