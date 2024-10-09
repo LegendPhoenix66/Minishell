@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:27 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/30 14:59:08 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/10/09 15:34:09 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,27 +15,31 @@
 #define COLOR_RESET "\033[0m"
 #define COLOR_GREEN "\033[0;32m"
 
-size_t calculate_size(char **elements)
+size_t	calculate_size(char **elements)
 {
-	int i = 0;
-	size_t size = 0;
+	int		i;
+	size_t	size;
 
+	i = 0;
+	size = 0;
 	while (elements[i])
 	{
 		size += ft_strlen(elements[i]);
 		i++;
 	}
-	return (size) + 1;
+	return ((size) + 1);
 }
 
-char *get_prompt(void)
+char	*get_prompt(void)
 {
-	char *prompt;
-	char *elements[] = {COLOR_GREEN, "minishell> ", COLOR_RESET, NULL};
-	size_t size = calculate_size(elements);
-	int i;
+	char	*prompt;
+	char	*elements[] = {COLOR_GREEN, "minishell> ", COLOR_RESET, NULL};
+	size_t	size;
+	int		i;
 
-	prompt = malloc(size); // Allocate enough memory for the prompt including escape sequences
+	size = calculate_size(elements);
+	prompt = malloc(size);
+		// Allocate enough memory for the prompt including escape sequences
 	if (!prompt)
 		return (NULL);
 	i = 1;
@@ -48,37 +52,41 @@ char *get_prompt(void)
 	return (prompt);
 }
 
-void ft_strtrim(char *str)
+void	ft_strtrim(char *str)
 {
-	int i = 0;
-	int j = 0;
+	int	i;
+	int	j;
 
+	i = 0;
+	j = 0;
 	// Skip leading whitespaces
 	while (str[i] == ' ' || str[i] == '\t')
 		i++;
-
 	// Remove extra whitespaces in between words
-	while (str[i]) {
-		if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') ||
-			(j > 0 && !(str[j - 1] == ' ' || str[j - 1] == '\t' || str[i] == '\n'))) {
+	while (str[i])
+	{
+		if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') || (j > 0
+				&& !(str[j - 1] == ' ' || str[j - 1] == '\t'
+					|| str[i] == '\n')))
+		{
 			str[j++] = str[i];
 		}
 		i++;
 	}
 	str[j] = '\0';
-
 	// Remove trailing whitespaces
 	j--;
-	while (j >= 0 && (str[j] == ' ' || str[j] == '\t')) {
+	while (j >= 0 && (str[j] == ' ' || str[j] == '\t'))
+	{
 		str[j] = '\0';
 		j--;
 	}
 }
 
-char *get_input()
+char	*get_input(void)
 {
-	char *line;
-	char *prompt;
+	char	*line;
+	char	*prompt;
 
 	prompt = get_prompt();
 	line = readline(prompt);
@@ -96,12 +104,13 @@ char *get_input()
 	return (line);
 }
 
-int main(void)
+int	main(void)
 {
-	char *input;
+	char	*input;
 
 	input = get_input();
-	while (input && ft_strncmp(input, "exit", 4) != 0) {
+	while (input && ft_strncmp(input, "exit", 4) != 0)
+	{
 		parse_input(input);
 		free(input);
 		input = get_input();
