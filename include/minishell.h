@@ -19,6 +19,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/wait.h>
+# include "libft.h"
 
 void	parse_input(char *input);
 void	execute_command(char **args);

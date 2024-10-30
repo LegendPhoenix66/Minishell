@@ -52,7 +52,7 @@ char	*get_prompt(void)
 	return (prompt);
 }
 
-void	ft_strtrim(char *str)
+void	ft_strtrim1(char *str)
 {
 	int	i;
 	int	j;
@@ -97,7 +97,7 @@ char	*get_input(void)
 		return (NULL);
 	}
 	// trim line
-	ft_strtrim(line);
+	ft_strtrim1(line);
 	// add line to history (if it's not an empty line)
 	if (*line)
 		add_history(line);
