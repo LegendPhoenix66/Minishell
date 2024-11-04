@@ -1,41 +1,41 @@
-# Compilateur et flags
+# Compiler and flags
 CC = cc
 FLAGS = -Wall -Wextra -Werror
 AR = ar rcs
 RM = /bin/rm -f
 
-# Dossiers
+# Directories
 SRC = src
 INC = include
 LIBFT = libft
 OBJ = obj
 
-# Fichiers
+# Files
 SOURCES = $(wildcard $(SRC)/*.c)
 OBJECTS = $(SOURCES:$(SRC)/%.c=$(OBJ)/%.o)
 CFLAGS = -I $(INC) -I $(LIBFT)
 LDFLAGS = -L $(LIBFT) -lft -lreadline
 
-# Nom de l'exécutable
+# Executable name
 NAME = minishell
 
-# Règle principale
+# Main rule
 $(NAME): $(OBJECTS) $(LIBFT)/libft.a
 	$(CC) $(FLAGS) $(OBJECTS) $(LDFLAGS) -o $(NAME)
 
-# Compilation des fichiers .c en .o
+# Compile .c files to .o
 $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) $(FLAGS) $(CFLAGS) -c $< -o $@
 
-# Création du dossier obj s'il n'existe pas
+# Create obj directory if it doesn't exist
 $(OBJ):
 	mkdir -p $(OBJ)
 
-# Compilation de libft
+# Compile libft
 $(LIBFT)/libft.a:
 	$(MAKE) -C $(LIBFT)
 
-# Nettoyage des fichiers objets et de l'exécutable
+# Clean object files and executable
 clean:
 	$(RM) $(OBJECTS)
 	$(MAKE) -C $(LIBFT) clean
@@ -45,8 +45,8 @@ fclean: clean
 	$(RM) -r $(OBJ)
 	$(MAKE) -C $(LIBFT) fclean
 
-# Réinitialisation complète
+# Complete reset
 re: fclean $(NAME)
 
-# Ignore les fichiers temporaires
+# Ignore temporary files
 .PHONY: all clean fclean re
