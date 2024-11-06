@@ -75,6 +75,9 @@ void	execute_external_command(char **args)
 {
 	char	*cmd_path;
 	pid_t	pid;
+	int		pipe_fd[2];
+	char	buffer[1024];
+	ssize_t	bytes_read;
 
 	cmd_path = find_command_in_path(args[0]);
 	if (cmd_path == NULL)
@@ -82,11 +85,20 @@ void	execute_external_command(char **args)
 		write(2, "Command not found\n", 18);
 		return ;
 	}
+
+	if (pipe(pipe_fd) == -1)
+	{
+		perror("pipe error");
+		return ;
+	}
+
 	pid = fork();
 	if (pid == 0) // Child process
 	{
+		close(pipe_fd[0]); // Close read end of the pipe
+		dup2(pipe_fd[1], STDOUT_FILENO); // Redirect stdout to the write end of the pipe
+		close(pipe_fd[1]); // Close the write end of the pipe after duplicating
 		if (execve(cmd_path, args, environ) == -1)
-			// Use execve to execute the command
 		{
 			perror("execve error");
 			exit(EXIT_FAILURE);
@@ -94,11 +106,17 @@ void	execute_external_command(char **args)
 	}
 	else if (pid > 0) // Parent process
 	{
+		close(pipe_fd[1]); // Close write end of the pipe
+		while ((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0)
+		{
+			buffer[bytes_read] = '\0';
+			write(STDOUT_FILENO, buffer, bytes_read); // Write the output to stdout
+		}
+		close(pipe_fd[0]); // Close read end of the pipe
 		waitpid(pid, NULL, 0); // Wait for the child process to finish
 	}
 	free(cmd_path); // Free the full path allocated
 }
-
 // Function to execute commands (either built-in or external)
 void	execute_command(char **args)
 {
