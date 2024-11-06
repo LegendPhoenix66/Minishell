@@ -3,6 +3,7 @@
 /cmake-build-debug/
 /cmake-build-release/
 /a.out
-/main
+/minishell
 /libft/.vscode/
 *.o
+/libft/libft.a
