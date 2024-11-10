@@ -107,14 +107,17 @@ char	*get_input(void)
 int	main(void)
 {
 	char	*input;
+	t_node  *env_lst;
 
+	env_lst = init_lst();
 	input = get_input();
 	while (input && ft_strncmp(input, "exit", 4) != 0)
 	{
-		parse_input(input);
+		parse_input(input, &env_lst);
 		free(input);
 		input = get_input();
 	}
 	free(input);
+	free_lst(env_lst);
 	return (0);
 }

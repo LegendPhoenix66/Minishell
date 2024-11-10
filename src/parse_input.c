@@ -118,9 +118,11 @@ void	execute_external_command(char **args)
 	free(cmd_path); // Free the full path allocated
 }
 // Function to execute commands (either built-in or external)
-void	execute_command(char **args)
+void	execute_command(char **args, t_node **env_lst)
 {
 		const char *dir = (args[1] == NULL) ? getenv("HOME") : args[1];
+		//char **env;
+		//char **new;
 
 	if (args[0] == NULL) // No command entered
 		return ;
@@ -130,6 +132,10 @@ void	execute_command(char **args)
 		if (dir == NULL || chdir(dir) != 0)
 			perror("cd error");
 	}
+	else if (strcmp(args[0], "env") == 0)
+		print_lst(env_lst);
+	else if (strcmp(args[0], "unset") == 0 && args[1] != NULL)
+		ft_unsetenv(env_lst, args[1]);
 	else
 	{
 		execute_external_command(args);
@@ -137,12 +143,13 @@ void	execute_command(char **args)
 }
 
 // Example parsing input into tokens
-void	parse_input(char *input)
+void	parse_input(char *input, t_node **env_lst)
 {
 	char	**args;
 
+	//print_lst(env_lst);
 	args = ft_split(input, ' ');
 		// Use your ft_split function to split the input by spaces
-	execute_command(args);       // Execute the command with the arguments
+	execute_command(args, env_lst);       // Execute the command with the arguments
 	free_split(args);            // Custom function to free memory of ft_split
 }
