@@ -13,7 +13,7 @@
 #include "../include/minishell.h"
 
 // compare variable value and remove all the line
-//if the fonction find this one
+//if the function finds this one
 int ft_unsetenv(t_node **env_list, const char *var)
 {
     size_t len;

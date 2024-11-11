@@ -21,18 +21,24 @@
 # include <sys/wait.h>
 # include "libft.h"
 
-//for manipulation of enviroment variable
+//for manipulation of environment variable
 typedef struct s_node
 {
     char *env;
     struct s_node *next;
 } t_node;
 
-void	parse_input(char *input, t_node **env_lst);
+typedef struct s_args
+{
+	t_node *env;
+	char *current_directory;
+} t_args;
+
+void	parse_input(char *input, t_args **args);
 void	execute_command(char **args, t_node **env_lst);
 t_node  *init_lst(void);
 void    free_lst(t_node *top); //free linked list
-void    print_lst(t_node **top);//make env fonction in execute commande
-int     ft_unsetenv(t_node **env_list, const char *var);//unset fonction
+void    print_lst(t_node **top);//make env function in execute command
+int     ft_unsetenv(t_node **env_list, const char *var);//unset function
 
 #endif //MINISHELL_H

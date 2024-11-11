@@ -104,20 +104,26 @@ char	*get_input(void)
 	return (line);
 }
 
+void init_args(t_args *args)
+{
+	args->env = init_lst();
+	args->current_directory = getcwd(NULL, 0);
+}
+
 int	main(void)
 {
 	char	*input;
-	t_node  *env_lst;
+	t_args  *args;
 
-	env_lst = init_lst();
+	init_args(args);
 	input = get_input();
 	while (input && ft_strncmp(input, "exit", 4) != 0)
 	{
-		parse_input(input, &env_lst);
+		parse_input(input, &args);
 		free(input);
 		input = get_input();
 	}
 	free(input);
-	free_lst(env_lst);
+	free_lst(args->env);
 	return (0);
 }

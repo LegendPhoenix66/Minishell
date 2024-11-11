@@ -143,13 +143,14 @@ void	execute_command(char **args, t_node **env_lst)
 }
 
 // Example parsing input into tokens
-void	parse_input(char *input, t_node **env_lst)
+void	parse_input(char *input, t_args **args)
 {
-	char	**args;
+	char	**command;
+	t_node **env_lst = &(*args)->env;
 
 	//print_lst(env_lst);
-	args = ft_split(input, ' ');
+	command = ft_split(input, ' ');
 		// Use your ft_split function to split the input by spaces
-	execute_command(args, env_lst);       // Execute the command with the arguments
-	free_split(args);            // Custom function to free memory of ft_split
+	execute_command(command, env_lst);       // Execute the command with the arguments
+	free_split(command);            // Custom function to free memory of ft_split
 }
