@@ -35,7 +35,7 @@ typedef struct s_args
 } t_args;
 
 void	parse_input(char *input, t_args **args);
-void	execute_command(char **args, t_node **env_lst);
+void	execute_command(char **command, t_args **args);
 t_node  *init_lst(void);
 void    free_lst(t_node *top); //free linked list
 void    print_lst(t_node **top);//make env function in execute command

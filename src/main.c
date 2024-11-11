@@ -115,6 +115,7 @@ int	main(void)
 	char	*input;
 	t_args  *args;
 
+	args = malloc(sizeof(t_args));
 	init_args(args);
 	input = get_input();
 	while (input && ft_strncmp(input, "exit", 4) != 0)

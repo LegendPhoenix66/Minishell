@@ -118,27 +118,34 @@ void	execute_external_command(char **args)
 	free(cmd_path); // Free the full path allocated
 }
 // Function to execute commands (either built-in or external)
-void	execute_command(char **args, t_node **env_lst)
+void	execute_command(char **command, t_args **args)
 {
-		const char *dir = (args[1] == NULL) ? getenv("HOME") : args[1];
+		const char *dir = (command[1] == NULL) ? getenv("HOME") : command[1];
 		//char **env;
 		//char **new;
 
-	if (args[0] == NULL) // No command entered
+	if (command[0] == NULL) // No command entered
 		return ;
 	// Built-in 'cd' command
-	if (strcmp(args[0], "cd") == 0)
+	if (strcmp(command[0], "cd") == 0)
 	{
 		if (dir == NULL || chdir(dir) != 0)
 			perror("cd error");
+		else {
+			free((*args)->current_directory);
+			(*args)->current_directory = getcwd(NULL, 0);
+		}
+	} else if (strcmp(command[0], "pwd") == 0)
+	{
+		printf("%s\n", (*args)->current_directory);
 	}
-	else if (strcmp(args[0], "env") == 0)
-		print_lst(env_lst);
-	else if (strcmp(args[0], "unset") == 0 && args[1] != NULL)
-		ft_unsetenv(env_lst, args[1]);
+	else if (strcmp(command[0], "env") == 0)
+		print_lst(&(*args)->env);
+	else if (strcmp(command[0], "unset") == 0 && command[1] != NULL)
+		ft_unsetenv(&(*args)->env, command[1]);
 	else
 	{
-		execute_external_command(args);
+		execute_external_command(command);
 	}
 }
 
@@ -146,11 +153,10 @@ void	execute_command(char **args, t_node **env_lst)
 void	parse_input(char *input, t_args **args)
 {
 	char	**command;
-	t_node **env_lst = &(*args)->env;
 
 	//print_lst(env_lst);
 	command = ft_split(input, ' ');
 		// Use your ft_split function to split the input by spaces
-	execute_command(command, env_lst);       // Execute the command with the arguments
+	execute_command(command, args);       // Execute the command with the arguments
 	free_split(command);            // Custom function to free memory of ft_split
 }
