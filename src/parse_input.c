@@ -136,10 +136,32 @@ void	execute_command(char **command, t_args **args)
 			(*args)->current_directory = getcwd(NULL, 0);
 		}
 	} else if (strcmp(command[0], "pwd") == 0)
-	{
 		printf("%s\n", (*args)->current_directory);
-	}
-	else if (strcmp(command[0], "env") == 0)
+	else if (strcmp(command[0], "echo") == 0) {
+		if (command[1] && strcmp(command[1], "-n") == 0)
+		{
+			int i = 2;
+			while (command[i])
+			{
+				printf("%s", command[i]);
+				if (command[i + 1])
+					printf(" ");
+				i++;
+			}
+		}
+		else
+		{
+			int i = 1;
+			while (command[i])
+			{
+				printf("%s", command[i]);
+				if (command[i + 1])
+					printf(" ");
+				i++;
+			}
+			printf("\n");
+		}
+	} else if (strcmp(command[0], "env") == 0)
 		print_lst(&(*args)->env);
 	else if (strcmp(command[0], "unset") == 0 && command[1] != NULL)
 		ft_unsetenv(&(*args)->env, command[1]);
