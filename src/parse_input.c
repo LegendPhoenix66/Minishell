@@ -79,11 +79,25 @@ void	execute_external_command(char **args)
 	char	buffer[1024];
 	ssize_t	bytes_read;
 
-	cmd_path = find_command_in_path(args[0]);
-	if (cmd_path == NULL)
+	if (args[0][0] == '/' || args[0][0] == '.')
 	{
-		write(2, "Command not found\n", 18);
-		return ;
+		// If it starts with '/' or '.', it is an absolute or relative path
+		if (access(args[0], X_OK) == 0)
+			cmd_path = strdup(args[0]); // Return a copy of the command if it is executable
+		else
+		{
+			write(2, "Command not found\n", 18);
+			return ;
+		}
+	}
+	else
+	{
+		cmd_path = find_command_in_path(args[0]);
+		if (cmd_path == NULL)
+		{
+			write(2, "Command not found\n", 18);
+			return ;
+		}
 	}
 
 	if (pipe(pipe_fd) == -1)
