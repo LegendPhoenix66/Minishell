@@ -96,7 +96,6 @@ char	*get_input(void)
 	}
 	else
 	{
-		write(1, "exit\n", 5); // Display "exit" on ctrl-D like bash
 		line = get_next_line(fileno(stdin));
 		char *trimmed_line = ft_strtrim(line, "\n");
 		free(line);
@@ -104,6 +103,7 @@ char	*get_input(void)
 	}
 	if (line == NULL)
 	{
+		write(1, "exit\n", 5); // Commented out to avoid printing to terminal
 		return (NULL);
 	}
 	// trim line
