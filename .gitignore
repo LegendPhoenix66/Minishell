@@ -7,3 +7,5 @@
 /libft/.vscode/
 *.o
 /libft/libft.a
+/minishell_tester/
+/42_minishell_tester/
