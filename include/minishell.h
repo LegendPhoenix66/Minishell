@@ -19,7 +19,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/wait.h>
-# include "libft.h"
+# include "../libft/libft.h"
 
 //for manipulation of environment variable
 typedef struct s_node
@@ -40,5 +40,7 @@ t_node  *init_lst(void);
 void    free_lst(t_node *top); //free linked list
 void    print_lst(t_node **top);//make env function in execute command
 int     ft_unsetenv(t_node **env_list, const char *var);//unset function
+
+char	*get_next_line(int fd);
 
 #endif //MINISHELL_H
