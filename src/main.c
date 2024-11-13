@@ -117,6 +117,7 @@ char	*get_input(void)
 void init_args(t_args *args)
 {
 	args->env = init_lst();
+	args->exit = 0;
 	args->current_directory = getcwd(NULL, 0);
 }
 
@@ -128,7 +129,7 @@ int	main(void)
 	args = malloc(sizeof(t_args));
 	init_args(args);
 	input = get_input();
-	while (input && ft_strncmp(input, "exit", 4) != 0)
+	while (input && args->exit == 0)
 	{
 		parse_input(input, &args);
 		free(input);

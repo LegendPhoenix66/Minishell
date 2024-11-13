@@ -140,6 +140,12 @@ void	execute_command(char **command, t_args **args)
 
 	if (command[0] == NULL) // No command entered
 		return ;
+
+	if (strcmp(command[0], "exit") == 0)
+	{
+		write(1, "exit\n", 5);
+		exit(command[1] ? ft_atoi(command[1]) : 0);
+	}
 	// Built-in 'cd' command
 	if (strcmp(command[0], "cd") == 0)
 	{

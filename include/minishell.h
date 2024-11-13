@@ -31,6 +31,7 @@ typedef struct s_node
 typedef struct s_args
 {
 	t_node *env;
+	int exit;
 	char *current_directory;
 } t_args;
 
