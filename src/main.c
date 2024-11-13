@@ -88,12 +88,22 @@ char	*get_input(void)
 	char	*line;
 	char	*prompt;
 
-	prompt = get_prompt();
-	line = readline(prompt);
-	free(prompt);
-	if (line == NULL) // Handle ctrl-D (EOF)
+	if (isatty(fileno(stdin)))
+	{
+		prompt = get_prompt();
+		line = readline(prompt);
+		free(prompt);
+	}
+	else
 	{
 		write(1, "exit\n", 5); // Display "exit" on ctrl-D like bash
+		line = get_next_line(fileno(stdin));
+		char *trimmed_line = ft_strtrim(line, "\n");
+		free(line);
+		line = trimmed_line;
+	}
+	if (line == NULL)
+	{
 		return (NULL);
 	}
 	// trim line
