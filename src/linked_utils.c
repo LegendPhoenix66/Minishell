@@ -34,9 +34,10 @@ t_node  *make_node(const char *env)
 }
 void    add_node(t_node **top, const char *env)
 {
-    t_node *new_node = make_node(env);
+    t_node *new_node;
     t_node *current;
 
+    new_node = make_node(env);
     if(new_node == NULL)
         return;
     if(*top == NULL)
@@ -47,6 +48,7 @@ void    add_node(t_node **top, const char *env)
         while (current->next != NULL)
             current = current->next;
         current->next = new_node;
+        new_node->next = NULL;
     }
 }
 t_node *init_lst(void)
@@ -88,4 +90,79 @@ void free_lst(t_node *top)
         free(tmp->env);
         free(tmp);
     }
+}
+void swap_nodes(t_node **top, t_node *prev)
+{
+    t_node *first;
+    t_node *second;
+
+    if(top == NULL || *top == NULL || (*top)->next == NULL)
+        return;
+    if(prev == NULL)
+    {
+        first = *top;
+        second = first->next;
+        first->next = second->next;
+        second->next = first;
+        *top = second;
+    }
+    else
+    {
+        first = prev->next;
+        if(first == NULL || first->next == NULL)
+            return;
+        second = first->next;
+        first->next = second->next;
+        second->next = first;
+        prev->next = second;
+    }
+}
+void sort_lst(t_node **top)
+{
+    int swaped;
+    t_node *current;
+    t_node *prev;
+    t_node *next;
+
+    if(top == NULL || *top == NULL || (*top)->next == NULL)
+        return;
+    swaped = 1;
+    while (swaped)
+    {
+        swaped = 0;
+        current = *top;
+        prev = NULL;
+        while (current->next != NULL)
+        {
+            next = current->next;
+            if(strcmp(current->env, next->env) > 0)
+            {
+                swap_nodes(top, prev);
+                swaped = 1;
+            }
+            if(prev == NULL)
+                prev = *top;
+            else
+                prev = prev->next;
+            current = prev->next;
+        }
+    }
+}
+t_node  *copy_list(t_node *original)
+{
+    t_node *new_node;
+
+    if(original == NULL)
+        return (NULL);
+    new_node = malloc(sizeof(t_node));
+    if(new_node == NULL)
+        return (NULL);
+    new_node->env = ft_strdup(original->env);
+    if(new_node->env == NULL)
+    {
+        free(new_node);
+        return (NULL);
+    } 
+    new_node->next = copy_list(original->next);
+    return (new_node);
 }

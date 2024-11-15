@@ -41,7 +41,10 @@ t_node  *init_lst(void);
 void    free_lst(t_node *top); //free linked list
 void    print_lst(t_node **top);//make env function in execute command
 int     ft_unsetenv(t_node **env_list, const char *var);//unset function
-
 char	*get_next_line(int fd);
+void    sort_lst(t_node **top); //sorting lst for export fonction
+t_node  *copy_list(t_node *original);
+void    add_node(t_node **top, const char *env);
+int     ft_export(const char *var, t_args **args);
 
 #endif //MINISHELL_H

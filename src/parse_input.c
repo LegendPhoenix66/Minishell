@@ -79,7 +79,7 @@ void	execute_external_command(char **args)
 	char	buffer[1024];
 	ssize_t	bytes_read;
 
-	if (args[0][0] == '/' || args[0][0] == '.')
+	if (args[0][0] == '/' || args[0][0] == '.') 
 	{
 		// If it starts with '/' or '.', it is an absolute or relative path
 		if (access(args[0], X_OK) == 0)
@@ -185,6 +185,10 @@ void	execute_command(char **command, t_args **args)
 		print_lst(&(*args)->env);
 	else if (strcmp(command[0], "unset") == 0 && command[1] != NULL)
 		ft_unsetenv(&(*args)->env, command[1]);
+	else if (strcmp(command[0], "export") == 0)
+	{
+		ft_export(command[1], args);
+	}
 	else
 	{
 		execute_external_command(command);
