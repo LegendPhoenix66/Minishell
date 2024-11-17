@@ -117,6 +117,8 @@ void init_args(t_args *args)
 	args->env = init_lst();
 	args->exit = 0;
 	args->current_directory = getcwd(NULL, 0);
+	args->tokens = init_lst();
+	args->flags = init_lst();
 }
 
 int	main(void)

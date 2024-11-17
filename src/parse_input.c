@@ -131,12 +131,22 @@ void	execute_external_command(char **args)
 	}
 	free(cmd_path); // Free the full path allocated
 }
+
 // Function to execute commands (either built-in or external)
-void	execute_command(char **command, t_args **args)
+void execute_command(t_args **args)
 {
-		const char *dir = (command[1] == NULL) ? getenv("HOME") : command[1];
-		//char **env;
-		//char **new;
+    t_node *token_node = (*args)->tokens;
+    t_node *flag_node = (*args)->flags;
+    char *command[1024];
+    int i = 0;
+
+    // Convert tokens linked list to an array
+    while (token_node)
+    {
+        command[i++] = token_node->content;
+        token_node = token_node->next;
+    }
+    command[i] = NULL;
 
 	if (command[0] == NULL) // No command entered
 		return ;
@@ -146,45 +156,53 @@ void	execute_command(char **command, t_args **args)
 		write(1, "exit\n", 5);
 		exit(command[1] ? ft_atoi(command[1]) : 0);
 	}
-	// Built-in 'cd' command
-	if (strcmp(command[0], "cd") == 0)
+	else if (strcmp(command[0], "cd") == 0)
 	{
+		const char *dir = (command[1] == NULL) ? getenv("HOME") : command[1];
 		if (dir == NULL || chdir(dir) != 0)
 			perror("cd error");
-		else {
+        else
+        {
 			free((*args)->current_directory);
 			(*args)->current_directory = getcwd(NULL, 0);
 		}
-	} else if (strcmp(command[0], "pwd") == 0)
+    }
+    else if (strcmp(command[0], "pwd") == 0)
+    {
 		printf("%s\n", (*args)->current_directory);
-	else if (strcmp(command[0], "echo") == 0) {
-		if (command[1] && strcmp(command[1], "-n") == 0)
+    }
+	else if (strcmp(command[0], "echo") == 0)
+	{
+		int i = 1;
+		int newline = 1;
+
+		// Check for the -n flag
+		if (flag_node && strcmp(flag_node->content, "-n") == 0)
 		{
-			int i = 2;
-			while (command[i])
-			{
-				printf("%s", command[i]);
-				if (command[i + 1])
-					printf(" ");
-				i++;
-			}
+			newline = 0;
+			flag_node = flag_node->next; // Move to the next flag if any
 		}
-		else
+
+		// Print the arguments
+		while (command[i])
 		{
-			int i = 1;
-			while (command[i])
-			{
-				printf("%s", command[i]);
-				if (command[i + 1])
-					printf(" ");
-				i++;
-			}
+			printf("%s", command[i]);
+			if (command[i + 1])
+				printf(" ");
+			i++;
+		}
+
+		if (newline)
 			printf("\n");
-		}
-	} else if (strcmp(command[0], "env") == 0)
+	}
+    else if (strcmp(command[0], "env") == 0)
+    {
 		print_lst(&(*args)->env);
+    }
 	else if (strcmp(command[0], "unset") == 0 && command[1] != NULL)
+    {
 		ft_unsetenv(&(*args)->env, command[1]);
+    }
 	else if (strcmp(command[0], "export") == 0)
 	{
 		ft_export(command[1], args);
@@ -198,11 +216,8 @@ void	execute_command(char **command, t_args **args)
 // Example parsing input into tokens
 void	parse_input(char *input, t_args **args)
 {
-	char	**command;
 
 	//print_lst(env_lst);
-	command = ft_split(input, ' ');
-		// Use your ft_split function to split the input by spaces
-	execute_command(command, args);       // Execute the command with the arguments
-	free_split(command);            // Custom function to free memory of ft_split
+	tokenize_input(input, args);
+	execute_command(args);       // Execute the command with the arguments
 }
