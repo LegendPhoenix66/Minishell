@@ -106,9 +106,7 @@ char	*get_input(void)
 		write(1, "exit\n", 5); // Commented out to avoid printing to terminal
 		return (NULL);
 	}
-	// trim line
 	ft_strtrim1(line);
-	// add line to history (if it's not an empty line)
 	if (*line)
 		add_history(line);
 	return (line);

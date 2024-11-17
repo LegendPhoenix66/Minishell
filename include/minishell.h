@@ -24,7 +24,7 @@
 //for manipulation of environment variable
 typedef struct s_node
 {
-    char *env;
+    char *content;
     struct s_node *next;
 } t_node;
 

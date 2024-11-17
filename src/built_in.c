@@ -30,13 +30,13 @@ int ft_unsetenv(t_node **env_list, const char *var)
     previous = NULL;
     while (current != NULL)
     {
-        if (strncmp(current->env, var, len) == 0 && current->env[len] == '=')
+        if (strncmp(current->content, var, len) == 0 && current->content[len] == '=')
         {
             if (previous == NULL)
                 *env_list = current->next;
             else
                 previous->next = current->next;
-            free(current->env);
+            free(current->content);
             free(current);
             return (0);
         }

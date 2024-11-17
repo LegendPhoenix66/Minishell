@@ -77,7 +77,7 @@ void print_export(t_args **args)
     sort_lst(&copy);
     while (copy != NULL)
     {
-        add_double_quotes(copy->env);
+        add_double_quotes(copy->content);
         copy = copy->next;
     }
     free_lst(copy);

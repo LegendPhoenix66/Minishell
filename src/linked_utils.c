@@ -22,8 +22,8 @@ t_node  *make_node(const char *env)
         perror("malloc error");
         return (NULL);
     }
-    new_node->env = ft_strdup(env);
-    if(new_node->env == NULL)
+    new_node->content = ft_strdup(env);
+    if(new_node->content == NULL)
     {
         perror("ft_strdup error");
         free(new_node);
@@ -75,7 +75,7 @@ void print_lst(t_node **top)
 
     while (current != NULL)
     {
-        printf("%s\n", current->env);
+        printf("%s\n", current->content);
         current = current->next;
     }
 }
@@ -87,7 +87,7 @@ void free_lst(t_node *top)
     {
         tmp = top;
         top = top->next;
-        free(tmp->env);
+        free(tmp->content);
         free(tmp);
     }
 }
@@ -135,7 +135,7 @@ void sort_lst(t_node **top)
         while (current->next != NULL)
         {
             next = current->next;
-            if(strcmp(current->env, next->env) > 0)
+            if(strcmp(current->content, next->content) > 0)
             {
                 swap_nodes(top, prev);
                 swaped = 1;
@@ -157,8 +157,8 @@ t_node  *copy_list(t_node *original)
     new_node = malloc(sizeof(t_node));
     if(new_node == NULL)
         return (NULL);
-    new_node->env = ft_strdup(original->env);
-    if(new_node->env == NULL)
+    new_node->content = ft_strdup(original->content);
+    if(new_node->content == NULL)
     {
         free(new_node);
         return (NULL);
