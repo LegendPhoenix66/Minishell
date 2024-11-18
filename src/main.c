@@ -120,7 +120,6 @@ void init_args(t_args *args)
 	args->tokens = init_lst();
 	args->flags = init_lst();
 }
-
 int	main(void)
 {
 	char	*input;
@@ -137,5 +136,7 @@ int	main(void)
 	}
 	free(input);
 	free_lst(args->env);
+	free_lst(args->tokens);
+	free_lst(args->flags);
 	return (0);
 }

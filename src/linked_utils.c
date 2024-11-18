@@ -148,6 +148,35 @@ void sort_lst(t_node **top)
         }
     }
 }
+//useful when export define a already existing variable
+void remove_if(t_node **top, const char *var_name)
+{
+    t_node *current = *top;
+    t_node *previous = NULL;
+    t_node *to_remove;
+
+    if (*top == NULL)
+        return;
+    while (current != NULL) 
+    {
+        if (strncmp(current->content, var_name, strchr(var_name, '=') - var_name) == 0)
+        {
+            to_remove = current;
+            if (previous == NULL)
+                *top = current->next; 
+            else 
+                previous->next = current->next;
+            current = current->next;
+            free(to_remove->content);
+            free(to_remove);
+        }
+        else 
+        {
+            previous = current;
+            current = current->next;
+        }
+    }
+}
 t_node  *copy_list(t_node *original)
 {
     t_node *new_node;

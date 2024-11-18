@@ -14,10 +14,15 @@
 
 void print_export(t_args **args);
 void add_or_update(const char *var, t_node **env_list);
+int check_in(const char *var);
+int quotes(const char *var);
+char *remove_quotes(const char *var);
+int find_equal(const char *var);
 
 int ft_export(const char *var, t_args **args)
 {
     int i;
+    int qt;
 
     i = 1;
     if (var == NULL || *var == '\0')
@@ -25,18 +30,20 @@ int ft_export(const char *var, t_args **args)
         print_export(args);
         return (0);
     }
-    printf("%s\n", var);
-    if (ft_isalpha(var[0]) || var[0] == '_' || ((var[0]) == '"' && var[ft_strlen(var) - 1] == '"'))
+    qt = quotes(var);
+    //printf("quotes vaut %d\n", qt);
+    //printf("%s\n", var);
+
+    //remove quotes if variable name is in
+    if(var[0] == '"' && var[find_equal(var) - 1] == '"')
+        var = remove_quotes(var); //attention cette fonction malloc 
+    if (check_in(var))
     {
         while (ft_isalnum(var[i]) || var[i] == '=' || var[i] == '_')
         {
             if (var[i] == '=')
             {
                 add_or_update(var, &(*args)->env);
-                //checker la validiter de ce qu' il y a apres le egale
-                //creation de la nouvelle variable qui ce repercute
-                //au processus enfant et existe dans le processus parent
-                //si ""=value test" la variable s' appelera just "value"
                 return (0);
             }
             i++;
@@ -53,7 +60,18 @@ int ft_export(const char *var, t_args **args)
     printf("premier caractere invalide");
     return (-1);
 }
-
+//check the validity of export arg (first charactere of argument)
+int check_in(const char *var)
+{
+    if (ft_isalpha(var[0]))
+        return (1);
+    else if (var[0] == '_')
+        return (1);
+    else if ((var[0]) == '"' && var[ft_strlen(var) - 1] == '"')
+        return (1);
+    return (0);
+}
+//add double quotes for eexport printing
 void add_double_quotes(char *var)
 {
     int i;
@@ -69,18 +87,21 @@ void add_double_quotes(char *var)
     write(1, "\"", 1);
     write(1, "\n", 1);
 }
+//printing for export fonction
 void print_export(t_args **args)
 {
     t_node *copy;
+    t_node *head;
 
     copy = copy_list((*args)->env);
     sort_lst(&copy);
+    head = copy;
     while (copy != NULL)
     {
         add_double_quotes(copy->content);
         copy = copy->next;
     }
-    free_lst(copy);
+    free_lst(head);
 }
 void add_or_update(const char *var, t_node **env_list)
 {
@@ -98,157 +119,86 @@ void add_or_update(const char *var, t_node **env_list)
         //the variable name is in double quotes
         if(equal[i] == '"' && equal[ft_strlen(equal) - 1] == '"')
         {
-            equal[ft_strlen(equal)] = '\0';
-            i++;
-            printf("condition variable name in double quotes\n");
+            name = remove_quotes(name); 
+            add_node(env_list, name);
+            free(name);
         }
         // all after the export fonction is in doubles quotes
         else if(name[0] == '"' && name[ft_strlen(name) - 1] == '"')
         {
             printf("all name in double quotes\n");
         }
-        //no variable name after =
-        else if(ft_strlen(equal) == 1 && equal[0] == '=')
+        //no variable name after = or varible name after =
+        else if((ft_strlen(equal) == 1 && equal[0] == '=') || quotes(var) == 0)
         {
+            //to replace if variable already in list
+            remove_if(env_list, name);
             add_node(env_list, name);
+            free(name);
         }
     }
 }
+int find_equal(const char *var)
+{
+    int i;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
-// Fonction pour ajouter ou modifier une variable dans la liste chaînée
-void add_or_update_var(const char *var, t_node **env_list) {
-    // Extraire le nom de la variable et sa valeur
-    char *name = strdup(var); // Copie de `var` pour modification
-    char *equal_pos = strchr(name, '=');
-    
-    if (equal_pos) {
-        // Séparer le nom de la valeur
-        *equal_pos = '\0'; // Coupure à `=`
-        char *value = equal_pos + 1;
-
-        // Vérifier si la valeur est entourée de guillemets et les retirer
-        if (*value == '"' && value[strlen(value) - 1] == '"') {
-            value[strlen(value) - 1] = '\0'; // Retirer le guillemet de fin
-            value++; // Avancer le pointeur pour ignorer le premier guillemet
-        }
-
-        // Créer une nouvelle chaîne avec la forme "name=value"
-        size_t new_var_len = strlen(name) + strlen(value) + 2; // +2 pour `=` et `\0`
-        char *new_var = malloc(new_var_len);
-        if (!new_var) {
-            free(name);
-            return; // Gérer l'échec de l'allocation
-        }
-        snprintf(new_var, new_var_len, "%s=%s", name, value);
-
-        // Ajouter ou mettre à jour la variable dans la liste chaînée
-        t_node *current = *env_list;
-        while (current) {
-            if (strncmp(current->env, name, equal_pos - name) == 0 && current->env[equal_pos - name] == '=') {
-                // Mettre à jour la variable existante
-                free(current->env);
-                current->env = new_var;
-                free(name);
-                return;
-            }
-            current = current->next;
-        }
-
-        // Ajouter la nouvelle variable si elle n'existe pas
-        t_node *new_node = malloc(sizeof(t_node));
-        if (!new_node) {
-            free(name);
-            free(new_var);
-            return; // Gérer l'échec de l'allocation
-        }
-        new_node->env = new_var;
-        new_node->next = *env_list;
-        *env_list = new_node;
-
-        free(name);
+    i = 0;
+    while(var[i] != '=')
+        i++;
+    if(var[i] == '=')
+    {
+        printf("i vaut %d\n", i);
+        return (i);
     }
-}
-
-// Mise à jour de la partie `if (var[i] == '=')` dans `ft_export`
-int ft_export(const char *var, t_args **args) {
-    int i = 1;
-    if (var == NULL || *var == '\0') {
-        print_export(args);
-        return (0);
-    }
-    printf("%s\n", var);
-    if (ft_isalpha(var[0]) || var[0] == '_') {
-        while (ft_isalnum(var[i]) || var[i] == '=' || var[i] == '_') {
-            if (var[i] == '=') {
-                // Appeler la fonction pour ajouter ou mettre à jour la variable
-                add_or_update_var(var, &(*args)->env);
-                return (0);
-            }
-            i++;
-        }
-        if (var[i] == '\0') {
-            printf("variable facultative");
-            return (0);
-        }
-        printf("invalide");
+    else
         return (-1);
+}
+//to know if doubles quotes are around variable name or variable value
+//et if opened double quotes are also close
+int quotes(const char *var)
+{
+    int i;
+    int nb_quotes;
+
+    i = 0;
+    nb_quotes = 0;
+    while(var[i])
+    {
+        if(var[i] == '"')
+            nb_quotes++;
+        i++;
     }
-    printf("premier caractere invalide");
-    return (-1);
-}*/
+    if(nb_quotes % 2 != 0)
+        return (0);
+    else if(var[0] == '"' && var[find_equal(var) - 1] == '"' )
+    {
+        printf("first argument in double quotes\n");
+        return (1);
+    }
+    else if(var[find_equal(var) + 1] == '"' && var[ft_strlen(var) - 1] == '"')
+    {
+        printf("second argument in double quotes\n");
+        return (2);
+    }
+    return (0);
+}
+//for ignore quotes for export fonction 
+char *remove_quotes(const char *var)
+{
+    int i;
+    int j;
+    char *new;
+
+    i = 0;
+    j = 0;
+    new = malloc(sizeof(char) * ft_strlen(var) - 1);
+    while (var[i])
+    {
+        if (var[i] == '"')
+            i++;
+        new[j++] = var[i++];
+    }
+    new[j] = '\0';
+    //printf("new: %s\n", new);
+    return (new);
+}
