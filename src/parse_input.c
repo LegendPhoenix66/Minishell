@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 20:46:54 by lhopp             #+#    #+#             */
-/*   Updated: 2024/10/09 15:34:18 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/11/27 11:26:07 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,19 +135,21 @@ void	execute_external_command(char **args)
 // Function to execute commands (either built-in or external)
 void execute_command(t_args **args)
 {
-    t_node *token_node = (*args)->tokens;
-    t_node *flag_node = (*args)->flags;
-    char *command[1024];
-    int i = 0;
+	t_node		*token_node;
+	char		*command[1024] = {NULL};
+	int			i;
+	const char	*dir = (command[1] == NULL) ? getenv("HOME") : command[1];
+	int			newline;
 
-    // Convert tokens linked list to an array
-    while (token_node)
-    {
-        command[i++] = token_node->content;
-        token_node = token_node->next;
-    }
-    command[i] = NULL;
-
+	token_node = (*args)->tokens;
+	i = 0;
+	// Convert tokens linked list to an array
+	while (token_node)
+	{
+		command[i++] = token_node->content;
+		token_node = token_node->next;
+	}
+	command[i] = NULL;
 	if (command[0] == NULL) // No command entered
 		return ;
 
@@ -173,14 +175,13 @@ void execute_command(t_args **args)
     }
 	else if (strcmp(command[0], "echo") == 0)
 	{
-		int i = 1;
-		int newline = 1;
-
+		i = 1;
+		newline = 1;
 		// Check for the -n flag
-		if (flag_node && strcmp(flag_node->content, "-n") == 0)
+		if (token_node && strcmp(token_node->content, "-n") == 0)
 		{
 			newline = 0;
-			flag_node = flag_node->next; // Move to the next flag if any
+			token_node = token_node->next; // Move to the next flag if any
 		}
 
 		// Print the arguments
