@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2024/09/30 16:52:46 by lhopp            ###   ########.fr       */
+/*   Updated: 2024/11/27 12:21:56 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,19 +37,20 @@ typedef struct s_args
 	t_node *flags;
 } t_args;
 
-void	parse_input(char *input, t_args **args);
-void	execute_command(t_args **args);
-t_node  *init_lst(void);
-void    free_lst(t_node *top); //free linked list
-void    print_lst(t_node **top);//make env function in execute command
-int     ft_unsetenv(t_node **env_list, const char *var);//unset function
-char	*get_next_line(int fd);
-void    sort_lst(t_node **top); //sorting lst for export fonction
-t_node  *copy_list(t_node *original);
-void    add_node(t_node **top, const char *env);
-int 	find_equal(const char *var);
-void    remove_if(t_node **top, const char *var_name);
-int     ft_export(const char *var, t_args **args);
-void	tokenize_input(const char *input, t_args **args);
+void				parse_input(char *input, t_args **args);
+void				execute_command(t_args **args);
+t_node				*init_lst(void);
+void				free_lst(t_node *top);
+void				print_lst(t_node **top);
+void				print_list_debug(t_node **top);
+int					ft_unsetenv(t_node **env_list, const char *var);
+char				*get_next_line(int fd);
+void				sort_lst(t_node **top);
+t_node				*copy_list(t_node *original);
+void				add_node(t_node **top, const char *env);
+int					find_equal(const char *var);
+void				remove_if(t_node **top, const char *var_name);
+int					ft_export(const char *var, t_args **args);
+void				tokenize_input(const char *input, t_args **args);
 
 #endif //MINISHELL_H
