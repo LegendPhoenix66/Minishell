@@ -21,7 +21,7 @@
 # include <sys/wait.h>
 # include "../libft/libft.h"
 
-//for manipulation of environment variable
+// for manipulation of environment variable
 typedef struct s_node
 {
     char *content;
@@ -30,12 +30,11 @@ typedef struct s_node
 
 typedef struct s_args
 {
-	t_node *env;
-	int exit;
-	char *current_directory;
-	t_node *tokens;
-	t_node *flags;
-} t_args;
+	t_node			*env;
+	int				exit;
+	char			*current_directory;
+	t_node			*tokens;
+}					t_args;
 
 void				parse_input(char *input, t_args **args);
 void				execute_command(t_args **args);
@@ -53,4 +52,4 @@ void				remove_if(t_node **top, const char *var_name);
 int					ft_export(const char *var, t_args **args);
 void				tokenize_input(const char *input, t_args **args);
 
-#endif //MINISHELL_H
+#endif // MINISHELL_H
