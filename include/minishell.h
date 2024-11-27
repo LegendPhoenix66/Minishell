@@ -19,13 +19,19 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/wait.h>
+# include <fcntl.h>
 # include "../libft/libft.h"
 
 // for manipulation of environment variable
 typedef struct s_node
 {
-    char *content;
-    struct s_node *next;
+	char *content;
+	int in_single;
+	int in_double;
+	int interpret;
+	int no_interp;
+	int is_cmd;
+	struct s_node *next;
 } t_node;
 
 typedef struct s_args
