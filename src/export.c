@@ -22,7 +22,6 @@ int		find_equal(const char *var);
 int	ft_export(const char *var, t_args **args)
 {
 	int	i;
-	//int	qt;
 
 	i = 1;
 	if (var == NULL || *var == '\0')
@@ -30,9 +29,6 @@ int	ft_export(const char *var, t_args **args)
 		print_export(args);
 		return (0);
 	}
-//	qt = quotes(var);
-//	 printf("quotes vaut %d\n", qt);
-//	 printf("%s\n", var);
 //	 remove quotes if variable name is in
 	if (var[0] == '"' && var[find_equal(var) - 1] == '"')
 		var = remove_quotes(var); // attention cette fonction malloc

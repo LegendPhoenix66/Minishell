@@ -100,6 +100,7 @@ void	free_lst(t_node *top)
 		free(tmp);
 	}
 }
+
 void	swap_nodes(t_node **top, t_node *prev)
 {
 	t_node	*first;

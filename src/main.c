@@ -119,6 +119,7 @@ void init_args(t_args *args)
 	args->current_directory = getcwd(NULL, 0);
 	args->tokens = NULL;
 }
+
 int	main(void)
 {
 	char	*input;

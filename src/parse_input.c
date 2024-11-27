@@ -168,6 +168,8 @@ void	execute_command(t_args **args)
 		{
 			free((*args)->current_directory);
 			(*args)->current_directory = getcwd(NULL, 0);
+			if ((*args)->current_directory == NULL)
+				perror("getcwd error");
 		}
 	}
 	else if (strcmp(command[0], "pwd") == 0)
