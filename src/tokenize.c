@@ -18,6 +18,10 @@ void	add_token(t_node **list, const char *token, int length)
 	t_node	*current;
 
 	new_node = malloc(sizeof(t_node));
+	if (!new_node) {
+		perror("malloc error");
+		exit(EXIT_FAILURE);
+	}
 	new_node->content = strndup(token, length);
 	new_node->next = NULL;
 	if (*list == NULL)
@@ -41,34 +45,38 @@ void error(const char *msg)
 	exit(EXIT_FAILURE);
 }
 
+void handle_quotes(const char *input, int *i, t_node **tokens) {
+	char quote = input[*i];
+	int start = *i + 1;
+	(*i)++;
+	while (input[*i] && input[*i] != quote) {
+		(*i)++;
+	}
+	if (input[*i] != quote) {
+		error("Unmatched quote");
+	}
+	add_token(tokens, input + start, *i - start);
+	(*i)++;
+}
+
 void tokenize_input(const char *input, t_args **args)
 {
-	char quote;
-	int i, j, start;
-
-	i = 0;
-	j = 0;
-	quote = 0;
+	int i = 0;
+	int j = 0;
 	(*args)->tokens = NULL;
+
 	while (input[i])
 	{
 		if (input[i] == '\'' || input[i] == '\"')
 		{
-			quote = input[i];
-			start = i;
-			i++;
-			while (input[i] && input[i] != quote)
-				i++;
-			if (input[i] != quote)
+			if (j > 0)
 			{
-				error("Unmatched quote");
-				return;
+				add_token(&(*args)->tokens, input + i - j, j);
+				j = 0;
 			}
-			add_token(&(*args)->tokens, input + start, i - start + 1);
-			i++;
-			j = 0;
+			handle_quotes(input, &i, &(*args)->tokens);
 		}
-		else if ((input[i] == ' ' && quote == 0) || input[i] == '|' || input[i] == '<' || input[i] == '>')
+		else if (input[i] == ' ' || input[i] == '|' || input[i] == '<' || input[i] == '>')
 		{
 			if (j > 0)
 			{
