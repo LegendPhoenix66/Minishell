@@ -121,25 +121,44 @@ void name_token(t_node **top)
 void no_quotes(t_node **top)
 {
     t_node *current;
-    current = *top;
 	char *new_content;
 
+    current = *top;
     while (current != NULL)
     {
         if (current->content[0] == '\"' && current->content[strlen(current->content) - 1] == '\"')
         {
-            new_content = strdup(current->content + 1);
+            new_content = ft_strdup(current->content + 1);
             new_content[strlen(new_content) - 1] = '\0'; 
             free(current->content);
             current->content = new_content; 
         }
         else if (current->content[0] == '\'' && current->content[strlen(current->content) - 1] == '\'')
         {
-            char *new_content = strdup(current->content + 1); 
+            new_content = ft_strdup(current->content + 1); 
             new_content[strlen(new_content) - 1] = '\0';      
             free(current->content);
             current->content = new_content;
         }
         current = current->next;
     }
+}
+//don' work for the moment
+void is_cmd(t_node **top)
+{
+	t_node *current;
+	char *is_cmd;
+
+	current = *top;
+	while (current != NULL)
+	{
+		is_cmd = find_commande_in_path(current->content);
+		if (is_cmd == NULL)
+			current = current->next;
+		else
+		{
+			current->is_cmd = 1;
+			current = current->next;
+		}
+	}
 }
