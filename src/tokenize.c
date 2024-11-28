@@ -92,7 +92,7 @@ void tokenize_input(const char *input, t_args **args)
 		add_token(&(*args)->tokens, input + i - j, j);
 	}
 }
-
+//tell if in single or double quotes
 void name_token(t_node **top)
 {
 	t_node *current;
