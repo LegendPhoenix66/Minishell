@@ -92,3 +92,54 @@ void tokenize_input(const char *input, t_args **args)
 		add_token(&(*args)->tokens, input + i - j, j);
 	}
 }
+
+void name_token(t_node **top)
+{
+	t_node *current;
+
+	current = *top;
+	while (current != NULL)
+	{
+		if(current->content[0] == '\"' && current->content[ft_strlen(current->content) - 1] == '\"')
+		{
+			current->in_double = 1;
+			printf("variable in double quotes\n");
+		}
+		if(current->content[0] == '\'' && current->content[ft_strlen(current->content) - 1] == '\'')
+		{
+			current->in_single = 1;
+			printf("variable in single quotes\n");
+		}
+		else
+		{
+			current->no_quotes = 1;
+			printf("no quotes around\n");
+		}
+		current = current->next;	
+	}
+}
+void no_quotes(t_node **top)
+{
+    t_node *current;
+    current = *top;
+	char *new_content;
+
+    while (current != NULL)
+    {
+        if (current->content[0] == '\"' && current->content[strlen(current->content) - 1] == '\"')
+        {
+            new_content = strdup(current->content + 1);
+            new_content[strlen(new_content) - 1] = '\0'; 
+            free(current->content);
+            current->content = new_content; 
+        }
+        else if (current->content[0] == '\'' && current->content[strlen(current->content) - 1] == '\'')
+        {
+            char *new_content = strdup(current->content + 1); 
+            new_content[strlen(new_content) - 1] = '\0';      
+            free(current->content);
+            current->content = new_content;
+        }
+        current = current->next;
+    }
+}

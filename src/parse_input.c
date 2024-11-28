@@ -220,5 +220,7 @@ void	parse_input(char *input, t_args **args)
 {
 	tokenize_input(input, args);
 	print_list_debug(&(*args)->tokens);
+	name_token(&(*args)->tokens);
+	no_quotes(&(*args)->tokens);
 	execute_command(args); // Execute the command with the arguments
 }

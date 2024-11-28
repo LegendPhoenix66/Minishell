@@ -28,8 +28,7 @@ typedef struct s_node
 	char *content;
 	int in_single;
 	int in_double;
-	int interpret;
-	int no_interp;
+	int no_quotes;
 	int is_cmd;
 	struct s_node *next;
 } t_node;
@@ -57,5 +56,7 @@ int					find_equal(const char *var);
 void				remove_if(t_node **top, const char *var_name);
 int					ft_export(const char *var, t_args **args);
 void				tokenize_input(const char *input, t_args **args);
+void				name_token(t_node **top);
+void				no_quotes(t_node **top);
 
 #endif // MINISHELL_H
