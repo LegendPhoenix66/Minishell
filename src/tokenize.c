@@ -100,6 +100,35 @@ void tokenize_input(const char *input, t_args **args)
 		add_token(&(*args)->tokens, input + i - j, j);
 	}
 }
+
+void tokenize_input2(const char *input, t_args **args)
+{
+	args = args;
+	t_node *temp_tokens = NULL;
+	int i = 0;
+	while (input[i]) {
+		if (input[i] == ' ') {
+			add_token(&temp_tokens, input, i);
+			input += i + 1;
+			i = 0;
+		} else if (input[i] == '\"' || input[i] == '\'') {
+			char quote = input[i];
+			int j = i + 1;
+			while (input[j] && input[j] != quote) {
+				j++;
+			}
+			if (!input[j]) {
+				error("Unmatched quote");
+			}
+			i = j + 1;
+		} else {
+			i++;
+		}
+	}
+	add_token(&temp_tokens, input, i);
+	(*args)->tokens = temp_tokens;
+}
+
 //tell if in single or double quotes
 void name_token(t_node **top)
 {
