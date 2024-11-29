@@ -22,6 +22,15 @@
 # include <fcntl.h>
 # include "../libft/libft.h"
 
+typedef enum e_dir
+{
+	STDOUT, //>
+	APPEND, //>>
+	STDIN,  //<
+	HEREDOC, //<<
+	NO_DIR
+} t_dir;
+
 // for manipulation of environment variable
 typedef struct s_node
 {
@@ -30,6 +39,8 @@ typedef struct s_node
 	int in_double;
 	int no_quotes;
 	int is_cmd;
+	int is_out;
+	t_dir type;
 	struct s_node *next;
 } t_node;
 
@@ -58,5 +69,9 @@ int					ft_export(const char *var, t_args **args);
 void				tokenize_input(const char *input, t_args **args);
 void				name_token(t_node **top);
 void				no_quotes(t_node **top);
+void				debug_list(t_node **head);
+char				*find_command_in_path(char *cmd);
+void 				is_cmd(t_node **top);
+void				parse_redirections(t_node **top);
 
 #endif // MINISHELL_H
