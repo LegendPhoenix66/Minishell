@@ -246,7 +246,8 @@ void tokenize_input2(const char *input, t_args **args)
 	(*args)->tokens = tokens_with_pipes;
 }
 
-//tell if in single or double quotes
+//tell if in single or double quotes or no quotes
+// and them put good variable at 1 in structure
 void name_token(t_node **top)
 {
 	t_node *current;
@@ -272,6 +273,8 @@ void name_token(t_node **top)
 		current = current->next;	
 	}
 }
+//now we know wath is in quotes or not them we can remove quotes
+//for tokenize the rest
 void no_quotes(t_node **top)
 {
     t_node *current;
@@ -297,7 +300,8 @@ void no_quotes(t_node **top)
         current = current->next;
     }
 }
-//don' work for the moment
+//this fonction just tell me if is a shell cmd or not
+//and if it is put the good variable at 1.
 void is_cmd(t_node **top)
 {
 	t_node *current;
@@ -306,7 +310,7 @@ void is_cmd(t_node **top)
 	current = *top;
 	while (current != NULL)
 	{
-		is_cmd = find_commande_in_path(current->content);
+		is_cmd = find_command_in_path(current->content);
 		if (is_cmd == NULL)
 			current = current->next;
 		else
@@ -316,3 +320,24 @@ void is_cmd(t_node **top)
 		}
 	}
 }
+void parse_redirections(t_node **top)
+{
+    t_node *current;
+
+	current = *top;
+    while (current != NULL)
+    {
+        if (strcmp(current->content, ">") == 0)
+            current->type = STDOUT;
+        else if (strcmp(current->content, ">>") == 0)
+            current->type = APPEND;
+        else if (strcmp(current->content, "<") == 0)
+            current->type = STDIN;
+        else if (strcmp(current->content, "<<") == 0)
+            current->type = HEREDOC;
+        else
+            current->type = NO_DIR;
+        current = current->next;
+    }
+}
+

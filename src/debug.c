@@ -12,6 +12,7 @@
 
 #include "../include/minishell.h"
 
+// Fonction de debug pour un seul nœud
 void debug_node(t_node *node) 
 {
     if (!node) 
@@ -40,6 +41,30 @@ void debug_node(t_node *node)
     else 
     {
         printf("Quotes: Undefined or mixed state\n");
+    }
+
+    // Vérification du type de redirection
+    printf("Redirection type: ");
+    switch (node->type) 
+    {
+        case STDOUT:
+            printf("STDOUT (>)\n");
+            break;
+        case APPEND:
+            printf("APPEND (>>)\n");
+            break;
+        case STDIN:
+            printf("STDIN (<)\n");
+            break;
+        case HEREDOC:
+            printf("HEREDOC (<<)\n");
+            break;
+        case NO_DIR:
+            printf("NO_DIR (not a redirection)\n");
+            break;
+        default:
+            printf("Unknown type\n");
+            break;
     }
 
     // Suivi de la chaîne des nœuds si elle existe
