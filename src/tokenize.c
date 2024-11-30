@@ -104,11 +104,11 @@ void tokenize_input(const char *input, t_args **args)
 void tokenize_input2(const char *input, t_args **args)
 {
 	args = args;
-	t_node *temp_tokens = NULL;
+	t_node *parsed_tokens = NULL;
 	int i = 0;
 	while (input[i]) {
 		if (input[i] == ' ') {
-			add_token(&temp_tokens, input, i);
+			add_token(&parsed_tokens, input, i);
 			input += i + 1;
 			i = 0;
 		} else if (input[i] == '\"' || input[i] == '\'') {
@@ -125,8 +125,57 @@ void tokenize_input2(const char *input, t_args **args)
 			i++;
 		}
 	}
-	add_token(&temp_tokens, input, i);
-	(*args)->tokens = temp_tokens;
+	add_token(&parsed_tokens, input, i);
+
+	// check every token for pipes or redirects (not in quotes)
+	t_node *tokens_with_pipes = NULL;
+	t_node *current = parsed_tokens;
+	while (current) {
+		i = 0;
+		int pipe_pos = -1;
+		while (current->content[i]) {
+			if (current->content[i] == '\"' || current->content[i] == '\'') {
+				char quote = current->content[i];
+				i++;
+				while (current->content[i] != quote) {
+					i++;
+				}
+				i++;
+			}
+			if (current->content[i] == '|') {
+				if (ft_strlen(current->content) == 1) {
+					break;
+				}
+				add_token(&tokens_with_pipes, current->content, i);
+				add_token(&tokens_with_pipes, current->content + i, 1);
+				pipe_pos = i;
+			}
+			if (current->content[i] == '<' || current->content[i] == '>') {
+				if (current->content[i + 1] == current->content[i]) {
+					if (ft_strlen(current->content) == 2) {
+						break;
+					}
+					add_token(&tokens_with_pipes, current->content, i);
+					add_token(&tokens_with_pipes, current->content + i, 2);
+					pipe_pos = i + 1;
+					i++;
+				} else {
+					if (ft_strlen(current->content) == 1) {
+						break;
+					}
+					add_token(&tokens_with_pipes, current->content, i);
+					add_token(&tokens_with_pipes, current->content + i, 1);
+					pipe_pos = i;
+				}
+			}
+			i++;
+		}
+		add_token(&tokens_with_pipes, current->content + pipe_pos + 1, ft_strlen(current->content) - pipe_pos - 1);
+		// add last token
+		current = current->next;
+	}
+
+	(*args)->tokens = tokens_with_pipes;
 }
 
 //tell if in single or double quotes
