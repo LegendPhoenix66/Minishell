@@ -175,6 +175,74 @@ void tokenize_input2(const char *input, t_args **args)
 		current = current->next;
 	}
 
+	// clean-up quotes and interpret $
+	current = tokens_with_pipes;
+	while (current) {
+		char *new_content = NULL;
+		i = 0;
+		int j = 0;
+		while (current->content[i]) {
+			if (current->content[i] == '\"') {
+				i++;
+				while (current->content[i] && current->content[i] != '\"') {
+					if (current->content[i] == '$') {
+						// Handle variable substitution
+						i++;
+						int var_start = i;
+						while (current->content[i] && current->content[i] != ' ' && current->content[i] != '\"') {
+							i++;
+						}
+						char var_name[i - var_start + 1];
+						strncpy(var_name, &current->content[var_start], i - var_start);
+						var_name[i - var_start] = '\0';
+						char *var_value = getenv(var_name);
+						if (var_value) {
+							new_content = realloc(new_content, j + strlen(var_value) + 1);
+							strcpy(&new_content[j], var_value);
+							j += strlen(var_value);
+						}
+					} else {
+						new_content = realloc(new_content, j + 2);
+						new_content[j++] = current->content[i++];
+					}
+				}
+				i++;
+			} else if (current->content[i] == '\'') {
+				i++;
+				while (current->content[i] && current->content[i] != '\'') {
+					new_content = realloc(new_content, j + 2);
+					new_content[j++] = current->content[i++];
+				}
+				i++;
+			} else if (current->content[i] == '$') {
+				// Handle variable substitution
+				i++;
+				int var_start = i;
+				while (current->content[i] && current->content[i] != ' ' && current->content[i] != '\"' && current->content[i] != '\'') {
+					i++;
+				}
+				char var_name[i - var_start + 1];
+				strncpy(var_name, &current->content[var_start], i - var_start);
+				var_name[i - var_start] = '\0';
+				char *var_value = getenv(var_name);
+				if (var_value) {
+					new_content = realloc(new_content, j + strlen(var_value) + 1);
+					strcpy(&new_content[j], var_value);
+					j += strlen(var_value);
+				}
+			} else {
+				new_content = realloc(new_content, j + 2);
+				new_content[j++] = current->content[i++];
+			}
+		}
+		if (new_content) {
+			new_content[j] = '\0';
+			free(current->content);
+			current->content = new_content;
+		}
+		current = current->next;
+	}
+
 	(*args)->tokens = tokens_with_pipes;
 }
 
