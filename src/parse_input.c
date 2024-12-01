@@ -138,7 +138,7 @@ void	execute_external_command(char **args)
 // Function to execute commands (either built-in or external)
 void	execute_command(t_args **args)
 {
-	t_node		*token_node;
+	t_list		*token_node;
 	char		*command[1024] = {NULL};
 	int			i;
 	const char	*dir = (command[1] == NULL) ? getenv("HOME") : command[1];
@@ -220,10 +220,8 @@ void	parse_input(char *input, t_args **args)
 {
 	tokenize_input2(input, args);
 	print_list_debug(&(*args)->tokens);
-	name_token(&(*args)->tokens);
-	no_quotes(&(*args)->tokens);
-	is_cmd(&(*args)->tokens);
-	parse_redirections(&(*args)->tokens);
-	debug_list(&(*args)->tokens);
+	//is_cmd(&(*args)->tokens);
+	//parse_redirections(&(*args)->tokens);
+	//debug_list(&(*args)->tokens);
 	execute_command(args); // Execute the command with the arguments
 }

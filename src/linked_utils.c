@@ -82,9 +82,16 @@ void	print_lst(t_node **top)
 	}
 }
 
-void print_list_debug(t_node **top) {
+void print_list_debug(t_list **top) {
 	printf("-------list start-------\n");
-	print_lst(top);
+	t_list	*current;
+
+	current = *top;
+	while (current != NULL)
+	{
+		printf("%s\n", (char *)(current->content));
+		current = current->next;
+	}
 	printf("-------list end-------\n");
 }
 

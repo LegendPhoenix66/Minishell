@@ -24,32 +24,12 @@ void init_node(t_node *node)
     node->no_quotes = 0;
     node->type = NO_DIR;
 }
-void	add_token(t_node **list, const char *token, int length)
+void	add_token(t_list **list, const char *token, int length)
 {
-	t_node	*new_node;
-	t_node	*current;
+	t_list	*new_node;
 
-	new_node = malloc(sizeof(t_node));
-	if (!new_node) {
-		perror("malloc error");
-		exit(EXIT_FAILURE);
-	}
-	init_node(new_node);
-	new_node->content = strndup(token, length);
-	new_node->next = NULL;
-	if (*list == NULL)
-	{
-		*list = new_node;
-	}
-	else
-	{
-		current = *list;
-		while (current->next != NULL)
-		{
-			current = current->next;
-		}
-		current->next = new_node;
-	}
+	new_node = ft_lstnew(strndup(token, length));
+	ft_lstadd_back(list, new_node);
 }
 
 void error(const char *msg)
@@ -58,7 +38,7 @@ void error(const char *msg)
 	exit(EXIT_FAILURE);
 }
 
-void handle_quotes(const char *input, int *i, t_node **tokens) {
+void handle_quotes(const char *input, int *i, t_list **tokens) {
 	char quote = input[*i];
 	int start = *i + 1;
 	(*i)++;
@@ -117,7 +97,7 @@ void tokenize_input(const char *input, t_args **args)
 void tokenize_input2(const char *input, t_args **args)
 {
 	args = args;
-	t_node *parsed_tokens = NULL;
+	t_list *parsed_tokens = NULL;
 	int i = 0;
 	while (input[i]) {
 		if (input[i] == ' ') {
@@ -141,21 +121,22 @@ void tokenize_input2(const char *input, t_args **args)
 	add_token(&parsed_tokens, input, i);
 
 	// check every token for pipes or redirects (not in quotes)
-	t_node *tokens_with_pipes = NULL;
-	t_node *current = parsed_tokens;
+	t_list *tokens_with_pipes = NULL;
+	t_list *current = parsed_tokens;
 	while (current) {
 		i = 0;
 		int pipe_pos = -1;
-		while (current->content[i]) {
-			if (current->content[i] == '\"' || current->content[i] == '\'') {
-				char quote = current->content[i];
+		char *content = current->content;
+		while (content[i]) {
+			if (content[i] == '\"' || content[i] == '\'') {
+				char quote = content[i];
 				i++;
-				while (current->content[i] != quote) {
+				while (content[i] != quote) {
 					i++;
 				}
 				i++;
 			}
-			if (current->content[i] == '|') {
+			if (content[i] == '|') {
 				if (ft_strlen(current->content) == 1) {
 					break;
 				}
@@ -163,27 +144,27 @@ void tokenize_input2(const char *input, t_args **args)
 				add_token(&tokens_with_pipes, current->content + i, 1);
 				pipe_pos = i;
 			}
-			if (current->content[i] == '<' || current->content[i] == '>') {
-				if (current->content[i + 1] == current->content[i]) {
-					if (ft_strlen(current->content) == 2) {
+			if (content[i] == '<' || content[i] == '>') {
+				if (content[i + 1] == content[i]) {
+					if (ft_strlen(content) == 2) {
 						break;
 					}
-					add_token(&tokens_with_pipes, current->content, i);
-					add_token(&tokens_with_pipes, current->content + i, 2);
+					add_token(&tokens_with_pipes, content, i);
+					add_token(&tokens_with_pipes, content + i, 2);
 					pipe_pos = i + 1;
 					i++;
 				} else {
-					if (ft_strlen(current->content) == 1) {
+					if (ft_strlen(content) == 1) {
 						break;
 					}
-					add_token(&tokens_with_pipes, current->content, i);
-					add_token(&tokens_with_pipes, current->content + i, 1);
+					add_token(&tokens_with_pipes, content, i);
+					add_token(&tokens_with_pipes, content + i, 1);
 					pipe_pos = i;
 				}
 			}
 			i++;
 		}
-		add_token(&tokens_with_pipes, current->content + pipe_pos + 1, ft_strlen(current->content) - pipe_pos - 1);
+		add_token(&tokens_with_pipes, content + pipe_pos + 1, ft_strlen(content) - pipe_pos - 1);
 		// add last token
 		current = current->next;
 	}
@@ -194,19 +175,20 @@ void tokenize_input2(const char *input, t_args **args)
 		char *new_content = NULL;
 		i = 0;
 		int j = 0;
-		while (current->content[i]) {
-			if (current->content[i] == '\"') {
+		char *content = current->content;
+		while (content[i]) {
+			if (content[i] == '\"') {
 				i++;
-				while (current->content[i] && current->content[i] != '\"') {
-					if (current->content[i] == '$') {
+				while (content[i] && content[i] != '\"') {
+					if (content[i] == '$') {
 						// Handle variable substitution
 						i++;
 						int var_start = i;
-						while (current->content[i] && current->content[i] != ' ' && current->content[i] != '\"') {
+						while (content[i] && content[i] != ' ' && content[i] != '\"') {
 							i++;
 						}
 						char var_name[i - var_start + 1];
-						strncpy(var_name, &current->content[var_start], i - var_start);
+						strncpy(var_name, &content[var_start], i - var_start);
 						var_name[i - var_start] = '\0';
 						char *var_value = getenv(var_name);
 						if (var_value) {
@@ -216,26 +198,26 @@ void tokenize_input2(const char *input, t_args **args)
 						}
 					} else {
 						new_content = realloc(new_content, j + 2);
-						new_content[j++] = current->content[i++];
+						new_content[j++] = content[i++];
 					}
 				}
 				i++;
-			} else if (current->content[i] == '\'') {
+			} else if (content[i] == '\'') {
 				i++;
-				while (current->content[i] && current->content[i] != '\'') {
+				while (content[i] && content[i] != '\'') {
 					new_content = realloc(new_content, j + 2);
-					new_content[j++] = current->content[i++];
+					new_content[j++] = content[i++];
 				}
 				i++;
-			} else if (current->content[i] == '$') {
+			} else if (content[i] == '$') {
 				// Handle variable substitution
 				i++;
 				int var_start = i;
-				while (current->content[i] && current->content[i] != ' ' && current->content[i] != '\"' && current->content[i] != '\'') {
+				while (content[i] && content[i] != ' ' && content[i] != '\"' && content[i] != '\'') {
 					i++;
 				}
 				char var_name[i - var_start + 1];
-				strncpy(var_name, &current->content[var_start], i - var_start);
+				strncpy(var_name, &content[var_start], i - var_start);
 				var_name[i - var_start] = '\0';
 				char *var_value = getenv(var_name);
 				if (var_value) {
@@ -245,7 +227,7 @@ void tokenize_input2(const char *input, t_args **args)
 				}
 			} else {
 				new_content = realloc(new_content, j + 2);
-				new_content[j++] = current->content[i++];
+				new_content[j++] = content[i++];
 			}
 		}
 		if (new_content) {
@@ -259,60 +241,6 @@ void tokenize_input2(const char *input, t_args **args)
 	(*args)->tokens = tokens_with_pipes;
 }
 
-//tell if in single or double quotes or no quotes
-// and them put good variable at 1 in structure
-void name_token(t_node **top)
-{
-	t_node *current;
-
-	current = *top;
-	while (current != NULL)
-	{
-		if(current->content[0] == '\"' && current->content[ft_strlen(current->content) - 1] == '\"')
-		{
-			current->in_double = 1;
-			printf("variable in double quotes\n");
-		}
-		if(current->content[0] == '\'' && current->content[ft_strlen(current->content) - 1] == '\'')
-		{
-			current->in_single = 1;
-			printf("variable in single quotes\n");
-		}
-		else
-		{
-			current->no_quotes = 1;
-			printf("no quotes around\n");
-		}
-		current = current->next;	
-	}
-}
-//now we know wath is in quotes or not them we can remove quotes
-//for tokenize the rest
-void no_quotes(t_node **top)
-{
-    t_node *current;
-	char *new_content;
-
-    current = *top;
-    while (current != NULL)
-    {
-        if (current->content[0] == '\"' && current->content[strlen(current->content) - 1] == '\"')
-        {
-            new_content = ft_strdup(current->content + 1);
-            new_content[strlen(new_content) - 1] = '\0'; 
-            free(current->content);
-            current->content = new_content; 
-        }
-        else if (current->content[0] == '\'' && current->content[strlen(current->content) - 1] == '\'')
-        {
-            new_content = ft_strdup(current->content + 1); 
-            new_content[strlen(new_content) - 1] = '\0';      
-            free(current->content);
-            current->content = new_content;
-        }
-        current = current->next;
-    }
-}
 //this fonction just tell me if is a shell cmd or not
 //and if it is put the good variable at 1.
 void is_cmd(t_node **top)
@@ -333,26 +261,28 @@ void is_cmd(t_node **top)
 		}
 	}
 }
-void parse_redirections(t_node **top)
-{
-    t_node *current;
 
-	current = *top;
-    while (current != NULL)
-    {
-        if (strcmp(current->content, ">") == 0)
-            current->type = STDOUT;
-        else if (strcmp(current->content, ">>") == 0)
-            current->type = APPEND;
-        else if (strcmp(current->content, "<") == 0)
-            current->type = STDIN;
-        else if (strcmp(current->content, "<<") == 0)
-            current->type = HEREDOC;
-        else
-            current->type = NO_DIR;
-        current = current->next;
-    }
-}
+// void parse_redirections(t_node **top)
+// {
+//     t_node *current;
+//
+// 	current = *top;
+//     while (current != NULL)
+//     {
+//         if (strcmp(current->content, ">") == 0)
+//             current->type = STDOUT;
+//         else if (strcmp(current->content, ">>") == 0)
+//             current->type = APPEND;
+//         else if (strcmp(current->content, "<") == 0)
+//             current->type = STDIN;
+//         else if (strcmp(current->content, "<<") == 0)
+//             current->type = HEREDOC;
+//         else
+//             current->type = NO_DIR;
+//         current = current->next;
+//     }
+// }
+
 //give back a pointer to the last element
 char *find_output(t_node **top)
 {
