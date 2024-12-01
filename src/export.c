@@ -19,14 +19,14 @@ int		quotes(const char *var);
 char	*remove_quotes(const char *var);
 int		find_equal(const char *var);
 
-int	ft_export(const char *var, t_args **args)
+int	ft_export(const char *var, t_args *args)
 {
 	int	i;
 
 	i = 1;
 	if (var == NULL || *var == '\0')
 	{
-		print_export(args);
+		print_export(&args);
 		return (0);
 	}
 //	 remove quotes if variable name is in
@@ -38,7 +38,7 @@ int	ft_export(const char *var, t_args **args)
 		{
 			if (var[i] == '=')
 			{
-				add_or_update(var, &(*args)->env);
+				add_or_update(var, &args->env);
 				return (0);
 			}
 			i++;

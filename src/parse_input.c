@@ -136,7 +136,7 @@ void	execute_external_command(char **args)
 }
 
 // Function to execute commands (either built-in or external)
-void	execute_command(t_args **args)
+void	execute_command(t_args *args)
 {
 	t_list		*token_node;
 	char		*command[1024] = {NULL};
@@ -144,7 +144,7 @@ void	execute_command(t_args **args)
 	const char	*dir = (command[1] == NULL) ? getenv("HOME") : command[1];
 	int			newline;
 
-	token_node = (*args)->tokens;
+	token_node = args->tokens;
 	i = 0;
 	// Convert tokens linked list to an array
 	while (token_node)
@@ -166,15 +166,15 @@ void	execute_command(t_args **args)
 			perror("cd error");
 		else
 		{
-			free((*args)->current_directory);
-			(*args)->current_directory = getcwd(NULL, 0);
-			if ((*args)->current_directory == NULL)
+			free(args->current_directory);
+			args->current_directory = getcwd(NULL, 0);
+			if (args->current_directory == NULL)
 				perror("getcwd error");
 		}
 	}
 	else if (strcmp(command[0], "pwd") == 0)
 	{
-		printf("%s\n", (*args)->current_directory);
+		printf("%s\n", args->current_directory);
 	}
 	else if (strcmp(command[0], "echo") == 0)
 	{
@@ -199,11 +199,11 @@ void	execute_command(t_args **args)
 	}
 	else if (strcmp(command[0], "env") == 0)
 	{
-		print_lst(&(*args)->env);
+		print_lst(&args->env);
 	}
 	else if (strcmp(command[0], "unset") == 0 && command[1] != NULL)
 	{
-		ft_unsetenv(&(*args)->env, command[1]);
+		ft_unsetenv(&args->env, command[1]);
 	}
 	else if (strcmp(command[0], "export") == 0)
 	{
@@ -216,10 +216,10 @@ void	execute_command(t_args **args)
 }
 
 // Example parsing input into tokens
-void	parse_input(char *input, t_args **args)
+void	parse_input(char *input, t_args *args)
 {
 	tokenize_input(input, args);
-	print_list_debug(&(*args)->tokens);
+	print_list_debug(&args->tokens);
 	//is_cmd(&(*args)->tokens);
 	//parse_redirections(&(*args)->tokens);
 	//debug_list(&(*args)->tokens);

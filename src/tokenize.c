@@ -53,7 +53,7 @@ void handle_quotes(const char *input, int *i, t_list **tokens) {
 	(*i)++;
 }
 
-void tokenize_input(const char *input, t_args **args)
+void tokenize_input(const char *input, t_args *args)
 {
 	t_list *parsed_tokens = NULL;
 	int i = 0;
@@ -196,7 +196,7 @@ void tokenize_input(const char *input, t_args **args)
 		current = current->next;
 	}
 
-	(*args)->tokens = tokens_with_pipes;
+	args->tokens = tokens_with_pipes;
 }
 
 //this fonction just tell me if is a shell cmd or not

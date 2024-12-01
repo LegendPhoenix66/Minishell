@@ -130,7 +130,7 @@ int	main(void)
 	input = get_input();
 	while (input && args->exit == 0)
 	{
-		parse_input(input, &args);
+		parse_input(input, args);
 		free(input);
 		input = get_input();
 	}

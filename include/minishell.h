@@ -52,8 +52,8 @@ typedef struct s_args
 	t_list			*tokens;
 }					t_args;
 
-void				parse_input(char *input, t_args **args);
-void				execute_command(t_args **args);
+void				parse_input(char *input, t_args *args);
+void				execute_command(t_args *args);
 t_node				*init_lst(void);
 void				free_lst(t_node *top);
 void				print_lst(t_node **top);
@@ -65,8 +65,8 @@ t_node				*copy_list(t_node *original);
 void				add_node(t_node **top, const char *env);
 int					find_equal(const char *var);
 void				remove_if(t_node **top, const char *var_name);
-int					ft_export(const char *var, t_args **args);
-void				tokenize_input(const char *input, t_args **args);
+int					ft_export(const char *var, t_args *args);
+void				tokenize_input(const char *input, t_args *args);
 void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
