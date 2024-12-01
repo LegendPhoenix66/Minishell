@@ -218,7 +218,7 @@ void	execute_command(t_args **args)
 // Example parsing input into tokens
 void	parse_input(char *input, t_args **args)
 {
-	tokenize_input(input, args);
+	tokenize_input2(input, args);
 	print_list_debug(&(*args)->tokens);
 	name_token(&(*args)->tokens);
 	no_quotes(&(*args)->tokens);

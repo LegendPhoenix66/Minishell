@@ -12,6 +12,18 @@
 
 #include "../include/minishell.h"
 
+void init_node(t_node *node)
+{
+    if (!node)
+        return;
+    node->content = NULL;
+    node->is_cmd = 0;
+    node->is_out = 0;
+    node->in_single = 0;
+    node->in_double = 0;
+    node->no_quotes = 0;
+    node->type = NO_DIR;
+}
 void	add_token(t_node **list, const char *token, int length)
 {
 	t_node	*new_node;
@@ -22,6 +34,7 @@ void	add_token(t_node **list, const char *token, int length)
 		perror("malloc error");
 		exit(EXIT_FAILURE);
 	}
+	init_node(new_node);
 	new_node->content = strndup(token, length);
 	new_node->next = NULL;
 	if (*list == NULL)
@@ -340,4 +353,21 @@ void parse_redirections(t_node **top)
         current = current->next;
     }
 }
+//give back a pointer to the last element
+char *find_output(t_node **top)
+{
+    t_node *current;
+    char *out;
 
+    current = *top;
+    while (current != NULL)
+    {
+        if(current->type != NO_DIR && current->next != NULL)
+        {
+            current->next->is_out = 1;
+             out = current->next->content;
+        }
+                current = current->next;
+    }
+    return (out);
+}

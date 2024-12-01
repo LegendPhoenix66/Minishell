@@ -73,5 +73,6 @@ void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
 void				parse_redirections(t_node **top);
+void				tokenize_input2(const char *input, t_args **args);
 
 #endif // MINISHELL_H
