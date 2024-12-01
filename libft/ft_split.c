@@ -3,69 +3,103 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/13 23:31:50 by drenquin          #+#    #+#             */
-/*   Updated: 2024/03/14 00:26:44 by drenquin         ###   ########.fr       */
+/*   Created: 2024/02/21 12:29:46 by lhopp             #+#    #+#             */
+/*   Updated: 2024/02/27 13:57:37 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
-static size_t	ft_count_argument(char const *str, char c)
+static int	count_words(char const *s, char c)
 {
-	size_t	count;
+	int			word_count;
+	const char	*word_start = s;
 
-	count = 0;
-	if (!*str)
-		return (0);
-	while (*str)
+	word_count = 0;
+	while (*s)
 	{
-		while (*str == c)
-			str++;
-		if (*str)
-			count++;
-		while (*str != c && *str)
-			str++;
-	}
-	return (count);
-}
-
-static char	**allocate_strings_array(char const *str, char s)
-{
-	char	**tab;
-	int		count;
-
-	count = ft_count_argument(str, s);
-	tab = (char **)malloc(sizeof(char *) * (count + 1));
-	if (tab == (NULL))
-		return (NULL);
-	return (tab);
-}
-
-char	**ft_split(char const *str, char c)
-{
-	char	**tab;
-	size_t	len;
-	int		i;
-
-	tab = allocate_strings_array(str, c);
-	if (!str || !tab)
-		return (0);
-	i = 0;
-	while (*str)
-	{
-		while (*str == c && *str)
-			str++;
-		if (*str)
+		if (*s == c)
 		{
-			if (!ft_strchr(str, c))
-				len = ft_strlen(str);
-			else
-				len = ft_strchr(str, c) - str;
-			tab[i++] = ft_substr(str, 0, len);
-			str += len;
+			if (s != word_start)
+			{
+				word_count++;
+			}
+			word_start = s + 1;
 		}
+		s++;
 	}
-	tab[i] = NULL;
-	return (tab);
-}	
+	if (*word_start)
+	{
+		word_count++;
+	}
+	return (word_count);
+}
+
+static char	**allocate_words(int word_count)
+{
+	char	**words;
+
+	words = malloc((word_count + 1) * sizeof(char *));
+	if (!words)
+	{
+		return (NULL);
+	}
+	return (words);
+}
+
+static void	create_substring(char **wordsarray, size_t *word_index,
+	const char **word_start, size_t word_length)
+{
+	if (word_length > 0)
+	{
+		wordsarray[*word_index] = ft_substr(*word_start, 0, word_length);
+		(*word_index)++;
+	}
+}
+
+static void	fill_words(char **wordsarray, char const *string, char c)
+{
+	size_t		word_index;
+	const char	*word_start = string;
+	size_t		word_length;
+
+	word_index = 0;
+	word_length = 0;
+	while (*string)
+	{
+		if (*string == c)
+		{
+			create_substring(wordsarray, &word_index, &word_start, word_length);
+			word_start = string + 1;
+			word_length = 0;
+		}
+		else
+		{
+			word_length++;
+		}
+		string++;
+	}
+	create_substring(wordsarray, &word_index, &word_start, word_length);
+	wordsarray[word_index] = NULL;
+}
+
+char	**ft_split(char const *string, char c)
+{
+	int		word_count;
+	char	**words;
+
+	if (!string)
+	{
+		return (NULL);
+	}
+	word_count = count_words(string, c);
+	words = allocate_words(word_count);
+	if (!words)
+	{
+		return (NULL);
+	}
+	fill_words(words, string, c);
+	return (words);
+}

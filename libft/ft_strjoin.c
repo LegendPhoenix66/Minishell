@@ -3,53 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/27 18:17:34 by drenquin          #+#    #+#             */
-/*   Updated: 2024/03/12 10:09:21 by drenquin         ###   ########.fr       */
+/*   Created: 2024/02/21 12:30:13 by lhopp             #+#    #+#             */
+/*   Updated: 2024/02/27 13:51:33 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	size_t				lenght;
-	char				*join;
-	unsigned int		i;
-	unsigned int		j;
+	size_t	s1_len;
+	size_t	s2_len;
+	char	*joined_str;
 
-	j = 0;
-	i = 0;
-	lenght = ft_strlen(s1) + ft_strlen(s2);
-	join = malloc((lenght + 1) * (sizeof(char)));
-	if (join == NULL)
-		return (NULL);
-	while (ft_strlen(s1) > i)
+	if (!s1 || !s2)
 	{
-		join[i] = s1[i];
-		i++;
+		return (NULL);
 	}
-	while (s2[j])
-		join[i++] = s2[j++];
-	join[i] = '\0';
-	return (join);
+	s1_len = ft_strlen(s1);
+	s2_len = ft_strlen(s2);
+	joined_str = malloc(s1_len + s2_len + 1);
+	if (!joined_str)
+	{
+		return (NULL);
+	}
+	ft_memcpy(joined_str, s1, s1_len);
+	ft_memcpy(joined_str + s1_len, s2, s2_len);
+	joined_str[s1_len + s2_len] = '\0';
+	return (joined_str);
 }
-
-/*#include<stdio.h>
-
-int main(void)
-{
-    const char *str1 = "Hello,";
-    const char *str2 = "world!";
-    char *result = ft_strjoin(str1, str2);
-    if (result)
-    {
-        printf("Concatenated string: %s\n", result);
-        free(result); // Don't forget to free the allocated memory!
-    }
-    else
-    {
-        printf("Memory allocation failed.\n");
-    }
-    return 0;
-}*/

@@ -3,37 +3,72 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/03 21:08:00 by drenquin          #+#    #+#             */
-/*   Updated: 2024/03/03 21:16:22 by drenquin         ###   ########.fr       */
+/*   Created: 2024/02/23 10:47:06 by lhopp             #+#    #+#             */
+/*   Updated: 2024/02/27 16:38:56 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
+
+static int	power_of_ten(int n)
+{
+	int	power;
+
+	power = 1;
+	while (n-- > 0)
+	{
+		power *= 10;
+	}
+	return (power);
+}
+
+static int	calculate_length(int n)
+{
+	int	length;
+
+	length = 0;
+	while (n != 0)
+	{
+		n /= 10;
+		length++;
+	}
+	return (length);
+}
+
+static void	print_number(int n, int length, int fd)
+{
+	int	power;
+	int	digit;
+
+	while (length-- > 0)
+	{
+		power = power_of_ten(length);
+		digit = (n / power) % 10;
+		ft_putchar_fd((char)('0' + digit), fd);
+	}
+}
 
 void	ft_putnbr_fd(int n, int fd)
 {
-	long	nbl;
-	short	i;
-	char	buffer[10];
+	int	length;
 
-	i = 0;
-	nbl = (long)n;
-	if (0 == n)
+	if (n == 0)
 	{
-		write (fd, "0", 1);
+		ft_putchar_fd('0', fd);
 		return ;
 	}
-	if (nbl < 0)
+	if (n == -2147483648)
 	{
-		nbl *= -1;
-		write(fd, "-", 1);
+		ft_putstr_fd("-2147483648", fd);
+		return ;
 	}
-	while (nbl)
+	if (n < 0)
 	{
-		buffer[i++] = (nbl % 10) + '0';
-		nbl = nbl / 10;
+		ft_putchar_fd('-', fd);
+		n = -n;
 	}
-	while (i > 0)
-		write (fd, &buffer[--i], 1);
+	length = calculate_length(n);
+	print_number(n, length, fd);
 }

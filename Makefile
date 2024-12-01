@@ -33,7 +33,7 @@ $(OBJ):
 
 # Compile libft
 $(LIBFT)/libft.a:
-	$(MAKE) -C $(LIBFT)
+	$(MAKE) -C $(LIBFT) bonus
 
 # Clean object files and executable
 clean:

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memmove.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/11 10:35:14 by drenquin          #+#    #+#             */
-/*   Updated: 2024/03/11 10:54:15 by drenquin         ###   ########.fr       */
+/*   Created: 2024/02/19 14:34:58 by lhopp             #+#    #+#             */
+/*   Updated: 2024/02/27 13:50:57 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,27 @@
 
 void	*ft_memmove(void *dest, const void *src, size_t n)
 {
-	unsigned char	*destination;
-	unsigned char	*source;
-	unsigned int	i;
+	unsigned char	*dest_c;
+	unsigned char	*src_c;
+	size_t			i;
 
-	destination = (unsigned char *)dest;
-	source = (unsigned char *)src;
-	i = 0;
-	if (source < destination)
+	dest_c = (unsigned char *)dest;
+	src_c = (unsigned char *)src;
+	if (dest_c < src_c)
 	{
-		while (n--)
-			destination[n] = source[n];
+		i = 0;
+		while (i < n)
+		{
+			dest_c[i] = src_c[i];
+			i++;
+		}
 	}
 	else
 	{
 		while (n--)
 		{
-			destination[i] = source[i];
-			i++;
+			dest_c[n] = src_c[n];
 		}
 	}
-	return (destination);
+	return (dest);
 }

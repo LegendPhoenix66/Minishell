@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcat.c                                       :+:      :+:    :+:   */
+/*   ft_lstadd_back_bonus.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/19 14:35:20 by lhopp             #+#    #+#             */
-/*   Updated: 2024/02/27 13:51:38 by lhopp            ###   ########.fr       */
+/*   Created: 2024/02/27 13:24:30 by lhopp             #+#    #+#             */
+/*   Updated: 2024/02/27 13:24:35 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlcat(char *dst, const char *src, size_t size)
+void	ft_lstadd_back(t_list **lst, t_list *newnode)
 {
-	size_t	i;
-	size_t	j;
+	t_list	*last;
 
-	i = 0;
-	while (dst[i] && i < size)
-		i++;
-	j = i;
-	while (src[i - j] && i + 1 < size)
+	if (lst)
 	{
-		dst[i] = src[i - j];
-		i++;
+		if (*lst)
+		{
+			last = ft_lstlast(*lst);
+			last->next = newnode;
+		}
+		else
+		{
+			*lst = newnode;
+		}
 	}
-	if (j < size)
-		dst[i] = '\0';
-	return (j + ft_strlen(src));
 }

@@ -3,37 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/20 17:33:39 by drenquin          #+#    #+#             */
-/*   Updated: 2024/02/22 14:33:34 by drenquin         ###   ########.fr       */
+/*   Created: 2024/02/19 14:34:48 by lhopp             #+#    #+#             */
+/*   Updated: 2024/03/01 11:27:26 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
 void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
-	char			*destination;
-	const char		*source;
+	unsigned char	*dest_c;
+	unsigned char	*src_c;
+	size_t			i;
 
-	destination = (char *)dest;
-	source = (const char *)src;
-	while (n--)
+	dest_c = (unsigned char *)dest;
+	src_c = (unsigned char *)src;
+	i = 0;
+	while (i < n)
 	{
-		destination[n] = source[n];
+		dest_c[i] = src_c[i];
+		i++;
 	}
-	return (destination);
+	return (dest);
 }
-/*
---n donne geeksgeeksfor
-n-- donne geeksgeeksgeek
-meme reponse qu en incrementant un index comparer a n
-#include <stdio.h>
-int main ()
-{
-       char src [] = "Geeksfor";
-      // char dest [50];
-       memcpy(src + 5,src,strlen(src)+1);
-       printf ("la src est: %s\n",src);
-       return (0);
-}*/
