@@ -136,6 +136,6 @@ int	main(void)
 	}
 	free(input);
 	free_lst(args->env);
-	free_lst(args->tokens);
+	ft_lstclear(&args->tokens, free);
 	return (0);
 }
