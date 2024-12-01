@@ -24,6 +24,7 @@ void init_node(t_node *node)
     node->no_quotes = 0;
     node->type = NO_DIR;
 }
+
 void	add_token(t_list **list, const char *token, int length)
 {
 	t_list	*new_node;
@@ -54,49 +55,6 @@ void handle_quotes(const char *input, int *i, t_list **tokens) {
 
 void tokenize_input(const char *input, t_args **args)
 {
-	int i = 0;
-	int j = 0;
-	(*args)->tokens = NULL;
-
-	while (input[i])
-	{
-		if (input[i] == '\'' || input[i] == '\"')
-		{
-			if (j > 0)
-			{
-				add_token(&(*args)->tokens, input + i - j, j);
-				j = 0;
-			}
-			handle_quotes(input, &i, &(*args)->tokens);
-		}
-		else if (input[i] == ' ' || input[i] == '|' || input[i] == '<' || input[i] == '>')
-		{
-			if (j > 0)
-			{
-				add_token(&(*args)->tokens, input + i - j, j);
-				j = 0;
-			}
-			if (input[i] != ' ')
-			{
-				add_token(&(*args)->tokens, input + i, 1);
-			}
-			i++;
-		}
-		else
-		{
-			j++;
-			i++;
-		}
-	}
-	if (j > 0)
-	{
-		add_token(&(*args)->tokens, input + i - j, j);
-	}
-}
-
-void tokenize_input2(const char *input, t_args **args)
-{
-	args = args;
 	t_list *parsed_tokens = NULL;
 	int i = 0;
 	while (input[i]) {
