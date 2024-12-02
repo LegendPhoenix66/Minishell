@@ -72,7 +72,7 @@ char	*find_command_in_path(char *cmd)
 	return (NULL);
 }
 
-void	execute_external_command(char **args)
+void	execute_external_command(t_list *token_node)
 {
 	char	*cmd_path;
 	pid_t	pid;
@@ -80,11 +80,11 @@ void	execute_external_command(char **args)
 	char	buffer[1024];
 	ssize_t	bytes_read;
 
-	if (args[0][0] == '/' || args[0][0] == '.')
+	if (((char *)token_node->content)[0] == '/' || ((char *)token_node->content)[0] == '.')
 	{
 		// If it starts with '/' or '.', it is an absolute or relative path
-		if (access(args[0], X_OK) == 0)
-			cmd_path = strdup(args[0]);
+		if (access(token_node->content, X_OK) == 0)
+			cmd_path = strdup(token_node->content);
 		// Return a copy of the command if it is executable
 		else
 		{
@@ -94,7 +94,7 @@ void	execute_external_command(char **args)
 	}
 	else
 	{
-		cmd_path = find_command_in_path(args[0]);
+		cmd_path = find_command_in_path(token_node->content);
 		if (cmd_path == NULL)
 		{
 			write(2, "Command not found\n", 18);
@@ -114,7 +114,7 @@ void	execute_external_command(char **args)
 		// Redirect stdout to the write end of the pipe
 		close(pipe_fd[1]);
 		// Close the write end of the pipe after duplicating
-		if (execve(cmd_path, args, environ) == -1)
+		if (execve(cmd_path, token_node->content, environ) == -1)
 		{
 			perror("execve error");
 			exit(EXIT_FAILURE);
@@ -139,46 +139,32 @@ void	execute_external_command(char **args)
 void	execute_command(t_args *args)
 {
 	t_list		*token_node;
-	char		*command[1024] = {NULL};
-	int			i;
-	const char	*dir = (command[1] == NULL) ? getenv("HOME") : command[1];
 	int			newline;
 
 	token_node = args->tokens;
-	i = 0;
-	// Convert tokens linked list to an array
-	while (token_node)
+	if (token_node == NULL) // No command entered
 	{
-		command[i++] = token_node->content;
-		token_node = token_node->next;
-	}
-	command[i] = NULL;
-	if (command[0] == NULL) // No command entered
+		printf("no command entered\n");
 		return ;
-	if (strcmp(command[0], "exit") == 0)
+	}
+	if (strcmp(token_node->content, "exit") == 0)
 	{
 		write(1, "exit\n", 5);
-		exit(command[1] ? ft_atoi(command[1]) : 0);
+		exit(token_node->next ? ft_atoi(token_node->next->content) : 0);
 	}
-	else if (strcmp(command[0], "cd") == 0)
-	{
-		if (dir == NULL || chdir(dir) != 0)
-			perror("cd error");
-		else
-		{
-			free(args->current_directory);
-			args->current_directory = getcwd(NULL, 0);
-			if (args->current_directory == NULL)
-				perror("getcwd error");
-		}
+	if (strcmp(token_node->content, "cd") == 0) {
+		free(args->current_directory);
+		args->current_directory = getcwd(NULL, 0);
+		if (args->current_directory == NULL)
+			perror("getcwd error");
 	}
-	else if (strcmp(command[0], "pwd") == 0)
+	else if (strcmp(token_node->content, "pwd") == 0)
 	{
 		printf("%s\n", args->current_directory);
 	}
-	else if (strcmp(command[0], "echo") == 0)
+	else if (strcmp(token_node->content, "echo") == 0)
 	{
-		i = 1;
+		token_node = token_node->next; // Move to the first argument
 		newline = 1;
 		// Check for the -n flag
 		if (token_node && strcmp(token_node->content, "-n") == 0)
@@ -187,31 +173,31 @@ void	execute_command(t_args *args)
 			token_node = token_node->next; // Move to the next flag if any
 		}
 		// Print the arguments
-		while (command[i])
+		while (token_node)
 		{
-			printf("%s", command[i]);
-			if (command[i + 1])
+			printf("%s", (char *)token_node->content);
+			if (token_node->next)
 				printf(" ");
-			i++;
+			token_node = token_node->next;
 		}
 		if (newline)
 			printf("\n");
 	}
-	else if (strcmp(command[0], "env") == 0)
+	else if (strcmp(token_node->content, "env") == 0)
 	{
 		print_lst(&args->env);
 	}
-	else if (strcmp(command[0], "unset") == 0 && command[1] != NULL)
+	else if (strcmp(token_node->content, "unset") == 0 && token_node->next != NULL)
 	{
-		ft_unsetenv(&args->env, command[1]);
+		ft_unsetenv(&args->env, token_node->next->content);
 	}
-	else if (strcmp(command[0], "export") == 0)
+	else if (strcmp(token_node->content, "export") == 0)
 	{
-		ft_export(command[1], args);
+		ft_export(token_node->next->content, args);
 	}
 	else
 	{
-		execute_external_command(command);
+		execute_external_command(token_node);
 	}
 }
 
@@ -219,7 +205,7 @@ void	execute_command(t_args *args)
 void	parse_input(char *input, t_args *args)
 {
 	tokenize_input(input, args);
-	print_list_debug(&args->tokens);
+	//print_list_debug(&args->tokens);
 	//is_cmd(&(*args)->tokens);
 	//parse_redirections(&(*args)->tokens);
 	//debug_list(&(*args)->tokens);
