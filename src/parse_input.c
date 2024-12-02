@@ -163,26 +163,7 @@ void	execute_command(t_args *args)
 		printf("%s\n", args->current_directory);
 	}
 	else if (strcmp(token_node->content, "echo") == 0)
-	{
-		token_node = token_node->next; // Move to the first argument
-		newline = 1;
-		// Check for the -n flag
-		if (token_node && strcmp(token_node->content, "-n") == 0)
-		{
-			newline = 0;
-			token_node = token_node->next; // Move to the next flag if any
-		}
-		// Print the arguments
-		while (token_node)
-		{
-			printf("%s", (char *)token_node->content);
-			if (token_node->next)
-				printf(" ");
-			token_node = token_node->next;
-		}
-		if (newline)
-			printf("\n");
-	}
+		builtin_echo(token_node->next);
 	else if (strcmp(token_node->content, "env") == 0)
 	{
 		print_lst(&args->env);

@@ -72,4 +72,7 @@ char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
 void				parse_redirections(t_node **top);
 
+// builtins
+void builtin_echo(const t_list *tokens);
+
 #endif // MINISHELL_H
