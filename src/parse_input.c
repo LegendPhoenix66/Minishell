@@ -139,7 +139,6 @@ void	execute_external_command(t_list *token_node)
 void	execute_command(t_args *args)
 {
 	t_list		*token_node;
-	int			newline;
 
 	token_node = args->tokens;
 	if (token_node == NULL) // No command entered

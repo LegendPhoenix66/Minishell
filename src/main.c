@@ -103,7 +103,6 @@ char	*get_input(void)
 	}
 	if (line == NULL)
 	{
-		write(1, "exit\n", 5); // Commented out to avoid printing to terminal
 		return (NULL);
 	}
 	ft_strtrim1(line);
@@ -115,7 +114,7 @@ char	*get_input(void)
 void init_args(t_args *args)
 {
 	args->env = init_lst();
-	args->exit = 0;
+	args->exit = -1;
 	args->current_directory = getcwd(NULL, 0);
 	args->tokens = NULL;
 }
@@ -126,16 +125,22 @@ int	main(void)
 	t_args  *args;
 
 	args = malloc(sizeof(t_args));
+	if (!args)
+		return (1);
 	init_args(args);
 	input = get_input();
-	while (input && args->exit == 0)
+	while (input && args->exit == -1)
 	{
 		parse_input(input, args);
 		free(input);
+		if (args->exit != -1)
+			break ;
 		input = get_input();
 	}
-	free(input);
+	if (args->exit == -1)
+		args->exit = 0;
 	free_lst(args->env);
 	ft_lstclear(&args->tokens, free);
-	return (0);
+	write(1, "exit\n", 5);
+	return (args->exit);
 }
