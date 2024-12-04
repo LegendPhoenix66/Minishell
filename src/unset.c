@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   built_in.c                                         :+:      :+:    :+:   */
+/*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/09 11:46:02 by drenquin          #+#    #+#             */
-/*   Updated: 2024/11/09 11:46:02 by drenquin         ###   ########.fr       */
+/*   Created: 2024/12/04 18:09:48 by drenquin          #+#    #+#             */
+/*   Updated: 2024/12/04 18:09:48 by drenquin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // compare variable value and remove all the line
 //if the function finds this one
-int ft_unsetenv(t_node **env_list, const char *var)
+int builtin_unset(t_node **env_list, const char *var)
 {
     size_t len;
     t_node *current;

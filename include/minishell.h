@@ -58,7 +58,7 @@ t_node				*init_lst(void);
 void				free_lst(t_node *top);
 void				print_lst(t_node **top);
 void				print_list_debug(t_list **top);
-int					ft_unsetenv(t_node **env_list, const char *var);
+int					builtin_unset(t_node **env_list, const char *var);
 char				*get_next_line(int fd);
 void				sort_lst(t_node **top);
 t_node				*copy_list(t_node *original);

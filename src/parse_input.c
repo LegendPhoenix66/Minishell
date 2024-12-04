@@ -79,10 +79,18 @@ void	execute_external_command(t_list *token_node)
 	int		pipe_fd[2];
 	char	buffer[1024];
 	ssize_t	bytes_read;
+	char *argv[3];
 
+	argv[0] = (char *)token_node->content;
+	if(token_node->next == NULL)
+		argv[1] = NULL;
+	else
+		argv[1] = (char *)token_node->next->content; //need a way to put a the flag in this var
+	argv[2] = NULL;
 	if (((char *)token_node->content)[0] == '/' || ((char *)token_node->content)[0] == '.')
 	{
 		// If it starts with '/' or '.', it is an absolute or relative path
+		printf("content %s\n", (char *)(token_node->content));
 		if (access(token_node->content, X_OK) == 0)
 			cmd_path = strdup(token_node->content);
 		// Return a copy of the command if it is executable
@@ -114,7 +122,7 @@ void	execute_external_command(t_list *token_node)
 		// Redirect stdout to the write end of the pipe
 		close(pipe_fd[1]);
 		// Close the write end of the pipe after duplicating
-		if (execve(cmd_path, token_node->content, environ) == -1)
+		if (execve(cmd_path, argv, environ) == -1)
 		{
 			perror("execve error");
 			exit(EXIT_FAILURE);
@@ -169,7 +177,7 @@ void	execute_command(t_args *args)
 	}
 	else if (strcmp(token_node->content, "unset") == 0 && token_node->next != NULL)
 	{
-		ft_unsetenv(&args->env, token_node->next->content);
+		builtin_unset(&args->env, token_node->next->content);
 	}
 	else if (strcmp(token_node->content, "export") == 0)
 	{
@@ -185,7 +193,7 @@ void	execute_command(t_args *args)
 void	parse_input(char *input, t_args *args)
 {
 	tokenize_input(input, args);
-	//print_list_debug(&args->tokens);
+	print_list_debug(&args->tokens);
 	//is_cmd(&(*args)->tokens);
 	//parse_redirections(&(*args)->tokens);
 	//debug_list(&(*args)->tokens);
