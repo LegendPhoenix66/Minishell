@@ -119,15 +119,18 @@ void init_args(t_shell *args)
 	args->tokens = NULL;
 }
 
-int	main(void)
+int	main(int argc, char **argv, char **env)
 {
 	char	*input;
 	t_shell  *args;
 
+	(void)argc;
+	(void)argv;
 	args = malloc(sizeof(t_shell));
 	if (!args)
 		return (1);
 	init_args(args);
+	args->environ = env;
 	input = get_input();
 	while (input && args->exit == -1)
 	{

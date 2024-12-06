@@ -46,6 +46,7 @@ typedef struct s_node
 
 typedef struct s_shell
 {
+	char			**environ;
 	t_node			*env;
 	int				exit;
 	char			*current_directory;

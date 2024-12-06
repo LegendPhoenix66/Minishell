@@ -12,8 +12,6 @@
 
 #include "../include/minishell.h"
 
-extern char	**environ;
-
 void	free_split(char **split)
 {
 	int	i;
@@ -72,7 +70,7 @@ char	*find_command_in_path(char *cmd)
 	return (NULL);
 }
 
-void	execute_external_command(t_list *token_node)
+void	execute_external_command(t_shell *args)
 {
 	char	*cmd_path;
 	pid_t	pid;
@@ -80,6 +78,7 @@ void	execute_external_command(t_list *token_node)
 	char	buffer[1024];
 	ssize_t	bytes_read;
 	char *argv[3];
+	t_list *token_node = args->tokens;
 
 	argv[0] = (char *)token_node->content;
 	if(token_node->next == NULL)
@@ -122,7 +121,7 @@ void	execute_external_command(t_list *token_node)
 		// Redirect stdout to the write end of the pipe
 		close(pipe_fd[1]);
 		// Close the write end of the pipe after duplicating
-		if (execve(cmd_path, argv, environ) == -1)
+		if (execve(cmd_path, argv, args->environ) == -1)
 		{
 			perror("execve error");
 			exit(EXIT_FAILURE);
@@ -183,7 +182,7 @@ void	execute_command(t_shell *args)
 	}
 	else
 	{
-		execute_external_command(token_node);
+		execute_external_command(args);
 	}
 }
 
