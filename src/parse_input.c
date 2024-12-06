@@ -144,7 +144,7 @@ void	execute_external_command(t_list *token_node)
 }
 
 // Function to execute commands (either built-in or external)
-void	execute_command(t_args *args)
+void	execute_command(t_shell *args)
 {
 	t_list		*token_node;
 
@@ -166,9 +166,7 @@ void	execute_command(t_args *args)
 			perror("getcwd error");
 	}
 	else if (strcmp(token_node->content, "pwd") == 0)
-	{
 		printf("%s\n", args->current_directory);
-	}
 	else if (strcmp(token_node->content, "echo") == 0)
 		builtin_echo(token_node->next);
 	else if (strcmp(token_node->content, "env") == 0)
@@ -190,7 +188,7 @@ void	execute_command(t_args *args)
 }
 
 // Example parsing input into tokens
-void	parse_input(char *input, t_args *args)
+void	parse_input(char *input, t_shell *args)
 {
 	tokenize_input(input, args);
 	print_list_debug(&args->tokens);

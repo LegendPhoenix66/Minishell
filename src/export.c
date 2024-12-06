@@ -12,14 +12,14 @@
 
 #include "../include/minishell.h"
 
-void	print_export(t_args **args);
+void	print_export(t_shell **args);
 void	add_or_update(const char *var, t_node **env_list);
 int		check_in(const char *var);
 int		quotes(const char *var);
 char	*remove_quotes(const char *var);
 int		find_equal(const char *var);
 
-int	ft_export(const char *var, t_args *args)
+int	ft_export(const char *var, t_shell *args)
 {
 	int	i;
 
@@ -83,7 +83,7 @@ void	add_double_quotes(char *var)
 	write(1, "\n", 1);
 }
 // printing for export fonction
-void	print_export(t_args **args)
+void	print_export(t_shell **args)
 {
 	t_node	*copy;
 	t_node	*head;

@@ -111,7 +111,7 @@ char	*get_input(void)
 	return (line);
 }
 
-void init_args(t_args *args)
+void init_args(t_shell *args)
 {
 	args->env = init_lst();
 	args->exit = -1;
@@ -122,9 +122,9 @@ void init_args(t_args *args)
 int	main(void)
 {
 	char	*input;
-	t_args  *args;
+	t_shell  *args;
 
-	args = malloc(sizeof(t_args));
+	args = malloc(sizeof(t_shell));
 	if (!args)
 		return (1);
 	init_args(args);

@@ -53,7 +53,7 @@ void handle_quotes(const char *input, int *i, t_list **tokens) {
 	(*i)++;
 }
 
-void tokenize_input(const char *input, t_args *args)
+void tokenize_input(const char *input, t_shell *args)
 {
 	t_list *parsed_tokens = NULL;
 	int i = 0;
