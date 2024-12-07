@@ -51,6 +51,7 @@ typedef struct s_shell
 	int				exit;
 	char			*current_directory;
 	t_list			*tokens;
+	t_node			*export;
 }					t_shell;
 
 void				parse_input(char *input, t_shell *args);
@@ -65,15 +66,18 @@ t_node				*copy_list(t_node *original);
 void				add_node(t_node **top, const char *env);
 int					find_equal(const char *var);
 void				remove_if(t_node **top, const char *var_name);
+//void				remove_if(t_list **top, const char *var_name);
 int					ft_export(const char *var, t_shell *args);
 void				tokenize_input(const char *input, t_shell *args);
 void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
 void				parse_redirections(t_node **top);
+void				tokenize_input1(t_shell *args);
 
 // builtins
 void				builtin_echo(const t_list *tokens);
 int					builtin_unset(t_node **env_list, const char *var);
+int					builtin_export(t_shell *args);
 
 #endif // MINISHELL_H

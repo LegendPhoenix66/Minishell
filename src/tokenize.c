@@ -24,22 +24,30 @@ void init_node(t_node *node)
     node->no_quotes = 0;
     node->type = NO_DIR;
 }
-
-void	add_token(t_list **list, const char *token, int length)
-{
-	t_list	*new_node;
-
-	new_node = ft_lstnew(strndup(token, length));
-	ft_lstadd_back(list, new_node);
-}
-
 void error(const char *msg)
 {
 	fprintf(stderr, "Error: %s\n", msg);
 	exit(EXIT_FAILURE);
 }
 
-void handle_quotes(const char *input, int *i, t_list **tokens) {
+t_list	*add_token(t_list **list, const char *token, int length)
+{
+	t_list	*new_node;
+
+	new_node = ft_lstnew(strndup(token, length));
+	if( new_node == NULL)
+	{
+		error("malloc token");
+		return (NULL);
+	}
+	new_node->d_quotes = 0;
+	new_node->s_quotes = 0;
+	ft_lstadd_back(list, new_node);
+	return (new_node);
+}
+
+
+/*void handle_quotes(const char *input, int *i, t_list **tokens) {
 	char quote = input[*i];
 	int start = *i + 1;
 	(*i)++;
@@ -51,7 +59,7 @@ void handle_quotes(const char *input, int *i, t_list **tokens) {
 	}
 	add_token(tokens, input + start, *i - start);
 	(*i)++;
-}
+}*/
 
 void tokenize_input(const char *input, t_shell *args)
 {
@@ -134,8 +142,11 @@ void tokenize_input(const char *input, t_shell *args)
 		i = 0;
 		int j = 0;
 		char *content = current->content;
-		while (content[i]) {
-			if (content[i] == '\"') {
+		while (content[i]) 
+		{
+			if (content[i] == '\"') 
+			{
+				current->d_quotes = 1;
 				i++;
 				while (content[i] && content[i] != '\"') {
 					if (content[i] == '$') {
@@ -160,7 +171,10 @@ void tokenize_input(const char *input, t_shell *args)
 					}
 				}
 				i++;
-			} else if (content[i] == '\'') {
+			} 
+			else if (content[i] == '\'')
+			{
+				current->s_quotes = 1;
 				i++;
 				while (content[i] && content[i] != '\'') {
 					new_content = realloc(new_content, j + 2);
@@ -198,7 +212,70 @@ void tokenize_input(const char *input, t_shell *args)
 
 	args->tokens = tokens_with_pipes;
 }
+/*void tokenize_input1(t_shell *args)
+{
+	t_list *current;
+	t_list *tokens_equal;
+	int len;
 
+	current = args->tokens;
+	tokens_equal = NULL;
+	while (current != NULL)
+	{
+		len = find_equal(current->content);
+		if(len != -1)
+		{
+			add_token(&tokens_equal, current->content, ft_strlen(current->content));
+		}
+		else
+		{
+
+		}
+
+	}
+	current = current->next;
+}*/
+//tokenize_input tokenize export salut=hello in 2 nodes
+//tokenize_input1 tokenize that in 4 nodes
+//need to take care tokenize make leaks ans tokenize1 also for the moment 
+void tokenize_input1(t_shell *args)  
+{
+    t_list *current;
+    t_list *tokens_equal = NULL;
+    int equal_pos;
+
+    current = args->tokens; // Liste initiale
+
+    while (current != NULL)
+	{
+        equal_pos = find_equal(current->content);
+        if (equal_pos != -1)
+		{
+            // Partie avant le '='
+            if (equal_pos > 0)
+			{
+                add_token(&tokens_equal, current->content, equal_pos);
+            }
+
+            // Le '='
+            add_token(&tokens_equal, "=", 1);
+
+            // Partie après le '='
+            if ((size_t)equal_pos + 1 < ft_strlen(current->content))
+			{
+                add_token(&tokens_equal, current->content + equal_pos + 1,
+                          ft_strlen(current->content) - equal_pos - 1);
+            }
+        }	
+		else 
+		{
+            add_token(&tokens_equal, current->content, ft_strlen(current->content));
+        }
+        current = current->next; // Passer à l'élément suivant
+    }
+    // Remplace la liste de tokens originale
+    args->tokens = tokens_equal;
+}
 //this fonction just tell me if is a shell cmd or not
 //and if it is put the good variable at 1.
 void is_cmd(t_node **top)

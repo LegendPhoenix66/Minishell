@@ -178,7 +178,8 @@ void	execute_command(t_shell *args)
 	}
 	else if (strcmp(token_node->content, "export") == 0)
 	{
-		ft_export(token_node->next->content, args);
+		printf("fonction export\n");
+		builtin_export(args);
 	}
 	else
 	{
@@ -190,6 +191,7 @@ void	execute_command(t_shell *args)
 void	parse_input(char *input, t_shell *args)
 {
 	tokenize_input(input, args);
+	tokenize_input1(args);
 	print_list_debug(&args->tokens);
 	//is_cmd(&(*args)->tokens);
 	//parse_redirections(&(*args)->tokens);

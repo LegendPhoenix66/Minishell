@@ -82,7 +82,7 @@ void	print_lst(t_node **top)
 	}
 }
 
-void print_list_debug(t_list **top) {
+/*void print_list_debug(t_list **top) {
 	printf("-------list start-------\n");
 	t_list	*current;
 
@@ -93,6 +93,22 @@ void print_list_debug(t_list **top) {
 		current = current->next;
 	}
 	printf("-------list end-------\n");
+}*/
+
+void print_list_debug(t_list **top) 
+{
+    printf("-------list start-------\n");
+    t_list *current = *top;
+
+    while (current != NULL) 
+	{
+        printf("Content: %s\n", (char *)(current->content));
+        printf("Single quotes: %s\n", current->s_quotes ? "yes" : "no");
+        printf("Double quotes: %s\n", current->d_quotes ? "yes" : "no");
+        printf("----------\n");
+        current = current->next;
+    }
+    printf("-------list end-------\n");
 }
 
 void	free_lst(t_node *top)
@@ -197,6 +213,38 @@ void	remove_if(t_node **top, const char *var_name)
 		}
 	}
 }
+/*void	remove_if(t_list **top, const char *var_name)
+{
+	t_list	*current;
+	t_list	*previous;
+	t_list	*to_remove;
+
+	current = *top;
+	previous = NULL;
+	if (*top == NULL)
+		return ;
+	while (current != NULL)
+	{
+		// Vérifie si le contenu correspond à la variable à supprimer
+		if (strncmp(current->content, var_name, strchr(var_name, '=') - var_name) == 0)
+		{
+			to_remove = current;
+			if (previous == NULL) // Cas du premier élément
+				*top = current->next;
+			else
+				previous->next = current->next;
+			current = current->next;
+			free(to_remove->content);
+			free(to_remove);
+		}
+		else
+		{
+			previous = current;
+			current = current->next;
+		}
+	}
+}*/
+
 t_node	*copy_list(t_node *original)
 {
 	t_node	*new_node;
@@ -215,3 +263,4 @@ t_node	*copy_list(t_node *original)
 	new_node->next = copy_list(original->next);
 	return (new_node);
 }
+

@@ -3,197 +3,187 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
+/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/11 10:58:36 by drenquin          #+#    #+#             */
-/*   Updated: 2024/11/27 12:09:42 by lhopp            ###   ########.fr       */
+/*   Created: 2024/12/06 12:16:46 by drenquin          #+#    #+#             */
+/*   Updated: 2024/12/06 12:16:46 by drenquin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	print_export(t_shell **args);
-void	add_or_update(const char *var, t_node **env_list);
-int		check_in(const char *var);
-int		quotes(const char *var);
-char	*remove_quotes(const char *var);
-int		find_equal(const char *var);
-
-int	ft_export(const char *var, t_shell *args)
+int     find_equal(const char *var)
 {
-	int	i;
+        int     i;
 
-	i = 1;
-	if (var == NULL || *var == '\0')
-	{
-		print_export(&args);
-		return (0);
-	}
-//	 remove quotes if variable name is in
-	if (var[0] == '"' && var[find_equal(var) - 1] == '"')
-		var = remove_quotes(var); // attention cette fonction malloc
-	if (check_in(var))
-	{
-		while (ft_isalnum(var[i]) || var[i] == '=' || var[i] == '_')
-		{
-			if (var[i] == '=')
-			{
-				add_or_update(var, &args->env);
-				return (0);
-			}
-			i++;
-		}
-		if (var[i] == '\0')
-		{
-			printf("variable facultative");
-			// todo : facultative var
-			return (0);
-		}
-		printf("invalide");
-		return (-1);
-	}
-	printf("premier caractere invalide");
-	return (-1);
+        i = 0;
+        while (var[i] != '=' && var[i])
+                i++;
+        if (var[i] == '=')
+        {
+                printf("i vaut %d\n", i);
+                return (i);
+        }
+        else
+                return (-1);
 }
 // check the validity of export arg (first charactere of argument)
-int	check_in(const char *var)
+int     check_in(const char *var)
 {
-	if (ft_isalpha(var[0]))
-		return (1);
-	else if (var[0] == '_')
-		return (1);
-	else if ((var[0]) == '"' && var[ft_strlen(var) - 1] == '"')
-		return (1);
-	return (0);
+        if (ft_isalpha(var[0]))
+                return (1);
+        else if (var[0] == '_')
+                return (1);
+        else if ((var[0]) == '"' && var[ft_strlen(var) - 1] == '"')
+                return (1);
+        return (0);
 }
-// add double quotes for eexport printing
-void	add_double_quotes(char *var)
+void    add_double_quotes(char *var)
 {
-	int	i;
+        int     i;
 
-	i = 0;
-	while (var[i] != '\0')
-	{
-		write(1, &var[i], 1);
-		if (var[i] == '=')
-			write(1, "\"", 1);
-		i++;
-	}
-	write(1, "\"", 1);
-	write(1, "\n", 1);
+        i = 0;
+		write(1,"declare -x ",11);
+        while (var[i] != '\0')
+        {
+                write(1, &var[i], 1);
+                if (var[i] == '=')
+                        write(1, "\"", 1);
+                i++;
+        }
+        write(1, "\"", 1);
+        write(1, "\n", 1);
 }
-// printing for export fonction
-void	print_export(t_shell **args)
+void    print_export(t_shell **args)
 {
-	t_node	*copy;
-	t_node	*head;
+        t_node  *copy;
+        t_node  *head;
+		t_node  *copy_exp;
+		t_node	*head_exp;
 
-	copy = copy_list((*args)->env);
-	sort_lst(&copy);
-	head = copy;
-	while (copy != NULL)
-	{
-		add_double_quotes(copy->content);
-		copy = copy->next;
-	}
-	free_lst(head);
-}
-void	add_or_update(const char *var, t_node **env_list)
-{
-	char	*name;
-	char	*equal;
-	int		i;
-
-	name = ft_strdup(var);
-	equal = ft_strchr(name, '=');
-	i = 1;
-	printf("equal %s\n", equal);
-	printf("name %s\n", name);
-	if (equal != NULL)
-	{
-		// the variable name is in double quotes
-		if (equal[i] == '"' && equal[ft_strlen(equal) - 1] == '"')
+        copy = copy_list((*args)->env);
+        sort_lst(&copy);
+        head = copy;
+        while (copy != NULL)
+        {
+                add_double_quotes(copy->content);
+                copy = copy->next;
+        }
+		copy_exp = copy_list((*args)->export);
+		head_exp = copy_exp;
+		while (copy_exp != NULL)
 		{
-			name = remove_quotes(name);
-			add_node(env_list, name);
-			free(name);
+			write(1,"declare -x ",11);
+			printf("%s\n", copy_exp->content);
+			copy_exp = copy_exp->next;
 		}
-		// all after the export fonction is in doubles quotes
-		else if (name[0] == '"' && name[ft_strlen(name) - 1] == '"')
-		{
-			printf("all name in double quotes\n");
-		}
-		// no variable name after = or varible name after =
-		else if ((ft_strlen(equal) == 1 && equal[0] == '=') || quotes(var) == 0)
-		{
-			// to replace if variable already in list
-			remove_if(env_list, name);
-			add_node(env_list, name);
-			free(name);
-		}
-	}
+        free_lst(head);
+		free_lst(head_exp);
 }
-int	find_equal(const char *var)
+/*int		builtin_export(t_shell *args)
 {
-	int	i;
+	t_list *current;
+	t_list *prev;
+	char *new_var;
+	int egale;
 
-	i = 0;
-	while (var[i] != '=')
-		i++;
-	if (var[i] == '=')
+	egale = 0;
+	current = args->tokens;
+	prev = NULL;
+	//export cmd is alone
+	if(current->next == NULL)
 	{
-		printf("i vaut %d\n", i);
-		return (i);
+		print_export(&args);
 	}
-	else
-		return (-1);
-}
-// to know if doubles quotes are around variable name or variable value
-// et if opened double quotes are also close
-int	quotes(const char *var)
-{
-	int	i;
-	int	nb_quotes;
-
-	i = 0;
-	nb_quotes = 0;
-	while (var[i])
+	else if(check_in(current->next->content))
 	{
-		if (var[i] == '"')
-			nb_quotes++;
-		i++;
-	}
-	if (nb_quotes % 2 != 0)
-		return (0);
-	else if (var[0] == '"' && var[find_equal(var) - 1] == '"')
-	{
-		printf("first argument in double quotes\n");
-		return (1);
-	}
-	else if (var[find_equal(var) + 1] == '"' && var[ft_strlen(var) - 1] == '"')
-	{
-		printf("second argument in double quotes\n");
-		return (2);
+		while (current != NULL)
+		{
+			//in both cases the variable have to be add at env variable
+			if(strcmp(current->content, "=") == 0)
+			{
+				if(current->next == NULL)
+				{
+					printf("pas de valeur donner a la variable\n");
+					new_var = ft_strjoin(prev->content,current->content);
+					return(1);
+				}
+				else if (current->next != NULL)
+				{
+					printf("presence d' une valeur apres le egale\n");
+					return(1);
+				}
+				egale++;
+			}
+			else if(current->next == NULL && egale == 0)
+			{
+				printf("pas de egale\n");
+				return(1);
+			}
+			prev = current;
+			current = current->next;
+		}
 	}
 	return (0);
-}
-// for ignore quotes for export fonction
-char	*remove_quotes(const char *var)
+}*/
+//fonctionne avec l' affichage et le trieen
+int		builtin_export(t_shell *args)
 {
-	int i;
-	int j;
-	char *new;
+	t_list *current;
+	t_list *prev;
+	char *new_var;
+	char *var_value;
+	int egale;
 
-	i = 0;
-	j = 0;
-	new = malloc(sizeof(char) * ft_strlen(var) - 1);
-	while (var[i])
+	egale = 0;
+	current = args->tokens;
+	prev = NULL;
+	//export cmd is alone
+	if(current->next == NULL)
 	{
-		if (var[i] == '"')
-			i++;
-		new[j++] = var[i++];
+		print_export(&args);
 	}
-	new[j] = '\0';
-	// printf("new: %s\n", new);
-	return (new);
+	else if(check_in(current->next->content))
+	{
+		while (current != NULL)
+		{
+			//in both cases the variable have to be add at env variable
+			if(strcmp(current->content, "=") == 0)
+			{
+				//no value after equal
+				if(current->next == NULL)
+				{
+					printf("pas de valeur donner a la variable\n");
+					new_var = ft_strjoin(prev->content,current->content);
+					remove_if(&args->env, new_var);
+					add_node(&args->env, new_var);
+					free(new_var);
+					return(1);
+				}
+				//variable had a value after equal
+				else if (current->next != NULL)
+				{
+					printf("presence d' une valeur apres le egale\n");
+					new_var = ft_strjoin(prev->content,current->content);
+					var_value = ft_strjoin(new_var, current->next->content);
+					remove_if(&args->env, new_var);
+					add_node(&args->env, var_value);
+					free(new_var);
+					free(var_value);
+					return(1);
+				}
+				egale++;
+			}
+			else if(current->next == NULL && egale == 0)
+			{
+				printf("pas de egale\n");
+				printf("ajouter a export %s\n", current->content);
+				add_node(&args->export, current->content);
+				return(1);
+			}
+			prev = current;
+			current = current->next;
+		}
+	}
+	return (0);
 }
