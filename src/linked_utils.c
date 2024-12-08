@@ -103,8 +103,6 @@ void print_list_debug(t_list **top)
     while (current != NULL) 
 	{
         printf("Content: %s\n", (char *)(current->content));
-        printf("Single quotes: %s\n", current->s_quotes ? "yes" : "no");
-        printf("Double quotes: %s\n", current->d_quotes ? "yes" : "no");
         printf("----------\n");
         current = current->next;
     }

@@ -40,8 +40,6 @@ t_list	*add_token(t_list **list, const char *token, int length)
 		error("malloc token");
 		return (NULL);
 	}
-	new_node->d_quotes = 0;
-	new_node->s_quotes = 0;
 	ft_lstadd_back(list, new_node);
 	return (new_node);
 }
@@ -146,7 +144,6 @@ void tokenize_input(const char *input, t_shell *args)
 		{
 			if (content[i] == '\"') 
 			{
-				current->d_quotes = 1;
 				i++;
 				while (content[i] && content[i] != '\"') {
 					if (content[i] == '$') {
@@ -174,7 +171,6 @@ void tokenize_input(const char *input, t_shell *args)
 			} 
 			else if (content[i] == '\'')
 			{
-				current->s_quotes = 1;
 				i++;
 				while (content[i] && content[i] != '\'') {
 					new_content = realloc(new_content, j + 2);
