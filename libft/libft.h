@@ -21,9 +21,7 @@
 // Function prototypes
 typedef struct s_list
 {
-	char			*content;
-	int				s_quotes;
-	int 			d_quotes;
+	void			*content;
 	struct s_list	*next;
 }					t_list;
 
