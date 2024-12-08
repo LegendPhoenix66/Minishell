@@ -191,10 +191,5 @@ void	execute_command(t_shell *args)
 void	parse_input(char *input, t_shell *args)
 {
 	tokenize_input(input, args);
-	tokenize_input1(args);
-	print_list_debug(&args->tokens);
-	//is_cmd(&(*args)->tokens);
-	//parse_redirections(&(*args)->tokens);
-	//debug_list(&(*args)->tokens);
 	execute_command(args); // Execute the command with the arguments
 }

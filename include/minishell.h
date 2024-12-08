@@ -66,14 +66,12 @@ t_node				*copy_list(t_node *original);
 void				add_node(t_node **top, const char *env);
 int					find_equal(const char *var);
 void				remove_if(t_node **top, const char *var_name);
-//void				remove_if(t_list **top, const char *var_name);
 int					ft_export(const char *var, t_shell *args);
 void				tokenize_input(const char *input, t_shell *args);
 void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
 void				parse_redirections(t_node **top);
-void				tokenize_input1(t_shell *args);
 
 // builtins
 void				builtin_echo(const t_list *tokens);
