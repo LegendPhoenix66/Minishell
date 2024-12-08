@@ -75,6 +75,7 @@ void				parse_redirections(t_node **top);
 
 // builtins
 void				builtin_echo(const t_list *tokens);
+void				builtin_exit(t_shell *args);
 int					builtin_unset(t_node **env_list, const char *var);
 int					builtin_export(t_shell *args);
 

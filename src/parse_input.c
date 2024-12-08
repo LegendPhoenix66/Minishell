@@ -154,11 +154,8 @@ void	execute_command(t_shell *args)
 		return ;
 	}
 	if (strcmp(token_node->content, "exit") == 0)
-	{
-		write(1, "exit\n", 5);
-		exit(token_node->next ? ft_atoi(token_node->next->content) : 0);
-	}
-	if (strcmp(token_node->content, "cd") == 0) {
+		builtin_exit(args);
+	else if (strcmp(token_node->content, "cd") == 0) {
 		free(args->current_directory);
 		args->current_directory = getcwd(NULL, 0);
 		if (args->current_directory == NULL)
