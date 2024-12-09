@@ -50,7 +50,9 @@ typedef struct s_shell
 	t_node			*env;
 	int				exit;
 	char			*current_directory;
-	t_list			*tokens;
+	t_list			*tmp_tokens; //to jump from split by space to pipe... and remove quote...whithout leaks
+	t_list			*tokens; //the final token_list a the end of your fonctions
+	t_list			*tokens1; //to jump from tokens you did to split_var_and_varname without leaks(now is new final linked list)
 	t_node			*export;
 }					t_shell;
 
@@ -72,6 +74,10 @@ void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
 void				parse_redirections(t_node **top);
+t_list 				*remove_quotes_and_substitue_variables1(const char *input, t_shell *args);
+t_list				*add_token(t_list **list, const char *token, int length);
+void				error(const char *msg);
+t_list				*split_var_and_varname(const char *input, t_shell *args); 
 
 // builtins
 void				builtin_echo(const t_list *tokens);

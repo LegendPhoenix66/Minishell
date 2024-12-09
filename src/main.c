@@ -118,6 +118,8 @@ void init_args(t_shell *args)
 	args->current_directory = getcwd(NULL, 0);
 	args->tokens = NULL;
 	args->export = NULL;
+	args->tmp_tokens = NULL;
+	args->tokens1 = NULL;
 }
 
 int	main(int argc, char **argv, char **env)
@@ -136,6 +138,9 @@ int	main(int argc, char **argv, char **env)
 	while (input && args->exit == -1)
 	{
 		parse_input(input, args);
+		ft_lstclear(&args->tmp_tokens, free);
+		ft_lstclear(&args->tokens, free);
+		ft_lstclear(&args->tokens1, free);
 		free(input);
 		if (args->exit != -1)
 			break ;
@@ -144,7 +149,6 @@ int	main(int argc, char **argv, char **env)
 	if (args->exit == -1)
 		args->exit = 0;
 	free_lst(args->env);
-	ft_lstclear(&args->tokens, free);
 	ft_lstclear(&args->tokens, free);
 	write(1, "exit\n", 5);
 	return (args->exit);

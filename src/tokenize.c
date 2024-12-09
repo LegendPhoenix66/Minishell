@@ -12,18 +12,6 @@
 
 #include "../include/minishell.h"
 
-void init_node(t_node *node)
-{
-    if (!node)
-        return;
-    node->content = NULL;
-    node->is_cmd = 0;
-    node->is_out = 0;
-    node->in_single = 0;
-    node->in_double = 0;
-    node->no_quotes = 0;
-    node->type = NO_DIR;
-}
 void error(const char *msg)
 {
 	fprintf(stderr, "Error: %s\n", msg);

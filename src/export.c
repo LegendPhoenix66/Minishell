@@ -177,7 +177,6 @@ int		builtin_export(t_shell *args)
 			else if(current->next == NULL && egale == 0)
 			{
 				printf("pas de egale\n");
-				printf("ajouter a export %s\n", current->content);
 				add_node(&args->export, current->content);
 				return(1);
 			}
