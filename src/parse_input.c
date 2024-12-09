@@ -187,6 +187,6 @@ void	execute_command(t_shell *args)
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *args)
 {
-	tokenize_input(input, args);
+	args->tokens = tokenize_input(input);
 	execute_command(args); // Execute the command with the arguments
 }

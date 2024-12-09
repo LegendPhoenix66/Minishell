@@ -44,8 +44,8 @@ t_list	*add_token(t_list **list, const char *token, int length)
 	return (new_node);
 }
 
-void tokenize_input(const char *input, t_shell *args)
-{
+// Function to split input by spaces
+t_list *split_by_spaces(const char *input) {
 	t_list *parsed_tokens = NULL;
 	int i = 0;
 	while (input[i]) {
@@ -60,7 +60,8 @@ void tokenize_input(const char *input, t_shell *args)
 				j++;
 			}
 			if (!input[j]) {
-				error("Unmatched quote");
+				fprintf(stderr, "Unmatched quote");
+				return NULL;
 			}
 			i = j + 1;
 		} else {
@@ -68,12 +69,16 @@ void tokenize_input(const char *input, t_shell *args)
 		}
 	}
 	add_token(&parsed_tokens, input, i);
+	return parsed_tokens;
+}
 
-	// check every token for pipes or redirects (not in quotes)
+// Function to correct pipes and redirects
+t_list *correct_pipes_and_redirects(t_list *parsed_tokens)
+{
 	t_list *tokens_with_pipes = NULL;
 	t_list *current = parsed_tokens;
 	while (current) {
-		i = 0;
+		int i = 0;
 		int pipe_pos = -1;
 		char *content = current->content;
 		while (content[i]) {
@@ -117,17 +122,21 @@ void tokenize_input(const char *input, t_shell *args)
 		// add last token
 		current = current->next;
 	}
+	return tokens_with_pipes;
+}
 
-	// clean-up quotes and interpret $
-	current = tokens_with_pipes;
+// Function to remove quotes and substitute variables
+void remove_quotes_and_substitute_variables(t_list *tokens)
+{
+	t_list *current = tokens;
 	while (current) {
 		char *new_content = NULL;
-		i = 0;
+		int i = 0;
 		int j = 0;
 		char *content = current->content;
-		while (content[i]) 
+		while (content[i])
 		{
-			if (content[i] == '\"') 
+			if (content[i] == '\"')
 			{
 				i++;
 				while (content[i] && content[i] != '\"') {
@@ -153,7 +162,7 @@ void tokenize_input(const char *input, t_shell *args)
 					}
 				}
 				i++;
-			} 
+			}
 			else if (content[i] == '\'')
 			{
 				i++;
@@ -190,6 +199,14 @@ void tokenize_input(const char *input, t_shell *args)
 		}
 		current = current->next;
 	}
+}
 
-	args->tokens = tokens_with_pipes;
+t_list *tokenize_input(const char *input)
+{
+	t_list *parsed_tokens = split_by_spaces(input);
+	if (!parsed_tokens)
+		return NULL;
+	t_list *tokens_with_pipes = correct_pipes_and_redirects(parsed_tokens);
+	remove_quotes_and_substitute_variables(tokens_with_pipes);
+	return tokens_with_pipes;
 }
