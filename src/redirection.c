@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-// don't work with env fonction directly
+// don't work with env function directly
 void	redirections(const char *file_path, const char *cmd, const char *flags)
 {
 	int		pid;
@@ -26,17 +26,17 @@ void	redirections(const char *file_path, const char *cmd, const char *flags)
 		perror("fork");
 		return ;
 	}
-	// Processus enfant
+	// Child processes
 	if (pid == 0)
 	{
-		// Ouvre le fichier pour écrire
+		// Open the file to write
 		file = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 		if (file == -1)
 		{
 			perror("open");
 			exit(2);
 		}
-		// Redirige stdout vers le fichier
+		// Redirect stdout to file
 		if (dup2(file, STDOUT_FILENO) == -1)
 		{
 			perror("dup2");
@@ -44,12 +44,12 @@ void	redirections(const char *file_path, const char *cmd, const char *flags)
 			exit(2);
 		}
 		close(file);
-		// Prépare les arguments pour execve
+		// Prepare arguments for execution
 		argv[0] = (char *)cmd;
 		argv[1] = (char *)flags;
 		argv[2] = NULL;
 		// Exécute la commande
-		err = execve(cmd, argv, NULL); // NULL pour hériter de l'environnement
+		err = execve(cmd, argv, NULL); // NULL to inherit from environment
 		if (err == -1)
 		{
 			perror("execve");
@@ -58,7 +58,7 @@ void	redirections(const char *file_path, const char *cmd, const char *flags)
 	}
 	else
 	{
-		// Processus parent : attend la fin du processus enfant
+		// Parent process: waits for the child process to finish
 		wait(NULL);
 	}
 }
@@ -75,14 +75,14 @@ void	redir_linked(const char *file_path, t_node **top)
 	}
 	if (pid == 0)
 	{
-		// Ouvre le fichier pour écrire
+		// Open the file to write
 		file = open(file_path, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 		if (file == -1)
 		{
 			perror("open");
 			exit(2);
 		}
-		// Redirige stdout vers le fichier
+		// Redirect stdout to file
 		if (dup2(file, STDOUT_FILENO) == -1)
 		{
 			perror("dup2");

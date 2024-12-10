@@ -126,7 +126,8 @@ void    print_export(t_shell **args)
 	}
 	return (0);
 }*/
-//fonctionne avec l' affichage et le trieen
+
+//works with display and sorting
 int		builtin_export(t_shell *args)
 {
 	t_list *current;
@@ -153,7 +154,6 @@ int		builtin_export(t_shell *args)
 				//no value after equal
 				if(current->next == NULL)
 				{
-					printf("pas de valeur donner a la variable\n");
 					new_var = ft_strjoin(prev->content,current->content);
 					remove_if(&args->env, new_var);
 					add_node(&args->env, new_var);
@@ -163,7 +163,6 @@ int		builtin_export(t_shell *args)
 				//variable had a value after equal
 				else if (current->next != NULL)
 				{
-					printf("presence d' une valeur apres le egale\n");
 					new_var = ft_strjoin(prev->content,current->content);
 					var_value = ft_strjoin(new_var, current->next->content);
 					remove_if(&args->env, new_var);
@@ -176,7 +175,6 @@ int		builtin_export(t_shell *args)
 			}
 			else if(current->next == NULL && egale == 0)
 			{
-				printf("pas de egale\n");
 				add_node(&args->export, current->content);
 				return(1);
 			}

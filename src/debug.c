@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-// Fonction de debug pour un seul nœud
+// Debug function for a single node
 void debug_node(t_node *node) 
 {
     if (!node) 
@@ -21,11 +21,11 @@ void debug_node(t_node *node)
         return;
     }
 
-    // Affichage des informations basiques du nœud
+    // Viewing basic node information
     printf("Node content: %s\n", node->content ? node->content : "(null)");
     printf("is_cmd: %d\n", node->is_cmd);
 
-    // Déterminer le type de quotes
+    // Determine the type of quotes
     if (node->in_single)
     {
         printf("Quotes: Single quotes ('...')\n");
@@ -43,7 +43,7 @@ void debug_node(t_node *node)
         printf("Quotes: Undefined or mixed state\n");
     }
 
-    // Vérification du type de redirection
+    // Checking the redirect type
     printf("Redirection type: ");
     switch (node->type) 
     {
@@ -67,7 +67,7 @@ void debug_node(t_node *node)
             break;
     }
 
-    // Suivi de la chaîne des nœuds si elle existe
+    // Tracking the chain of nodes if it exists
     if (node->next)
     {
         printf("Next node exists.\n");
@@ -78,7 +78,7 @@ void debug_node(t_node *node)
     }
 }
 
-// Fonction de debug pour parcourir toute une liste chaînée de t_node
+// Debug function to traverse an entire t_node linked list
 void debug_list(t_node **head) 
 {
     t_node *current = *head;

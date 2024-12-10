@@ -51,7 +51,7 @@ typedef struct s_shell
 	int				exit;
 	char			*current_directory;
 	t_list			*tmp_tokens; //to jump from split by space to pipe... and remove quote...whithout leaks
-	t_list			*tokens; //the final token_list a the end of your fonctions
+	t_list			*tokens; //the final token_list a the end of your functions
 	t_list			*tokens1; //to jump from tokens you did to split_var_and_varname without leaks(now is new final linked list)
 	t_node			*export;
 }					t_shell;
