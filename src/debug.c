@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-// Fonction de debug pour un seul nœud
+// Debug function for a single node
 void debug_node(t_node *node) 
 {
     if (!node) 
@@ -78,7 +78,7 @@ void debug_node(t_node *node)
     }
 }
 
-// Fonction de debug pour parcourir toute une liste chaînée de t_node
+// Debug function to traverse an entire t_node linked list
 void debug_list(t_node **head) 
 {
     t_node *current = *head;

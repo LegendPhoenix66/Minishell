@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-//that fonction manage space and unmatched quote
+//that function manage space and unmatched quote
 t_list *split_by_spaces1(const char *input, t_shell *args)
 {
     t_list *parsed_tokens;
@@ -29,7 +29,6 @@ t_list *split_by_spaces1(const char *input, t_shell *args)
     {
         if(input[i] == ' ')
         {
-            //printf("malloc space\n");
             add_token(&parsed_tokens, input, i);
             input += i + 1;
             i = 0;
@@ -47,11 +46,11 @@ t_list *split_by_spaces1(const char *input, t_shell *args)
         else
             i++;
     }
-    //printf("add at end 1\n");
     add_token(&parsed_tokens, input, i);
     args->tmp_tokens = parsed_tokens;
     return (args->tmp_tokens);
 }
+
 //check every token for pipe or redirects (not in quotes)
 t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
 {
@@ -62,7 +61,6 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
     char quote;
 
     current = split_by_spaces1(input, args);
-    quote = 0;
     while (current)
     {
         i = 0;
@@ -82,7 +80,6 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             {
                 if(ft_strlen(current->content) == 1)
                     break;
-                //printf("malloc pipe\n");
                 add_token(&(args->tokens), current->content, i);
                 add_token(&(args->tokens), current->content + i, 1);
                 pipe_pos = i;
@@ -93,7 +90,6 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 {
                     if(ft_strlen(content) == 2)
                         break;
-                    printf("malloc rederirection if\n");
                     add_token(&(args->tokens), content, i);
                     add_token(&(args->tokens), content + i, 2);
 					pipe_pos = i + 1;
@@ -103,7 +99,6 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 {
                     if(ft_strlen(content) == 1)
                         break;
-                    printf("malloc redirection else\n");
                     add_token(&(args->tokens), content, i);
                     add_token(&(args->tokens), content + i, 1);
 				    pipe_pos = i;
@@ -111,12 +106,12 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             }
             i++;
         }
-        printf("add at end 2\n");
         add_token(&(args->tokens), content + pipe_pos + 1, ft_strlen(content) - pipe_pos - 1);
         current = current->next;
     }
     return (args->tokens);
 }
+
 // Function to remove quotes and substitute variables
 t_list *remove_quotes_and_substitue_variables1(const char *input, t_shell *args)
 {
@@ -209,6 +204,7 @@ t_list *remove_quotes_and_substitue_variables1(const char *input, t_shell *args)
     }
     return (args->tokens);
 }
+
 //tokenize_input tokenize export salut=hello in 2 nodes
 //tokenize_input1 tokenize that in 4 nodes
 //need to take care tokenize make leaks ans tokenize1 also for the moment 
@@ -225,21 +221,17 @@ t_list *split_var_and_varname(const char *input, t_shell *args)
 		{
             if (equal_pos > 0)
             {
-                //printf("pas de valeur\n");
                 add_token(&args->tokens1, current->content, equal_pos);
             }
-            //printf("ajout du egale\n");
             add_token(&args->tokens1, "=", 1);
             if ((size_t)equal_pos + 1 < ft_strlen(current->content))
 			{
-                //printf("rajout de la valeur");
                 add_token(&args->tokens1, current->content + equal_pos + 1,
                           ft_strlen(current->content) - equal_pos - 1);
             }
         }	
 		else 
         {
-           //printf("simple ajout d' un token");
             add_token(&args->tokens1, current->content, ft_strlen(current->content));
         }
         current = current->next;
