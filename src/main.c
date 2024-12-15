@@ -150,6 +150,8 @@ int	main(int argc, char **argv, char **env)
 		args->exit = 0;
 	free_lst(args->env);
 	ft_lstclear(&args->tokens, free);
+	free(args->current_directory);
+	free(args);
 	write(1, "exit\n", 5);
-	return (args->exit);
+	return (0);
 }

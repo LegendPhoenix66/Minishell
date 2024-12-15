@@ -31,6 +31,25 @@ typedef enum e_dir
 	NO_DIR
 } t_dir;
 
+typedef struct s_redir
+{
+    t_dir type;
+    char *file;
+    int fd;
+} t_redir;
+
+typedef enum e_builtin
+{
+    BUILTIN_EXIT,
+    BUILTIN_CD,
+    BUILTIN_PWD,
+    BUILTIN_ECHO,
+    BUILTIN_ENV,
+    BUILTIN_UNSET,
+    BUILTIN_EXPORT,
+    BUILTIN_UNKNOWN
+} t_builtin;
+
 // for manipulation of environment variable
 typedef struct s_node
 {
@@ -54,6 +73,9 @@ typedef struct s_shell
 	t_list			*tokens; //the final token_list a the end of your fonctions
 	t_list			*tokens1; //to jump from tokens you did to split_var_and_varname without leaks(now is new final linked list)
 	t_node			*export;
+	int           saved_stdin;
+	int           saved_stdout;
+	t_redir       *redirections;
 }					t_shell;
 
 void				parse_input(char *input, t_shell *args);
@@ -77,7 +99,14 @@ void				parse_redirections(t_node **top);
 t_list 				*remove_quotes_and_substitue_variables1(const char *input, t_shell *args);
 t_list				*add_token(t_list **list, const char *token, int length);
 void				error(const char *msg);
-t_list				*split_var_and_varname(const char *input, t_shell *args); 
+t_list				*split_var_and_varname(const char *input, t_shell *args);
+t_list              *is_a_redirecton(t_shell *args);
+void				save_std_fds(int *saved_stdin, int *saved_stdout);
+int					handle_output_redir(char *file, int flags);
+void				restore_std_fds(int saved_stdin, int saved_stdout);
+void				execute_external_command1(t_shell *args);
+int					is_redir(char *node_content);
+int					handle_redirection(t_list *token);
 
 // builtins
 void				builtin_echo(const t_list *tokens);

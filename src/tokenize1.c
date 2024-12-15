@@ -47,7 +47,7 @@ t_list *split_by_spaces1(const char *input, t_shell *args)
         else
             i++;
     }
-    //printf("add at end 1\n");
+   // printf("add at end 1\n");
     add_token(&parsed_tokens, input, i);
     args->tmp_tokens = parsed_tokens;
     return (args->tmp_tokens);
@@ -74,9 +74,9 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             {
                 quote = content[i];
                 i++;
-                while (content[i] != quote)
+                while (content[i] != quote && content[i])
                     i++;
-                i++;
+                //i++;
             }
             if(content[i] == '|')
             {
@@ -93,7 +93,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 {
                     if(ft_strlen(content) == 2)
                         break;
-                    printf("malloc rederirection if\n");
+                    //printf("malloc rederirection if\n");
                     add_token(&(args->tokens), content, i);
                     add_token(&(args->tokens), content + i, 2);
 					pipe_pos = i + 1;
@@ -103,7 +103,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 {
                     if(ft_strlen(content) == 1)
                         break;
-                    printf("malloc redirection else\n");
+                    //printf("malloc redirection else\n");
                     add_token(&(args->tokens), content, i);
                     add_token(&(args->tokens), content + i, 1);
 				    pipe_pos = i;
@@ -111,7 +111,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             }
             i++;
         }
-        printf("add at end 2\n");
+        //printf("add at end 2\n");
         add_token(&(args->tokens), content + pipe_pos + 1, ft_strlen(content) - pipe_pos - 1);
         current = current->next;
     }
@@ -239,10 +239,13 @@ t_list *split_var_and_varname(const char *input, t_shell *args)
         }	
 		else 
         {
-           //printf("simple ajout d' un token");
+           // printf("simple ajout d' un token\n");
             add_token(&args->tokens1, current->content, ft_strlen(current->content));
         }
         current = current->next;
     }
     return(args->tokens1);
 }
+
+
+

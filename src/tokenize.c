@@ -61,29 +61,37 @@ t_list *split_by_spaces(const char *input) {
 }
 
 // Function to correct pipes and redirects
-t_list *correct_pipes_and_redirects(t_list *parsed_tokens) {
+t_list *correct_pipes_and_redirects(t_list *parsed_tokens)
+{
 	t_list *tokens_with_pipes = NULL;
 	t_list *current = parsed_tokens;
-	while (current) {
+	while (current)
+	{
 		int i = 0;
 		int pipe_pos = -1;
 		char *content = current->content;
-		while (content[i]) {
-			if (content[i] == '\"' || content[i] == '\'') {
+		while (content[i])
+		{
+			if (content[i] == '\"' || content[i] == '\'')
+			{
 				char quote = content[i];
 				i++;
-				while (content[i] != quote) {
+				while (content[i] != quote)
+				{
 					i++;
 				}
 				i++;
 			}
-			if (content[i] == '|' || content[i] == '<' || content[i] == '>') {
+			if (content[i] == '|' || content[i] == '<' || content[i] == '>')
+			{
 				int length = (content[i + 1] == content[i]) ? 2 : 1;
 				add_token(&tokens_with_pipes, current->content, i);
 				add_token(&tokens_with_pipes, current->content + i, length);
 				pipe_pos = i + length - 1;
 				i += length;
-			} else {
+			}
+			else 
+			{
 				i++;
 			}
 		}
@@ -94,20 +102,27 @@ t_list *correct_pipes_and_redirects(t_list *parsed_tokens) {
 }
 
 // Function to remove quotes and substitute variables
-void remove_quotes_and_substitute_variables(t_list *tokens) {
+void remove_quotes_and_substitute_variables(t_list *tokens)
+{
     t_list *current = tokens;
-    while (current) {
+    while (current)
+	{
         char *new_content = NULL;
         int i = 0, j = 0;
         char *content = current->content;
-        while (content[i]) {
-            if (content[i] == '\"' || content[i] == '\'') {
+        while (content[i]) 
+		{
+            if (content[i] == '\"' || content[i] == '\'')
+			{
                 char quote = content[i++];
-                while (content[i] && content[i] != quote) {
-                    if (content[i] == '$' && quote == '\"') {
+                while (content[i] && content[i] != quote) 
+				{
+                    if (content[i] == '$' && quote == '\"')
+					{
                         // Variable substitution
                         int var_start = ++i;
-                        while (content[i] && content[i] != ' ' && content[i] != quote) {
+                        while (content[i] && content[i] != ' ' && content[i] != quote) 
+						{
                             i++;
                         }
                         char var_name[i - var_start + 1];
@@ -119,32 +134,41 @@ void remove_quotes_and_substitute_variables(t_list *tokens) {
                             strcpy(&new_content[j], var_value);
                             j += strlen(var_value);
                         }
-                    } else {
+                    } 
+					else 
+					{
                         new_content = realloc(new_content, j + 2);
                         new_content[j++] = content[i++];
                     }
                 }
                 i++;
-            } else if (content[i] == '$') {
+            } 
+			else if (content[i] == '$') 
+			{
                 int var_start = ++i;
-                while (content[i] && content[i] != ' ' && content[i] != '\"' && content[i] != '\'') {
+                while (content[i] && content[i] != ' ' && content[i] != '\"' && content[i] != '\'') 
+				{
                     i++;
                 }
                 char var_name[i - var_start + 1];
                 strncpy(var_name, &content[var_start], i - var_start);
                 var_name[i - var_start] = '\0';
                 char *var_value = getenv(var_name);
-                if (var_value) {
+                if (var_value) 
+				{
                     new_content = realloc(new_content, j + strlen(var_value) + 1);
                     strcpy(&new_content[j], var_value);
                     j += strlen(var_value);
                 }
-            } else {
+            } 
+			else 
+			{
                 new_content = realloc(new_content, j + 2);
                 new_content[j++] = content[i++];
             }
         }
-        if (new_content) {
+        if (new_content) 
+		{
             new_content[j] = '\0';
             free(current->content);
             current->content = new_content;

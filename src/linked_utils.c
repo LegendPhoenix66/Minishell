@@ -103,6 +103,7 @@ void print_list_debug(t_list **top)
     while (current != NULL) 
 	{
         printf("Content: %s\n", (char *)(current->content));
+		printf("adresse %p\n", (char *)(current));
         printf("----------\n");
         current = current->next;
     }

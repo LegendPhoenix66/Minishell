@@ -78,7 +78,7 @@ void	execute_external_command(t_shell *args)
 	char	buffer[1024];
 	ssize_t	bytes_read;
 	char *argv[3];
-	t_list *token_node = args->tokens;
+	t_list *token_node = args->tokens; //to see if don' t needed args->token2
 
 	argv[0] = (char *)token_node->content;
 	if(token_node->next == NULL)
@@ -146,8 +146,10 @@ void	execute_external_command(t_shell *args)
 void	execute_command(t_shell *args)
 {
 	t_list		*token_node;
+	t_list 		*redirection;
 
-	token_node = args->tokens;
+	redirection = is_a_redirecton(args);
+	token_node = args->tokens1; //modification en tokens1 pour le moment
 	if (token_node == NULL) // No command entered
 	{
 		printf("no command entered\n");
@@ -180,15 +182,42 @@ void	execute_command(t_shell *args)
 	}
 	else
 	{
-		execute_external_command(args);
+		if(redirection != NULL)
+		{
+			execute_external_command1(args);
+		}
+		else
+			execute_external_command(args);
 	}
 }
 
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *args)
 {
-	//args->tokens = tokenize_input(input);
+	t_list *redirection;
+	int save_stdin;
+	int save_stdout;
+
 	args->tokens1 = split_var_and_varname(input, args);
-	print_list_debug(&args->tokens1);
-	execute_command(args); // Execute the command with the arguments
+	redirection = is_a_redirecton(args);
+	if(redirection != NULL)
+	{
+		if(redirection->next == NULL)
+		{
+			error("no file descriptor after the redirection\n");
+			return;
+		}
+		save_std_fds(&save_stdin, &save_stdout);
+		if(handle_redirection(redirection) == -1)
+		{
+			error("redirection error\n");
+			return;
+		}
+		execute_command(args);
+		restore_std_fds(save_stdin, save_stdout);
+	}
+	else
+	{
+		execute_command(args); // Execute the command with the arguments
+	}	
 }
