@@ -102,8 +102,7 @@ void print_list_debug(t_list **top)
 
     while (current != NULL) 
 	{
-        printf("Content: %s\n", (char *)(current->content));
-        printf("----------\n");
+        printf("%s\n", (char *)(current->content));
         current = current->next;
     }
     printf("-------list end-------\n");

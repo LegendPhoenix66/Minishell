@@ -143,7 +143,7 @@ void	execute_external_command(t_shell *args)
 }
 
 // Function to execute commands (either built-in or external)
-void	execute_command(t_shell *args)
+void	execute_command_old(t_shell *args)
 {
 	t_list		*token_node;
 

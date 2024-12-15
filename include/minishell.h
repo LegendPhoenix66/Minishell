@@ -44,6 +44,16 @@ typedef struct s_node
 	struct s_node *next;
 } t_node;
 
+typedef struct s_cmd {
+	char **args;
+	char *input_file;
+	char *output_file;
+	int input_fd;
+	int output_fd;
+	int input_mode; // 0: stdin, 1: file <, 2: heredoc <<
+	int output_mode; // 0: stdout, 1: file >, 2: file >>
+} t_cmd;
+
 typedef struct s_shell
 {
 	char			**environ;
@@ -78,6 +88,8 @@ t_list 				*remove_quotes_and_substitue_variables1(const char *input, t_shell *a
 t_list				*add_token(t_list **list, const char *token, int length);
 void				error(const char *msg);
 t_list				*split_var_and_varname(const char *input, t_shell *args); 
+
+void execute_command(t_shell *shell);
 
 // builtins
 void				builtin_echo(const t_list *tokens);
