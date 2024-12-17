@@ -149,7 +149,7 @@ void	execute_command(t_shell *args)
 	t_list 		*redirection;
 
 	redirection = is_a_redirecton(args);
-	token_node = args->tokens1; //modification en tokens1 pour le moment
+	token_node = args->tokens; //modification en tokens1 pour le moment
 	if (token_node == NULL) // No command entered
 	{
 		printf("no command entered\n");
@@ -194,12 +194,13 @@ void	execute_command(t_shell *args)
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *args)
 {
-	t_list *redirection;
+	/*t_list *redirection;
 	int save_stdin;
-	int save_stdout;
+	int save_stdout;*/
 
-	args->tokens1 = split_var_and_varname(input, args);
-	redirection = is_a_redirecton(args);
+	args->tokens = remove_quotes_and_substitue_variables1(input, args);
+	print_list_debug(&args->tokens);
+	/*redirection = is_a_redirecton(args);
 	if(redirection != NULL)
 	{
 		if(redirection->next == NULL)
@@ -219,5 +220,6 @@ void	parse_input(char *input, t_shell *args)
 	else
 	{
 		execute_command(args); // Execute the command with the arguments
-	}	
+	}*/
+	execute_command1(args);	
 }

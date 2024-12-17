@@ -38,6 +38,18 @@ typedef struct s_redir
     int fd;
 } t_redir;
 
+typedef struct s_cmd 
+{
+	char **args;
+	char *input_file;
+	char *output_file;
+	int input_fd;
+	int output_fd;
+	int input_mode; // 0: stdin, 1: file <, 2: heredoc <<
+	int output_mode; // 0: stdout, 1: file >, 2: file >>
+} t_cmd;
+
+
 typedef enum e_builtin
 {
     BUILTIN_EXIT,
@@ -107,6 +119,8 @@ void				restore_std_fds(int saved_stdin, int saved_stdout);
 void				execute_external_command1(t_shell *args);
 int					is_redir(char *node_content);
 int					handle_redirection(t_list *token);
+int					count_node(t_list **top);
+void				execute_command1(t_shell *shell); 
 
 // builtins
 void				builtin_echo(const t_list *tokens);

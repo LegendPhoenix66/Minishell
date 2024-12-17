@@ -82,7 +82,6 @@ void	ft_strtrim1(char *str)
 		j--;
 	}
 }
-
 char	*get_input(void)
 {
 	char	*line;
@@ -151,6 +150,8 @@ int	main(int argc, char **argv, char **env)
 	free_lst(args->env);
 	ft_lstclear(&args->tokens, free);
 	free(args->current_directory);
+	if(args->export != NULL)
+		free_lst(args->export);
 	free(args);
 	write(1, "exit\n", 5);
 	return (0);

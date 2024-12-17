@@ -262,4 +262,19 @@ t_node	*copy_list(t_node *original)
 	new_node->next = copy_list(original->next);
 	return (new_node);
 }
+int count_node(t_list **top)
+{
+	int i;
+	t_list *current;
+
+	i = 0;
+	current = *top;
+	while(current != NULL)
+	{
+		current = current->next;
+		i++;
+	}
+	printf("%d\n", i);
+	return(i);
+}
 

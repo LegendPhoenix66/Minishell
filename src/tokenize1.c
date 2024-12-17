@@ -76,13 +76,12 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 i++;
                 while (content[i] != quote && content[i])
                     i++;
-                //i++;
             }
             if(content[i] == '|')
             {
                 if(ft_strlen(current->content) == 1)
                     break;
-                //printf("malloc pipe\n");
+                printf("malloc pipe\n");
                 add_token(&(args->tokens), current->content, i);
                 add_token(&(args->tokens), current->content + i, 1);
                 pipe_pos = i;
@@ -93,7 +92,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 {
                     if(ft_strlen(content) == 2)
                         break;
-                    //printf("malloc rederirection if\n");
+                    printf("malloc rederirection if\n");
                     add_token(&(args->tokens), content, i);
                     add_token(&(args->tokens), content + i, 2);
 					pipe_pos = i + 1;
@@ -103,7 +102,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
                 {
                     if(ft_strlen(content) == 1)
                         break;
-                    //printf("malloc redirection else\n");
+                    printf("malloc redirection else\n");
                     add_token(&(args->tokens), content, i);
                     add_token(&(args->tokens), content + i, 1);
 				    pipe_pos = i;
@@ -111,7 +110,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             }
             i++;
         }
-        //printf("add at end 2\n");
+        printf("add at end 2\n");
         add_token(&(args->tokens), content + pipe_pos + 1, ft_strlen(content) - pipe_pos - 1);
         current = current->next;
     }
@@ -207,44 +206,8 @@ t_list *remove_quotes_and_substitue_variables1(const char *input, t_shell *args)
         }
         current = current->next;
     }
+    args->tokens1 = args->tokens;
     return (args->tokens);
-}
-//tokenize_input tokenize export salut=hello in 2 nodes
-//tokenize_input1 tokenize that in 4 nodes
-//need to take care tokenize make leaks ans tokenize1 also for the moment 
-t_list *split_var_and_varname(const char *input, t_shell *args)  
-{
-    t_list *current;
-    int equal_pos;
-
-    current = remove_quotes_and_substitue_variables1(input, args);
-    while (current != NULL)
-	{
-        equal_pos = find_equal(current->content);
-        if (equal_pos != -1)
-		{
-            if (equal_pos > 0)
-            {
-                //printf("pas de valeur\n");
-                add_token(&args->tokens1, current->content, equal_pos);
-            }
-            //printf("ajout du egale\n");
-            add_token(&args->tokens1, "=", 1);
-            if ((size_t)equal_pos + 1 < ft_strlen(current->content))
-			{
-                //printf("rajout de la valeur");
-                add_token(&args->tokens1, current->content + equal_pos + 1,
-                          ft_strlen(current->content) - equal_pos - 1);
-            }
-        }	
-		else 
-        {
-           // printf("simple ajout d' un token\n");
-            add_token(&args->tokens1, current->content, ft_strlen(current->content));
-        }
-        current = current->next;
-    }
-    return(args->tokens1);
 }
 
 

@@ -67,7 +67,7 @@ t_list *is_a_redirecton(t_shell *args)
     t_list *redirection;
 
     redirection = NULL;
-    current = args->tokens1;
+    current = args->tokens;
     while (current != NULL)
     {
         if(is_redir(current->content))

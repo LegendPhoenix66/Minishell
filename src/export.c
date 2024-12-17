@@ -80,54 +80,8 @@ void    print_export(t_shell **args)
         free_lst(head);
 		free_lst(head_exp);
 }
-/*int		builtin_export(t_shell *args)
-{
-	t_list *current;
-	t_list *prev;
-	char *new_var;
-	int egale;
-
-	egale = 0;
-	current = args->tokens;
-	prev = NULL;
-	//export cmd is alone
-	if(current->next == NULL)
-	{
-		print_export(&args);
-	}
-	else if(check_in(current->next->content))
-	{
-		while (current != NULL)
-		{
-			//in both cases the variable have to be add at env variable
-			if(strcmp(current->content, "=") == 0)
-			{
-				if(current->next == NULL)
-				{
-					printf("pas de valeur donner a la variable\n");
-					new_var = ft_strjoin(prev->content,current->content);
-					return(1);
-				}
-				else if (current->next != NULL)
-				{
-					printf("presence d' une valeur apres le egale\n");
-					return(1);
-				}
-				egale++;
-			}
-			else if(current->next == NULL && egale == 0)
-			{
-				printf("pas de egale\n");
-				return(1);
-			}
-			prev = current;
-			current = current->next;
-		}
-	}
-	return (0);
-}*/
 //fonctionne avec l' affichage et le trieen
-int		builtin_export(t_shell *args)
+/*int		builtin_export(t_shell *args)
 {
 	t_list *current;
 	t_list *prev;
@@ -185,4 +139,104 @@ int		builtin_export(t_shell *args)
 		}
 	}
 	return (0);
+}*/
+char *concat_list_content(t_list *list)
+{
+    t_list *current;
+    char *result;
+    char *temp;
+    
+    if (!list)
+        return (NULL);
+    result = ft_strdup(list->content);
+    if (!result)
+        return (NULL);
+    current = list->next;
+    while (current)
+    {
+        temp = result;
+        result = ft_strjoin(result, current->content);
+        free(temp);
+        if (!result)
+            return (NULL);
+        current = current->next;
+    }
+	printf("use concatenation fonction");
+    return (result);
+}
+
+int builtin_export(t_shell *args)
+{
+    char *input;
+    char *equal_pos;
+    char *var_name;
+    char *var_value;
+    char *full_var;
+	char *no_value;
+	int to_free;
+
+    // Si pas d'argument après export
+	to_free = 0;
+    if (args->tokens->next == NULL)
+    {
+        print_export(&args);
+        return (0);
+    }
+
+    if(count_node(&args->tokens) < 3)
+    	input = args->tokens->next->content;
+	else
+	{
+		input = concat_list_content(args->tokens->next);
+		to_free++;
+	}
+    // Vérifie si l'input est valide
+    if (!check_in(input))
+        return (1);
+
+    // Cherche le signe égal
+    equal_pos = ft_strchr(input, '=');
+
+    if (equal_pos == NULL)
+    {
+        // Pas de signe égal, ajouter à export
+        printf("pas de egale\n");
+		no_value = ft_strdup(input);
+        add_node(&args->export, no_value);
+		free(no_value);
+    }
+    else
+    {
+        // Extrait le nom de variable
+        var_name = ft_substr(input, 0, equal_pos - input);
+        
+        if (*(equal_pos + 1) == '\0')
+        {
+            // Égal sans valeur
+            printf("pas de valeur donner a la variable\n");
+            full_var = ft_strjoin(var_name, "=");
+            remove_if(&args->env, full_var);
+            add_node(&args->env, full_var);
+            free(var_name);
+			free(full_var);
+        }
+        else
+        {
+            // Égal avec valeur
+            printf("presence d'une valeur apres le egale\n");
+            var_value = ft_strdup(equal_pos + 1);
+            full_var = ft_strjoin(var_name, "=");
+			free(var_name);
+            var_name = full_var;
+            full_var = ft_strjoin(var_name, var_value);
+            remove_if(&args->env, var_name);
+            add_node(&args->env, full_var);
+            free(var_name);
+            free(var_value);
+			free(full_var);
+        }
+    }
+	if(to_free != 0)
+		free(input);
+    return (0);
 }
