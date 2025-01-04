@@ -40,17 +40,17 @@ typedef struct s_redir
 
 typedef struct s_cmd 
 {
-	char **args;
-	char *input_file;
-	char *output_file;
-	int input_fd;
-	int output_fd;
+	char **args; //tableau de chaine pour les arg de la cmd
+	char *input_file; //Nom  du fichier pour <
+	char *output_file; //Nom du fichier pour > ou >>
+	int input_fd; //descripteur de fichier pour l' entrer
+	int output_fd; //descripteur de fichier pour la sortie
 	int input_mode; // 0: stdin, 1: file <, 2: heredoc <<
 	int output_mode; // 0: stdout, 1: file >, 2: file >>
 } t_cmd;
 
 
-typedef enum e_builtin
+typedef enum e_builtin_type
 {
     BUILTIN_EXIT,
     BUILTIN_CD,
@@ -59,8 +59,8 @@ typedef enum e_builtin
     BUILTIN_ENV,
     BUILTIN_UNSET,
     BUILTIN_EXPORT,
-    BUILTIN_UNKNOWN
-} t_builtin;
+    BUILTIN_NONE
+} t_builtin_type;
 
 // for manipulation of environment variable
 typedef struct s_node
@@ -120,12 +120,18 @@ void				execute_external_command1(t_shell *args);
 int					is_redir(char *node_content);
 int					handle_redirection(t_list *token);
 int					count_node(t_list **top);
-void				execute_command1(t_shell *shell); 
+void				execute_command1(t_shell *shell);
+int				execute_builtin(t_cmd *cmd, t_shell *shell);
 
 // builtins
-void				builtin_echo(const t_list *tokens);
-void				builtin_exit(t_shell *args);
+//void				builtin_echo(const t_list *tokens);
+int					builtin_echo(t_cmd *cmd);
+//void				builtin_exit(t_shell *args);
 int					builtin_unset(t_node **env_list, const char *var);
-int					builtin_export(t_shell *args);
+//int					builtin_export(t_shell *args);
+int					builtin_export(t_shell *shell, char **args);
+int					builtin_exit(t_shell *shell, t_cmd *cmd);
+int					builtin_pwd();
+int					builtin_cd(t_shell *shell, t_cmd *cmd);
 
 #endif // MINISHELL_H

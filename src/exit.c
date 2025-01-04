@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-void builtin_exit(t_shell *args)
+/*void builtin_exit(t_shell *args)
 {
 	t_list *command_arguments = args->tokens->next;
 
@@ -40,4 +40,40 @@ void builtin_exit(t_shell *args)
 	else {
 		args->exit = 0;
 	}
+}*/
+int builtin_exit(t_shell *shell, t_cmd *cmd)
+{
+    ft_putendl_fd("exit", STDOUT_FILENO);
+
+    if (!cmd->args[1])
+    {
+        shell->exit = 0;
+        return 0;
+    }
+
+    // Check for too many arguments
+    if (cmd->args[1] && cmd->args[2])
+    {
+        ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+        return 1;
+    }
+
+    // Check if argument is numeric
+    char *arg = cmd->args[1];
+    int i = 0;
+    while (arg[i])
+    {
+        if (!ft_isdigit(arg[i]))
+        {
+            ft_putstr_fd("minishell: exit: ", 2);
+            ft_putstr_fd(arg, 2);
+            ft_putstr_fd(": numeric argument required\n", 2);
+            shell->exit = 255;
+            return 255;
+        }
+        i++;
+    }
+
+    shell->exit = ft_atoi(arg) % 256;
+    return shell->exit;
 }

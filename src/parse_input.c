@@ -143,7 +143,7 @@ void	execute_external_command(t_shell *args)
 }
 
 // Function to execute commands (either built-in or external)
-void	execute_command(t_shell *args)
+/*void	execute_command(t_shell *args)
 {
 	t_list		*token_node;
 	t_list 		*redirection;
@@ -189,37 +189,12 @@ void	execute_command(t_shell *args)
 		else
 			execute_external_command(args);
 	}
-}
+}*/
 
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *args)
 {
-	/*t_list *redirection;
-	int save_stdin;
-	int save_stdout;*/
-
 	args->tokens = remove_quotes_and_substitue_variables1(input, args);
-	print_list_debug(&args->tokens);
-	/*redirection = is_a_redirecton(args);
-	if(redirection != NULL)
-	{
-		if(redirection->next == NULL)
-		{
-			error("no file descriptor after the redirection\n");
-			return;
-		}
-		save_std_fds(&save_stdin, &save_stdout);
-		if(handle_redirection(redirection) == -1)
-		{
-			error("redirection error\n");
-			return;
-		}
-		execute_command(args);
-		restore_std_fds(save_stdin, save_stdout);
-	}
-	else
-	{
-		execute_command(args); // Execute the command with the arguments
-	}*/
+	//print_list_debug(&args->tokens);
 	execute_command1(args);	
 }

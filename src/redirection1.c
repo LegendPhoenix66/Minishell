@@ -44,7 +44,7 @@ int is_redir(char *node_content)
 }
 
 //tell if there is builtin
-int is_builtin(const char *token)
+/*int is_builtin(const char *token)
 {
     const char *builtins[] = {"exit", "cd", "pwd", "echo", "env", "unset", "export"};
     size_t i;
@@ -58,7 +58,7 @@ int is_builtin(const char *token)
             return 1;
     }
     return 0;
-}
+}*/
 //this fonction return a pointeur to the redirection token if there is one
 // in the token link list
 t_list *is_a_redirecton(t_shell *args)

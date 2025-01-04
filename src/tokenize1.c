@@ -110,7 +110,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             }
             i++;
         }
-        printf("add at end 2\n");
+        //printf("add at end 2\n");
         add_token(&(args->tokens), content + pipe_pos + 1, ft_strlen(content) - pipe_pos - 1);
         current = current->next;
     }

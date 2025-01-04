@@ -145,6 +145,7 @@ int	main(int argc, char **argv, char **env)
 			break ;
 		input = get_input();
 	}
+	//rl_clear_history();
 	if (args->exit == -1)
 		args->exit = 0;
 	free_lst(args->env);

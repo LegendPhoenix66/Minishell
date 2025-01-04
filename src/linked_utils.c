@@ -75,6 +75,7 @@ void	print_lst(t_node **top)
 	t_node	*current;
 
 	current = *top;
+	printf("print my linklist\n");
 	while (current != NULL)
 	{
 		printf("%s\n", current->content);

@@ -80,66 +80,6 @@ void    print_export(t_shell **args)
         free_lst(head);
 		free_lst(head_exp);
 }
-//fonctionne avec l' affichage et le trieen
-/*int		builtin_export(t_shell *args)
-{
-	t_list *current;
-	t_list *prev;
-	char *new_var;
-	char *var_value;
-	int egale;
-
-	egale = 0;
-	current = args->tokens;
-	prev = NULL;
-	//export cmd is alone
-	if(current->next == NULL)
-	{
-		print_export(&args);
-	}
-	else if(check_in(current->next->content))
-	{
-		while (current != NULL)
-		{
-			//in both cases the variable have to be add at env variable
-			if(strcmp(current->content, "=") == 0)
-			{
-				//no value after equal
-				if(current->next == NULL)
-				{
-					printf("pas de valeur donner a la variable\n");
-					new_var = ft_strjoin(prev->content,current->content);
-					remove_if(&args->env, new_var);
-					add_node(&args->env, new_var);
-					free(new_var);
-					return(1);
-				}
-				//variable had a value after equal
-				else if (current->next != NULL)
-				{
-					printf("presence d' une valeur apres le egale\n");
-					new_var = ft_strjoin(prev->content,current->content);
-					var_value = ft_strjoin(new_var, current->next->content);
-					remove_if(&args->env, new_var);
-					add_node(&args->env, var_value);
-					free(new_var);
-					free(var_value);
-					return(1);
-				}
-				egale++;
-			}
-			else if(current->next == NULL && egale == 0)
-			{
-				printf("pas de egale\n");
-				add_node(&args->export, current->content);
-				return(1);
-			}
-			prev = current;
-			current = current->next;
-		}
-	}
-	return (0);
-}*/
 char *concat_list_content(t_list *list)
 {
     t_list *current;
@@ -164,25 +104,24 @@ char *concat_list_content(t_list *list)
 	printf("use concatenation fonction");
     return (result);
 }
-
-int builtin_export(t_shell *args)
+/*int builtin_export(t_shell *args)
 {
-    char *input;
-    char *equal_pos;
-    char *var_name;
-    char *var_value;
-    char *full_var;
-	char *no_value;
+    char *input = NULL;
+    char *equal_pos = NULL;
+    char *var_name = NULL;
+    char *var_value = NULL;
+    char *full_var = NULL;
+	char *no_value = NULL;
 	int to_free;
 
-    // Si pas d'argument après export
 	to_free = 0;
+    if(!args || !args->tokens)
+        return (1);
     if (args->tokens->next == NULL)
     {
         print_export(&args);
         return (0);
     }
-
     if(count_node(&args->tokens) < 3)
     	input = args->tokens->next->content;
 	else
@@ -190,30 +129,20 @@ int builtin_export(t_shell *args)
 		input = concat_list_content(args->tokens->next);
 		to_free++;
 	}
-    // Vérifie si l'input est valide
     if (!check_in(input))
         return (1);
-
-    // Cherche le signe égal
     equal_pos = ft_strchr(input, '=');
-
     if (equal_pos == NULL)
     {
-        // Pas de signe égal, ajouter à export
-        printf("pas de egale\n");
 		no_value = ft_strdup(input);
         add_node(&args->export, no_value);
 		free(no_value);
     }
     else
     {
-        // Extrait le nom de variable
-        var_name = ft_substr(input, 0, equal_pos - input);
-        
+        var_name = ft_substr(input, 0, equal_pos - input);   
         if (*(equal_pos + 1) == '\0')
         {
-            // Égal sans valeur
-            printf("pas de valeur donner a la variable\n");
             full_var = ft_strjoin(var_name, "=");
             remove_if(&args->env, full_var);
             add_node(&args->env, full_var);
@@ -222,8 +151,6 @@ int builtin_export(t_shell *args)
         }
         else
         {
-            // Égal avec valeur
-            printf("presence d'une valeur apres le egale\n");
             var_value = ft_strdup(equal_pos + 1);
             full_var = ft_strjoin(var_name, "=");
 			free(var_name);
@@ -238,5 +165,60 @@ int builtin_export(t_shell *args)
     }
 	if(to_free != 0)
 		free(input);
+    return (0);
+}*/
+// Modification de builtin_export pour accepter les arguments
+int builtin_export(t_shell *shell, char **args)
+{
+    if (!args[1])  // Si pas d'arguments
+    {
+        print_export(&shell);
+        return (0);
+    }
+
+    // Pour chaque argument après "export"
+    for (int i = 1; args[i]; i++)
+    {
+        char *input = args[i];
+        if (!check_in(input))
+            continue;
+
+        char *equal_pos = ft_strchr(input, '=');
+        if (!equal_pos)
+        {
+            // Cas export sans '='
+            char *no_value = ft_strdup(input);
+            if (no_value)
+            {
+                add_node(&shell->export, no_value);
+                free(no_value);
+            }
+        }
+        else
+        {
+            // Cas export avec '='
+            size_t name_len = equal_pos - input;
+            char *var_name = ft_substr(input, 0, name_len);
+            char *var_value = ft_strdup(equal_pos + 1);
+            
+            if (var_name && var_value)
+            {
+                char *full_var = ft_strjoin(var_name, "=");
+                if (full_var)
+                {
+                    char *complete_var = ft_strjoin(full_var, var_value);
+                    if (complete_var)
+                    {
+                        remove_if(&shell->env, var_name);
+                        add_node(&shell->env, complete_var);
+                        free(complete_var);
+                    }
+                    free(full_var);
+                }
+            }
+            free(var_name);
+            free(var_value);
+        }
+    }
     return (0);
 }
