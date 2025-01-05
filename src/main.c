@@ -121,10 +121,22 @@ void init_args(t_shell *args)
 	args->tokens1 = NULL;
 }
 
+void handle_sigint(int sig)
+{
+	(void)sig; // Suppress unused parameter warning
+	write(1, "\n", 1); // Print a newline
+	rl_on_new_line();  // Tell readline to move to a new line
+	rl_replace_line("", 0); // Clear the current line buffer
+	rl_redisplay();    // Redisplay the prompt
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	char	*input;
 	t_shell  *args;
+
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, SIG_IGN);
 
 	(void)argc;
 	(void)argv;
