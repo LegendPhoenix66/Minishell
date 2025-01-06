@@ -308,14 +308,59 @@ t_cmd *parse_command(t_list **tokens)
 	return cmd;
 }
 
+// Helper to search for a command in PATH
+char *find_executable(const char *command)
+{
+    char *path = getenv("PATH");
+    if (!path) {
+        fprintf(stderr, "Error: PATH not set\n");
+        return NULL;
+    }
+
+    char *dirs = strdup(path); // Duplicate PATH string to tokenize
+    if (!dirs) {
+        perror("strdup failed");
+        return NULL;
+    }
+
+    // Tokenize the PATH directories
+    char *dir = strtok(dirs, ":");
+    while (dir) {
+        // Build the full path to the executable
+        size_t full_path_len = strlen(dir) + strlen(command) + 2;
+        char *full_path = malloc(full_path_len);
+        if (!full_path) {
+            perror("malloc failed");
+            free(dirs);
+            return NULL;
+        }
+        snprintf(full_path, full_path_len, "%s/%s", dir, command);
+
+        // Check if the executable exists and is accessible
+        if (access(full_path, X_OK) == 0) {
+            free(dirs);
+            return full_path; // Found the executable
+        }
+
+        free(full_path);
+        dir = strtok(NULL, ":"); // Move to the next directory in PATH
+    }
+
+    free(dirs);
+    return NULL; // Command not found
+}
+
 void execute_simple_command(t_cmd *cmd, t_shell *shell) 
 {
+    pid_t pid;
+    int status;
+
     if(is_builtin(cmd->args[0]))
     {
         execute_builtin(cmd, shell);
         return ;
     }
-    pid_t pid = fork();
+    pid = fork();
     if (pid == 0) 
     { // Child process
 
@@ -367,29 +412,40 @@ void execute_simple_command(t_cmd *cmd, t_shell *shell)
 			dup2(fd, STDOUT_FILENO);
             close(fd);
         }
-        if (cmd->args != NULL && cmd->args[0] != NULL) 
-        {
-            execvp(cmd->args[0], cmd->args);
-            perror("execvp failed"); // Only reached if execvp fails
+
+        // Find the executable file
+        char *exec_path = find_executable(cmd->args[0]);
+        if (!exec_path) {
+            fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
             free_cmd(cmd);
-            exit(EXIT_FAILURE);
-        } 
-        else 
-        {
-            fprintf(stderr, "Error: No command specified\n");
-			free_cmd(cmd);
-            exit(EXIT_FAILURE);
+            status = 127;
         }
+
+        execve(exec_path, cmd->args, shell->environ);
+        perror("execve failed"); // Only reached if execve fails
+        free(exec_path);
+        free_cmd(cmd);
+        exit(EXIT_FAILURE);
     } 
     else if (pid > 0)
     { // Parent process
-        int status;
         waitpid(pid, &status, 0);
+
+        // Update the shell's last_status based on the child's exit
+        if (WIFEXITED(status)) {
+            shell->last_status = WEXITSTATUS(status);
+        } else if (WIFSIGNALED(status)) {
+            shell->last_status = 128 + WTERMSIG(status); // Signal exit status
+        } else {
+            shell->last_status = 1; // Generic failure
+        }
     } 
     else 
     {
+        // Fork failed
         perror("fork failed");
-		free_cmd(cmd);
+        shell->last_status = 1; // Set failure status
+        free_cmd(cmd);
         exit(EXIT_FAILURE);
     }
 }
@@ -398,6 +454,7 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
 {
     int pipefd[2];
     pid_t pid;
+    int status;
     int input_fd = STDIN_FILENO; // Initial input source
 
     while (1)
@@ -405,19 +462,17 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
         t_cmd *cmd = parse_command(tokens);
         if (cmd == NULL)
             break;
-        // Gestion spéciale pour le dernier builtin dans un pipeline
+        // Special handling for the last builtin in a pipeline
         if (is_builtin(cmd->args[0]) && *tokens == NULL)
         {
             if (input_fd != STDIN_FILENO)
             {
-                // Sauvegarder stdin
                 int saved_stdin = dup(STDIN_FILENO);
-                // Rediriger l'entrée du pipe
+                // Redirect pipe entry
                 dup2(input_fd, STDIN_FILENO);
                 
                 execute_builtin(cmd, shell);
                 
-                // Restaurer stdin
                 dup2(saved_stdin, STDIN_FILENO);
                 close(saved_stdin);
                 close(input_fd);
@@ -507,7 +562,6 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
             if (input_fd != STDIN_FILENO)
                 close(input_fd); // Close the previous input fd, only if it wasn't stdin
 			input_fd = pipefd[0]; // Set the read end of the current pipe for next iteration
-            int status;
             waitpid(pid, &status, 0);
         }
 		else

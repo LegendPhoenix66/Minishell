@@ -85,9 +85,10 @@ typedef struct s_shell
 	t_list			*tokens; //the final token_list a the end of your fonctions
 	t_list			*tokens1; //to jump from tokens you did to split_var_and_varname without leaks(now is new final linked list)
 	t_node			*export;
-	int           saved_stdin;
-	int           saved_stdout;
-	t_redir       *redirections;
+	int				saved_stdin;
+	int				saved_stdout;
+	t_redir			*redirections;
+	int				last_status;
 }					t_shell;
 
 void				parse_input(char *input, t_shell *args);
