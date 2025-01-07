@@ -456,20 +456,24 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
     pid_t pid;
     int status;
     int input_fd = STDIN_FILENO; // Initial input source
+    int is_last_command = 0; // Flag to determine the last command
 
     while (1)
     {
         t_cmd *cmd = parse_command(tokens);
         if (cmd == NULL)
             break;
+
+        // Determine if the current command is the last one
+        is_last_command = (*tokens == NULL);
+
         // Special handling for the last builtin in a pipeline
-        if (is_builtin(cmd->args[0]) && *tokens == NULL)
+        if (is_last_command && is_builtin(cmd->args[0]))
         {
             if (input_fd != STDIN_FILENO)
             {
                 int saved_stdin = dup(STDIN_FILENO);
-                // Redirect pipe entry
-                dup2(input_fd, STDIN_FILENO);
+                dup2(input_fd, STDIN_FILENO); // Redirect pipe entry to stdin
                 
                 execute_builtin(cmd, shell);
                 
@@ -483,7 +487,7 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
             free_cmd(cmd);
             break;
         }
-        if (*tokens != NULL && strcmp((*tokens)->content, "|") == 0)
+        if (!is_last_command && strcmp((*tokens)->content, "|") == 0)
             *tokens = (*tokens)->next;
 		if (pipe(pipefd) == -1)
         {
@@ -491,21 +495,19 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
 			free_cmd(cmd);
             exit(EXIT_FAILURE);
         }
+
         pid = fork();
 
 		if (pid == 0) // Child process
 		{
 			dup2(input_fd, STDIN_FILENO);
-			if (*tokens != NULL)
-				dup2(pipefd[1], STDOUT_FILENO); // output of this process goes to pipe
+			if (!is_last_command)
+				dup2(pipefd[1], STDOUT_FILENO); // Output of this process goes to pipe
 
             close(pipefd[0]);
             close(pipefd[1]);
-            if (strcmp(cmd->args[0], "env") == 0)
-            {
-                print_lst(&shell->env);
-                exit(EXIT_SUCCESS);
-            }
+
+		    // Handle input and output redirection
             if (cmd->input_mode == 1)
             {
                 int fd = open(cmd->input_file, O_RDONLY);
@@ -542,27 +544,41 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
 				dup2(fd, STDOUT_FILENO);
                 close(fd);
             }
-            if(cmd->args != NULL && cmd->args[0] != NULL)
-            {
-                execvp(cmd->args[0], cmd->args);
-                perror("execvp failed");
-                free_cmd(cmd);
-                exit(EXIT_FAILURE);
-            }
-            else
-            {
-                fprintf(stderr, "Error: No command specified\n");
-                free_cmd(cmd);
-                exit(EXIT_FAILURE);
-            }
+
+		    // Locate the executable
+		    char *exec_path = find_executable(cmd->args[0]);
+		    if (!exec_path) {
+		        fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
+		        free_cmd(cmd);
+		        status = 127;
+		        exit(127); // Command not found
+		    }
+
+		    // Execute the command
+		    execve(exec_path, cmd->args, shell->environ);
+		    perror("execve failed"); // Only reached if execve fails
+		    free(exec_path);
+		    free_cmd(cmd);
+		    exit(EXIT_FAILURE);
         }
-		else if (pid > 0) //Parent process
+        else if (pid > 0) //Parent process
 		{
 			close(pipefd[1]); // Close the write end of the current pipe
             if (input_fd != STDIN_FILENO)
                 close(input_fd); // Close the previous input fd, only if it wasn't stdin
 			input_fd = pipefd[0]; // Set the read end of the current pipe for next iteration
             waitpid(pid, &status, 0);
+
+            // Only update the shell's last status for the last command
+            if (is_last_command) {
+                if (WIFEXITED(status)) {
+                    shell->last_status = WEXITSTATUS(status);
+                } else if (WIFSIGNALED(status)) {
+                    shell->last_status = 128 + WTERMSIG(status);
+                } else {
+                    shell->last_status = 1; // Generic failure
+                }
+            }
         }
 		else
 		{
@@ -572,7 +588,7 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
         }
         free_cmd(cmd);
 
-		if (*tokens == NULL)
+		if (is_last_command)
 			break;
     }
 	if (input_fd != STDIN_FILENO)
