@@ -141,60 +141,10 @@ void	execute_external_command(t_shell *args)
 	}
 	free(cmd_path); // Free the full path allocated
 }
-
-// Function to execute commands (either built-in or external)
-/*void	execute_command(t_shell *args)
-{
-	t_list		*token_node;
-	t_list 		*redirection;
-
-	redirection = is_a_redirecton(args);
-	token_node = args->tokens; //modification en tokens1 pour le moment
-	if (token_node == NULL) // No command entered
-	{
-		printf("no command entered\n");
-		return ;
-	}
-	if (strcmp(token_node->content, "exit") == 0)
-		builtin_exit(args);
-	else if (strcmp(token_node->content, "cd") == 0) {
-		free(args->current_directory);
-		args->current_directory = getcwd(NULL, 0);
-		if (args->current_directory == NULL)
-			perror("getcwd error");
-	}
-	else if (strcmp(token_node->content, "pwd") == 0)
-		printf("%s\n", args->current_directory);
-	else if (strcmp(token_node->content, "echo") == 0)
-		builtin_echo(token_node->next);
-	else if (strcmp(token_node->content, "env") == 0)
-	{
-		print_lst(&args->env);
-	}
-	else if (strcmp(token_node->content, "unset") == 0 && token_node->next != NULL)
-	{
-		builtin_unset(&args->env, token_node->next->content);
-	}
-	else if (strcmp(token_node->content, "export") == 0)
-	{
-		printf("fonction export\n");
-		builtin_export(args);
-	}
-	else
-	{
-		if(redirection != NULL)
-		{
-			execute_external_command1(args);
-		}
-		else
-			execute_external_command(args);
-	}
-}*/
-
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *args)
 {
 	args->tokens = remove_quotes_and_substitue_variables1(input, args);
-	//print_list_debug(&args->tokens);
-	execute_command1(args);	
+	print_list_debug(&args->tokens);
+	execute_command1(args);
 }

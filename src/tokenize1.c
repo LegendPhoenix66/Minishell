@@ -29,7 +29,7 @@ t_list *split_by_spaces1(const char *input, t_shell *args)
     {
         if(input[i] == ' ')
         {
-            //printf("malloc space\n");
+            printf("malloc space\n");
             add_token(&parsed_tokens, input, i);
             input += i + 1;
             i = 0;
@@ -47,7 +47,7 @@ t_list *split_by_spaces1(const char *input, t_shell *args)
         else
             i++;
     }
-   // printf("add at end 1\n");
+    printf("add at end 1\n");
     add_token(&parsed_tokens, input, i);
     args->tmp_tokens = parsed_tokens;
     return (args->tmp_tokens);
@@ -110,7 +110,7 @@ t_list *correct_pipes_and_redirects1(const char *input, t_shell *args)
             }
             i++;
         }
-        //printf("add at end 2\n");
+        printf("add at end 2\n");
         add_token(&(args->tokens), content + pipe_pos + 1, ft_strlen(content) - pipe_pos - 1);
         current = current->next;
     }

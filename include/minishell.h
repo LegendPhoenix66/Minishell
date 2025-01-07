@@ -21,6 +21,8 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include "../libft/libft.h"
+# define COLOR_RESET "\033[0m"
+# define COLOR_GREEN "\033[0;32m"
 
 typedef enum e_dir
 {
@@ -90,6 +92,11 @@ typedef struct s_shell
 	t_redir			*redirections;
 	int				last_status;
 }					t_shell;
+
+char				*get_input(void);
+void				set_upsignals(void);
+t_shell				*initialize_shell(char **env);
+
 
 void				parse_input(char *input, t_shell *args);
 void				execute_command(t_shell *args);
