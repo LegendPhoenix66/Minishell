@@ -111,7 +111,7 @@ void				add_node(t_node **top, const char *env);
 int					find_equal(const char *var);
 void				remove_if(t_node **top, const char *var_name);
 int					ft_export(const char *var, t_shell *args);
-t_list				*tokenize_input(const char *input);
+t_list				*tokenize_input(const char *input, int last_status);
 void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 void 				is_cmd(t_node **top);
