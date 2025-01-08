@@ -242,30 +242,28 @@ void handle_heredoc(t_cmd *cmd, const char *delimiter)
 }
 
 // Function to extract command
-t_cmd   *parse_command(t_list **tokens)
+t_cmd   *parse_command(t_list *tokens)
 {
     t_cmd   *cmd;
-    t_list *current_token;
 
-    current_token = *tokens;
-    if (current_token == NULL)
+    if (tokens == NULL)
         return NULL;
     cmd = init_cmd();
-    while (current_token != NULL)
+    while (tokens != NULL)
     {
-        char *token = current_token->content;
+        char *token = tokens->content;
 		if (strcmp(token, "|") == 0)
 			break ;
         if (strcmp(token, "<") == 0)
         {
-            current_token = current_token->next;
-            if (current_token == NULL)
+            tokens = tokens->next;
+            if (tokens == NULL)
             {
                 fprintf(stderr, "Error: Missing filename after <\n");
                 free_cmd(cmd);
                 return NULL;
             }
-            cmd->input_file = strdup(current_token->content);
+            cmd->input_file = strdup(tokens->content);
             if (cmd->input_file == NULL)
             {
                 perror("strdup failed");
@@ -276,14 +274,14 @@ t_cmd   *parse_command(t_list **tokens)
         }
         else if (strcmp(token, ">") == 0)
         {
-            current_token = current_token->next;
-            if (current_token == NULL)
+            tokens = tokens->next;
+            if (tokens == NULL)
             {
                 fprintf(stderr, "Error: Missing filename after >\n");
                 free_cmd(cmd);
                 return NULL;
             }
-            cmd->output_file = strdup(current_token->content);
+            cmd->output_file = strdup(tokens->content);
             if (cmd->output_file == NULL)
             {
                 perror("strdup failed");
@@ -294,14 +292,14 @@ t_cmd   *parse_command(t_list **tokens)
         }
         else if (strcmp(token, ">>") == 0)
         {
-            current_token = current_token->next;
-            if (current_token == NULL)
+            tokens = tokens->next;
+            if (tokens == NULL)
             {
                 fprintf(stderr, "Error: Missing filename after >>\n");
                 free_cmd(cmd);
                 return NULL;
             }
-            cmd->output_file = strdup(current_token->content);
+            cmd->output_file = strdup(tokens->content);
             if (cmd->output_file == NULL)
             {
                 perror("strdup failed");
@@ -312,19 +310,19 @@ t_cmd   *parse_command(t_list **tokens)
         }
         else if (strcmp(token, "<<") == 0)
         {
-            current_token = current_token->next;
-            if (current_token == NULL)
+            tokens = tokens->next;
+            if (tokens == NULL)
             {
                 fprintf(stderr, "Error: Missing delimiter after <<\n");
                 free_cmd(cmd);
                 return NULL;
             }
             cmd->input_mode = 2;
-            handle_heredoc(cmd, current_token->content);
+            handle_heredoc(cmd, tokens->content);
         }
         else
             add_arg(cmd, token);
-        current_token = current_token->next;
+        tokens = tokens->next;
     }
 	return cmd;
 }
@@ -471,13 +469,14 @@ void execute_simple_command(t_cmd *cmd, t_shell *shell)
     }
 }
 
-void execute_pipeline(t_list **tokens, t_shell *shell)
+void execute_pipeline(t_shell *shell)
 {
     int pipefd[2];
     pid_t pid;
     int status;
     int input_fd = STDIN_FILENO; // Initial input source
     int is_last_command = 0; // Flag to determine the last command
+    t_list *tokens = shell->tokens;
 
     while (1)
     {
@@ -486,7 +485,7 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
             break;
 
         // Determine if the current command is the last one
-        is_last_command = (*tokens == NULL);
+        is_last_command = tokens == NULL;
 
         // Special handling for the last builtin in a pipeline
         if (is_last_command && is_builtin(cmd->args[0]))
@@ -508,34 +507,36 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
             free_cmd(cmd);
             break;
         }
-        if (!is_last_command && strcmp((*tokens)->content, "|") == 0)
-            *tokens = (*tokens)->next;
-		if (pipe(pipefd) == -1)
+
+        if (!is_last_command && strcmp(tokens->content, "|") == 0)
+            tokens = tokens->next;
+
+        if (pipe(pipefd) == -1)
         {
             perror("pipe failed");
-			free_cmd(cmd);
+            free_cmd(cmd);
             exit(EXIT_FAILURE);
         }
 
         pid = fork();
 
-		if (pid == 0) // Child process
-		{
-			dup2(input_fd, STDIN_FILENO);
-			if (!is_last_command)
-				dup2(pipefd[1], STDOUT_FILENO); // Output of this process goes to pipe
+        if (pid == 0) // Child process
+        {
+            dup2(input_fd, STDIN_FILENO);
+            if (!is_last_command)
+                dup2(pipefd[1], STDOUT_FILENO); // Output of this process goes to pipe
 
             close(pipefd[0]);
             close(pipefd[1]);
 
-		    // Handle input and output redirection
+            // Handle input and output redirection
             if (cmd->input_mode == 1)
             {
                 int fd = open(cmd->input_file, O_RDONLY);
                 if (fd == -1)
                 {
                     perror("Error opening input file");
-					free_cmd(cmd);
+                    free_cmd(cmd);
                     exit(EXIT_FAILURE);
                 }
                 dup2(fd, STDIN_FILENO);
@@ -547,7 +548,7 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
                 if (fd == -1)
                 {
                     perror("Error opening output file");
-					free_cmd(cmd);
+                    free_cmd(cmd);
                     exit(EXIT_FAILURE);
                 }
                 dup2(fd, STDOUT_FILENO);
@@ -559,35 +560,35 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
                 if (fd == -1)
                 {
                     perror("Error opening output file");
-					free_cmd(cmd);
+                    free_cmd(cmd);
                     exit(EXIT_FAILURE);
                 }
-				dup2(fd, STDOUT_FILENO);
+                dup2(fd, STDOUT_FILENO);
                 close(fd);
             }
 
-		    // Locate the executable
-		    char *exec_path = find_executable(cmd->args[0]);
-		    if (!exec_path) {
-		        fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
-		        free_cmd(cmd);
-		        status = 127;
-		        exit(127); // Command not found
-		    }
+            // Locate the executable
+            char *exec_path = find_executable(cmd->args[0]);
+            if (!exec_path) {
+                fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
+                free_cmd(cmd);
+                status = 127;
+                exit(127); // Command not found
+            }
 
-		    // Execute the command
-		    execve(exec_path, cmd->args, shell->environ);
-		    perror("execve failed"); // Only reached if execve fails
-		    free(exec_path);
-		    free_cmd(cmd);
-		    exit(EXIT_FAILURE);
+            // Execute the command
+            execve(exec_path, cmd->args, shell->environ);
+            perror("execve failed"); // Only reached if execve fails
+            free(exec_path);
+            free_cmd(cmd);
+            exit(EXIT_FAILURE);
         }
-        else if (pid > 0) //Parent process
-		{
-			close(pipefd[1]); // Close the write end of the current pipe
+        else if (pid > 0) // Parent process
+        {
+            close(pipefd[1]); // Close the write end of the current pipe
             if (input_fd != STDIN_FILENO)
                 close(input_fd); // Close the previous input fd, only if it wasn't stdin
-			input_fd = pipefd[0]; // Set the read end of the current pipe for next iteration
+            input_fd = pipefd[0]; // Set the read end of the current pipe for next iteration
             waitpid(pid, &status, 0);
 
             // Only update the shell's last status for the last command
@@ -601,20 +602,19 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
                 }
             }
         }
-		else
-		{
-			perror("fork failed");
+        else
+        {
+            perror("fork failed");
             free_cmd(cmd);
             exit(EXIT_FAILURE);
         }
         free_cmd(cmd);
 
-		if (is_last_command)
-			break;
+        if (is_last_command)
+            break;
     }
-	if (input_fd != STDIN_FILENO)
-		close(input_fd);
-}
+    if (input_fd != STDIN_FILENO)
+        close(input_fd);
 
 
 void	execute_command1(t_shell *shell)
@@ -639,10 +639,10 @@ void	execute_command1(t_shell *shell)
 		tokens = tokens->next;
 	}
 	if (has_pipe)
-		execute_pipeline(&shell->tokens, shell);
+		execute_pipeline(shell);
 	else
 	{
-		cmd = parse_command(&shell->tokens);
+		cmd = parse_command(shell->tokens);
 		if (cmd)
 		{
 			execute_simple_command(cmd, shell);
