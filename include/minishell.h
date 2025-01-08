@@ -98,8 +98,8 @@ void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);
 
 
-void				parse_input(char *input, t_shell *args);
 void				execute_command(t_shell *args);
+void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);
 void				free_lst(t_node *top);
 void				print_lst(t_node **top);

@@ -245,8 +245,10 @@ void handle_heredoc(t_cmd *cmd, const char *delimiter)
 t_cmd *parse_command(t_list **tokens) 
 {
     t_cmd *cmd = init_cmd();
-    if (*tokens == NULL)
-		return NULL;
+    if (*tokens == NULL) {
+        free_cmd(cmd);
+        return NULL;
+    }
     while (*tokens != NULL) 
     {
         char *token = (*tokens)->content;
@@ -262,6 +264,12 @@ t_cmd *parse_command(t_list **tokens)
                 return NULL;
             }
             cmd->input_file = strdup((*tokens)->content);
+            if (cmd->input_file == NULL)
+            {
+                perror("strdup failed");
+                free_cmd(cmd);
+                return NULL;
+            }
             cmd->input_mode = 1;
         }
         else if (strcmp(token, ">") == 0)
@@ -274,6 +282,12 @@ t_cmd *parse_command(t_list **tokens)
                 return NULL;
             }
             cmd->output_file = strdup((*tokens)->content);
+            if (cmd->output_file == NULL)
+            {
+                perror("strdup failed");
+                free_cmd(cmd);
+                return NULL;
+            }
             cmd->output_mode = 1;
         }
         else if (strcmp(token, ">>") == 0)
@@ -286,6 +300,12 @@ t_cmd *parse_command(t_list **tokens)
                 return NULL;
             }
             cmd->output_file = strdup((*tokens)->content);
+            if (cmd->output_file == NULL)
+            {
+                perror("strdup failed");
+                free_cmd(cmd);
+                return NULL;
+            }
             cmd->output_mode = 2;
         }
         else if (strcmp(token, "<<") == 0)
@@ -297,7 +317,6 @@ t_cmd *parse_command(t_list **tokens)
                 free_cmd(cmd);
                 return NULL;
             }
-            //cmd->input_file = strdup((*tokens)->content);
             cmd->input_mode = 2;
             handle_heredoc(cmd, (*tokens)->content);
         }
@@ -596,32 +615,36 @@ void execute_pipeline(t_list **tokens, t_shell *shell)
 }
 
 
-void execute_command1(t_shell *shell) 
+void	execute_command1(t_shell *shell)
 {
-    t_list *tokens = shell->tokens;
-    if (tokens == NULL)
-        return;
-    t_list *temp_tokens = shell->tokens;
-	int has_pipe = 0;
-	while (temp_tokens) 
-    {
-		char *token = temp_tokens->content;
+	t_list	*tokens;
+	int		has_pipe;
+	char	*token;
+	t_cmd	*cmd;
+
+	tokens = shell->tokens;
+	has_pipe = 0;
+	if (tokens == NULL)
+		return ;
+	while (tokens)
+	{
+		token = tokens->content;
 		if (strcmp(token, "|") == 0)
 		{
 			has_pipe = 1;
-			break;
+			break ;
 		}
-		temp_tokens = temp_tokens->next;
+		tokens = tokens->next;
 	}
 	if (has_pipe)
 		execute_pipeline(&shell->tokens, shell);
-    else
-    { 
-        t_cmd *cmd = parse_command(&shell->tokens);
-        if (cmd)
-        {
-            execute_simple_command(cmd, shell);
-            free_cmd(cmd);
-        }
-    }
+	else
+	{
+		cmd = parse_command(&shell->tokens);
+		if (cmd)
+		{
+			execute_simple_command(cmd, shell);
+			free_cmd(cmd);
+		}
+	}
 }

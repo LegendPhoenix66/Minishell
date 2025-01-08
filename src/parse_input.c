@@ -142,9 +142,9 @@ void	execute_external_command(t_shell *args)
 	free(cmd_path); // Free the full path allocated
 }
 // Example parsing input into tokens
-void	parse_input(char *input, t_shell *args)
+void	parse_input(char *input, t_shell *shell)
 {
-	// args->tokens = remove_quotes_and_substitue_variables1(input, args);
-	args->tokens = tokenize_input(input, args->last_status);
-	execute_command1(args);
+	//args->tokens = remove_quotes_and_substitue_variables1(input, args);
+	shell->tokens = tokenize_input(input, shell->last_status);
+	execute_command1(shell);
 }

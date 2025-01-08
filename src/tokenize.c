@@ -33,35 +33,42 @@ t_list	*add_token(t_list **list, const char *token, int length)
 }
 
 // Function to split input by spaces
-t_list *split_by_spaces(const char *input) {
-	t_list *parsed_tokens = NULL;
-	int i = 0;
-	while (input[i]) {
-		if (input[i] == ' ') {
+t_list	*split_by_spaces(const char *input)
+{
+	t_list	*parsed_tokens;
+	int		i;
+	char	quote;
+	int		j;
+
+	parsed_tokens = NULL;
+	i = 0;
+	while (input[i])
+	{
+		if (input[i] == ' ')
+		{
 			add_token(&parsed_tokens, input, i);
 			input += i + 1;
 			i = 0;
-		} else if (input[i] == '\"' || input[i] == '\'') {
-			char quote = input[i];
-			int j = i + 1;
-			while (input[j] && input[j] != quote) {
-				j++;
-			}
-			if (!input[j]) {
-				fprintf(stderr, "Unmatched quote");
-				return NULL;
-			}
-			i = j + 1;
-		} else {
-			i++;
 		}
+		else if (input[i] == '\"' || input[i] == '\'')
+		{
+			quote = input[i];
+			j = i + 1;
+			while (input[j] && input[j] != quote)
+				j++;
+			if (!input[j])
+				error("unmatched quote");
+			i = j + 1;
+		}
+		else
+			i++;
 	}
 	add_token(&parsed_tokens, input, i);
-	return parsed_tokens;
+	return (parsed_tokens);
 }
 
 // Function to correct pipes and redirects
-t_list *correct_pipes_and_redirects(t_list *parsed_tokens)
+void correct_pipes_and_redirects(t_list *parsed_tokens)
 {
 	t_list *tokens_with_pipes = NULL;
 	t_list *current = parsed_tokens;
@@ -98,7 +105,8 @@ t_list *correct_pipes_and_redirects(t_list *parsed_tokens)
 		add_token(&tokens_with_pipes, content + pipe_pos + 1, strlen(content) - pipe_pos - 1);
 		current = current->next;
 	}
-	return tokens_with_pipes;
+	parsed_tokens = tokens_with_pipes;
+	ft_lstclear(&tokens_with_pipes, free);
 }
 
 // Function to remove quotes and substitute variables
@@ -209,7 +217,7 @@ t_list *tokenize_input(const char *input, int last_status)
 	t_list *parsed_tokens = split_by_spaces(input);
 	if (!parsed_tokens)
 		return NULL;
-	t_list *tokens_with_pipes = correct_pipes_and_redirects(parsed_tokens);
-	remove_quotes_and_substitute_variables(tokens_with_pipes, last_status);
-	return tokens_with_pipes;
+	correct_pipes_and_redirects(parsed_tokens);
+	remove_quotes_and_substitute_variables(parsed_tokens, last_status);
+	return parsed_tokens;
 }
