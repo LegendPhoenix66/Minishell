@@ -469,7 +469,7 @@ void execute_simple_command(t_cmd *cmd, t_shell *shell)
     }
 }
 
-void execute_pipeline(t_shell *shell)
+/*void execute_pipeline(t_shell *shell)
 {
     int pipefd[2];
     pid_t pid;
@@ -615,7 +615,153 @@ void execute_pipeline(t_shell *shell)
     }
     if (input_fd != STDIN_FILENO)
         close(input_fd);
+}*/
 
+void execute_pipeline(t_shell *shell)
+{
+    int     pipefd[2];
+    pid_t   pid;
+    int     status;
+    int     input_fd = STDIN_FILENO;
+    int     is_last_command = 0;
+    t_list  *tokens = shell->tokens;
+
+    while (tokens)
+    {
+        t_cmd *cmd = parse_command(tokens);
+        if (cmd == NULL)
+            break;
+
+        // Avancer jusqu'au prochain pipe ou fin
+        while (tokens && strcmp(tokens->content, "|") != 0)
+            tokens = tokens->next;
+
+        is_last_command = (tokens == NULL);
+
+        if (!is_last_command)
+            tokens = tokens->next;  // Skip le pipe et passe à la commande suivante
+
+        // Special handling for the last builtin in a pipeline
+        if (is_last_command && is_builtin(cmd->args[0]))
+        {
+            if (input_fd != STDIN_FILENO)
+            {
+                int saved_stdin = dup(STDIN_FILENO);
+                dup2(input_fd, STDIN_FILENO);
+                
+                execute_builtin(cmd, shell);
+                
+                dup2(saved_stdin, STDIN_FILENO);
+                close(saved_stdin);
+                close(input_fd);
+            }
+            else
+                execute_builtin(cmd, shell);
+            
+            free_cmd(cmd);
+            break;
+        }
+
+        if (pipe(pipefd) == -1)
+        {
+            perror("pipe failed");
+            free_cmd(cmd);
+            exit(EXIT_FAILURE);
+        }
+
+        pid = fork();
+
+        if (pid == 0) // Child process
+        {
+            dup2(input_fd, STDIN_FILENO);
+            if (!is_last_command)
+                dup2(pipefd[1], STDOUT_FILENO);
+
+            close(pipefd[0]);
+            close(pipefd[1]);
+
+            // Handle input and output redirection
+            if (cmd->input_mode == 1)
+            {
+                int fd = open(cmd->input_file, O_RDONLY);
+                if (fd == -1)
+                {
+                    perror("Error opening input file");
+                    free_cmd(cmd);
+                    exit(EXIT_FAILURE);
+                }
+                dup2(fd, STDIN_FILENO);
+                close(fd);
+            }
+            if(cmd->output_mode == 1)
+            {
+                int fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                if (fd == -1)
+                {
+                    perror("Error opening output file");
+                    free_cmd(cmd);
+                    exit(EXIT_FAILURE);
+                }
+                dup2(fd, STDOUT_FILENO);
+                close(fd);
+            }
+            if (cmd->output_mode == 2)
+            {
+                int fd = open(cmd->output_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+                if (fd == -1)
+                {
+                    perror("Error opening output file");
+                    free_cmd(cmd);
+                    exit(EXIT_FAILURE);
+                }
+                dup2(fd, STDOUT_FILENO);
+                close(fd);
+            }
+
+            char *exec_path = find_executable(cmd->args[0]);
+            if (!exec_path) {
+                fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
+                free_cmd(cmd);
+                exit(127);
+            }
+
+            execve(exec_path, cmd->args, shell->environ);
+            perror("execve failed");
+            free(exec_path);
+            free_cmd(cmd);
+            exit(EXIT_FAILURE);
+        }
+        else if (pid > 0) // Parent process
+        {
+            close(pipefd[1]);
+            if (input_fd != STDIN_FILENO)
+                close(input_fd);
+            input_fd = pipefd[0];
+            waitpid(pid, &status, 0);
+
+            if (is_last_command) {
+                if (WIFEXITED(status))
+                    shell->last_status = WEXITSTATUS(status);
+                else if (WIFSIGNALED(status))
+                    shell->last_status = 128 + WTERMSIG(status);
+                else
+                    shell->last_status = 1;
+            }
+        }
+        else
+        {
+            perror("fork failed");
+            free_cmd(cmd);
+            exit(EXIT_FAILURE);
+        }
+        free_cmd(cmd);
+
+        if (is_last_command)
+            break;
+    }
+    if (input_fd != STDIN_FILENO)
+        close(input_fd);
+}
 
 void	execute_command1(t_shell *shell)
 {
