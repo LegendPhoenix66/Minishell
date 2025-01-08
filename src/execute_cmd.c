@@ -242,28 +242,30 @@ void handle_heredoc(t_cmd *cmd, const char *delimiter)
 }
 
 // Function to extract command
-t_cmd *parse_command(t_list **tokens) 
+t_cmd   *parse_command(t_list **tokens)
 {
-    t_cmd *cmd = init_cmd();
-    if (*tokens == NULL) {
-        free_cmd(cmd);
+    t_cmd   *cmd;
+    t_list *current_token;
+
+    current_token = *tokens;
+    if (current_token == NULL)
         return NULL;
-    }
-    while (*tokens != NULL) 
+    cmd = init_cmd();
+    while (current_token != NULL)
     {
-        char *token = (*tokens)->content;
+        char *token = current_token->content;
 		if (strcmp(token, "|") == 0)
 			break ;
         if (strcmp(token, "<") == 0)
         {
-            *tokens = (*tokens)->next;
-            if (*tokens == NULL) 
+            current_token = current_token->next;
+            if (current_token == NULL)
             {
                 fprintf(stderr, "Error: Missing filename after <\n");
                 free_cmd(cmd);
                 return NULL;
             }
-            cmd->input_file = strdup((*tokens)->content);
+            cmd->input_file = strdup(current_token->content);
             if (cmd->input_file == NULL)
             {
                 perror("strdup failed");
@@ -274,14 +276,14 @@ t_cmd *parse_command(t_list **tokens)
         }
         else if (strcmp(token, ">") == 0)
         {
-            *tokens = (*tokens)->next;
-            if (*tokens == NULL) 
+            current_token = current_token->next;
+            if (current_token == NULL)
             {
                 fprintf(stderr, "Error: Missing filename after >\n");
                 free_cmd(cmd);
                 return NULL;
             }
-            cmd->output_file = strdup((*tokens)->content);
+            cmd->output_file = strdup(current_token->content);
             if (cmd->output_file == NULL)
             {
                 perror("strdup failed");
@@ -292,14 +294,14 @@ t_cmd *parse_command(t_list **tokens)
         }
         else if (strcmp(token, ">>") == 0)
         {
-            *tokens = (*tokens)->next;
-            if (*tokens == NULL) 
+            current_token = current_token->next;
+            if (current_token == NULL)
             {
                 fprintf(stderr, "Error: Missing filename after >>\n");
                 free_cmd(cmd);
                 return NULL;
             }
-            cmd->output_file = strdup((*tokens)->content);
+            cmd->output_file = strdup(current_token->content);
             if (cmd->output_file == NULL)
             {
                 perror("strdup failed");
@@ -310,19 +312,19 @@ t_cmd *parse_command(t_list **tokens)
         }
         else if (strcmp(token, "<<") == 0)
         {
-            *tokens = (*tokens)->next;
-            if (*tokens == NULL) 
+            current_token = current_token->next;
+            if (current_token == NULL)
             {
                 fprintf(stderr, "Error: Missing delimiter after <<\n");
                 free_cmd(cmd);
                 return NULL;
             }
             cmd->input_mode = 2;
-            handle_heredoc(cmd, (*tokens)->content);
+            handle_heredoc(cmd, current_token->content);
         }
         else
             add_arg(cmd, token);
-        *tokens = (*tokens)->next;
+        current_token = current_token->next;
     }
 	return cmd;
 }
