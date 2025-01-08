@@ -98,7 +98,6 @@ void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);
 
 
-void				execute_command(t_shell *args);
 void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);
 void				free_lst(t_node *top);
@@ -110,16 +109,12 @@ t_node				*copy_list(t_node *original);
 void				add_node(t_node **top, const char *env);
 int					find_equal(const char *var);
 void				remove_if(t_node **top, const char *var_name);
-int					ft_export(const char *var, t_shell *args);
 t_list				*tokenize_input(const char *input, int last_status);
 void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
-void 				is_cmd(t_node **top);
-void				parse_redirections(t_node **top);
 t_list 				*remove_quotes_and_substitue_variables1(const char *input, t_shell *args);
 t_list				*add_token(t_list **list, const char *token, int length);
 void				error(const char *msg);
-t_list				*split_var_and_varname(const char *input, t_shell *args);
 t_list              *is_a_redirecton(t_shell *args);
 void				save_std_fds(int *saved_stdin, int *saved_stdout);
 int					handle_output_redir(char *file, int flags);
@@ -132,11 +127,8 @@ void				execute_command1(t_shell *shell);
 int				execute_builtin(t_cmd *cmd, t_shell *shell);
 
 // builtins
-//void				builtin_echo(const t_list *tokens);
 int					builtin_echo(t_cmd *cmd);
-//void				builtin_exit(t_shell *args);
 int					builtin_unset(t_node **env_list, const char *var);
-//int					builtin_export(t_shell *args);
 int					builtin_export(t_shell *shell, char **args);
 int					builtin_exit(t_shell *shell, t_cmd *cmd);
 int					builtin_pwd();
