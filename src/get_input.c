@@ -33,14 +33,13 @@ char	*get_prompt(void)
 	char	*elements[4];
 	size_t	size;
 	int		i;
-	
+
 	elements[0] = COLOR_GREEN;
 	elements[1] = "minishell> ";
 	elements[2] = COLOR_RESET;
 	elements[3] = NULL;
 	size = calculate_size(elements);
 	prompt = malloc(size);
-		// Allocate enough memory for the prompt including escape sequences
 	if (!prompt)
 		return (NULL);
 	i = 1;
@@ -60,10 +59,8 @@ void	ft_strtrim1(char *str)
 
 	i = 0;
 	j = 0;
-	// Skip leading whitespaces
 	while (str[i] == ' ' || str[i] == '\t')
 		i++;
-	// Remove extra whitespaces in between words
 	while (str[i])
 	{
 		if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') || (j > 0
@@ -75,7 +72,6 @@ void	ft_strtrim1(char *str)
 		i++;
 	}
 	str[j] = '\0';
-	// Remove trailing whitespaces
 	j--;
 	while (j >= 0 && (str[j] == ' ' || str[j] == '\t'))
 	{
@@ -83,6 +79,7 @@ void	ft_strtrim1(char *str)
 		j--;
 	}
 }
+
 char	*get_input(void)
 {
 	char	*line;

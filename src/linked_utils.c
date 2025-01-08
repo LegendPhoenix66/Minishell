@@ -32,6 +32,7 @@ t_node	*make_node(const char *env)
 	new_node->next = NULL;
 	return (new_node);
 }
+
 void	add_node(t_node **top, const char *env)
 {
 	t_node	*new_node;
@@ -51,6 +52,7 @@ void	add_node(t_node **top, const char *env)
 		new_node->next = NULL;
 	}
 }
+
 t_node	*init_lst(void)
 {
 	t_node	*lst;
@@ -70,6 +72,7 @@ t_node	*init_lst(void)
 	}
 	return (lst);
 }
+
 void	print_lst(t_node **top)
 {
 	t_node	*current;
@@ -83,32 +86,20 @@ void	print_lst(t_node **top)
 	}
 }
 
-/*void print_list_debug(t_list **top) {
-	printf("-------list start-------\n");
+void	print_list_debug(t_list **top)
+{
 	t_list	*current;
 
+	printf("-------list start-------\n");
 	current = *top;
 	while (current != NULL)
 	{
-		printf("%s\n", (char *)(current->content));
+		printf("Content: %s\n", (char *)(current->content));
+		printf("adresse %p\n", (char *)(current));
+		printf("----------\n");
 		current = current->next;
 	}
 	printf("-------list end-------\n");
-}*/
-
-void print_list_debug(t_list **top) 
-{
-    printf("-------list start-------\n");
-    t_list *current = *top;
-
-    while (current != NULL) 
-	{
-        printf("Content: %s\n", (char *)(current->content));
-		printf("adresse %p\n", (char *)(current));
-        printf("----------\n");
-        current = current->next;
-    }
-    printf("-------list end-------\n");
 }
 
 void	free_lst(t_node *top)
@@ -150,6 +141,7 @@ void	swap_nodes(t_node **top, t_node *prev)
 		prev->next = second;
 	}
 }
+
 void	sort_lst(t_node **top)
 {
 	int		swaped;
@@ -181,6 +173,7 @@ void	sort_lst(t_node **top)
 		}
 	}
 }
+
 // useful when export define a already existing variable
 void	remove_if(t_node **top, const char *var_name)
 {
@@ -213,37 +206,6 @@ void	remove_if(t_node **top, const char *var_name)
 		}
 	}
 }
-/*void	remove_if(t_list **top, const char *var_name)
-{
-	t_list	*current;
-	t_list	*previous;
-	t_list	*to_remove;
-
-	current = *top;
-	previous = NULL;
-	if (*top == NULL)
-		return ;
-	while (current != NULL)
-	{
-		// Vérifie si le contenu correspond à la variable à supprimer
-		if (strncmp(current->content, var_name, strchr(var_name, '=') - var_name) == 0)
-		{
-			to_remove = current;
-			if (previous == NULL) // Cas du premier élément
-				*top = current->next;
-			else
-				previous->next = current->next;
-			current = current->next;
-			free(to_remove->content);
-			free(to_remove);
-		}
-		else
-		{
-			previous = current;
-			current = current->next;
-		}
-	}
-}*/
 
 t_node	*copy_list(t_node *original)
 {
@@ -263,19 +225,19 @@ t_node	*copy_list(t_node *original)
 	new_node->next = copy_list(original->next);
 	return (new_node);
 }
-int count_node(t_list **top)
+
+int	count_node(t_list **top)
 {
-	int i;
-	t_list *current;
+	int		i;
+	t_list	*current;
 
 	i = 0;
 	current = *top;
-	while(current != NULL)
+	while (current != NULL)
 	{
 		current = current->next;
 		i++;
 	}
 	printf("%d\n", i);
-	return(i);
+	return (i);
 }
-

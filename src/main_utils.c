@@ -12,20 +12,22 @@
 
 #include "../include/minishell.h"
 
-void handle_sigint(int sig)
+void	handle_sigint(int sig)
 {
-	(void)sig; // Suppress unused parameter warning
-	write(1, "\n", 1); // Print a newline
-	rl_on_new_line();  // Tell readline to move to a new line
-	rl_replace_line("", 0); // Clear the current line buffer
-	rl_redisplay();    // Redisplay the prompt
+	(void)sig;
+	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
-void set_upsignals(void)
+
+void	set_upsignals(void)
 {
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, SIG_IGN);
 }
-void init_args(t_shell *args)
+
+void	init_args(t_shell *args)
 {
 	args->env = init_lst();
 	args->exit = -1;
@@ -37,12 +39,13 @@ void init_args(t_shell *args)
 	args->redirections = NULL;
 	args->last_status = 0;
 }
-t_shell *initialize_shell(char **env)
+
+t_shell	*initialize_shell(char **env)
 {
-	t_shell *args;
+	t_shell	*args;
 
 	args = malloc(sizeof(t_shell));
-	if(!args)
+	if (!args)
 		return (NULL);
 	init_args(args);
 	args->environ = env;

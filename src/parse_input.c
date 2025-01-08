@@ -31,8 +31,9 @@ void	free_split(char **split)
 char	*join_path_command(const char *path, const char *cmd)
 {
 	char	*full_path;
+	size_t	len;
 
-	size_t len = ft_strlen(path) + ft_strlen(cmd) + 2; // +2 for '/' and '\0'
+	len = ft_strlen(path) + ft_strlen(cmd) + 2;
 	full_path = malloc(len);
 	if (!full_path)
 		return (NULL);
@@ -58,9 +59,8 @@ char	*find_command_in_path(char *cmd)
 	{
 		full_path = join_path_command(paths[i], cmd);
 		if (access(full_path, X_OK) == 0)
-		// Check if the command exists and is executable
 		{
-			free_split(paths); // Custom function to free memory of ft_split
+			free_split(paths);
 			return (full_path);
 		}
 		free(full_path);
@@ -77,22 +77,22 @@ void	execute_external_command(t_shell *args)
 	int		pipe_fd[2];
 	char	buffer[1024];
 	ssize_t	bytes_read;
-	char *argv[3];
-	t_list *token_node = args->tokens; //to see if don' t needed args->token2
+	char	*argv[3];
+	t_list	*token_node;
 
+	token_node = args->tokens;
 	argv[0] = (char *)token_node->content;
-	if(token_node->next == NULL)
+	if (token_node->next == NULL)
 		argv[1] = NULL;
 	else
-		argv[1] = (char *)token_node->next->content; //need a way to put a the flag in this var
+		argv[1] = (char *)token_node->next->content;
 	argv[2] = NULL;
-	if (((char *)token_node->content)[0] == '/' || ((char *)token_node->content)[0] == '.')
+	if (((char *)token_node->content)[0] == '/'
+		|| ((char *)token_node->content)[0] == '.')
 	{
-		// If it starts with '/' or '.', it is an absolute or relative path
 		printf("content %s\n", (char *)(token_node->content));
 		if (access(token_node->content, X_OK) == 0)
 			cmd_path = strdup(token_node->content);
-		// Return a copy of the command if it is executable
 		else
 		{
 			write(2, "Command not found\n", 18);
@@ -114,37 +114,34 @@ void	execute_external_command(t_shell *args)
 		return ;
 	}
 	pid = fork();
-	if (pid == 0) // Child process
+	if (pid == 0)
 	{
-		close(pipe_fd[0]); // Close read end of the pipe
+		close(pipe_fd[0]);
 		dup2(pipe_fd[1], STDOUT_FILENO);
-		// Redirect stdout to the write end of the pipe
 		close(pipe_fd[1]);
-		// Close the write end of the pipe after duplicating
 		if (execve(cmd_path, argv, args->environ) == -1)
 		{
 			perror("execve error");
 			exit(EXIT_FAILURE);
 		}
 	}
-	else if (pid > 0) // Parent process
+	else if (pid > 0)
 	{
-		close(pipe_fd[1]); // Close write end of the pipe
+		close(pipe_fd[1]);
 		while ((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0)
 		{
 			buffer[bytes_read] = '\0';
 			write(STDOUT_FILENO, buffer, bytes_read);
-			// Write the output to stdout
 		}
-		close(pipe_fd[0]);     // Close read end of the pipe
-		waitpid(pid, NULL, 0); // Wait for the child process to finish
+		close(pipe_fd[0]);
+		waitpid(pid, NULL, 0);
 	}
-	free(cmd_path); // Free the full path allocated
+	free(cmd_path);
 }
+
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *shell)
 {
-	//args->tokens = remove_quotes_and_substitue_variables1(input, args);
 	shell->tokens = tokenize_input(input, shell->last_status);
 	execute_command1(shell);
 }

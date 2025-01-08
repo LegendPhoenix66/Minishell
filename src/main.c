@@ -12,15 +12,16 @@
 
 #include "../include/minishell.h"
 
-void process_command(char *input, t_shell *shell)
+void	process_command(char *input, t_shell *shell)
 {
 	parse_input(input, shell);
 	ft_lstclear(&shell->tmp_tokens, free);
 	ft_lstclear(&shell->tokens, free);
 	ft_lstclear(&shell->tokens1, free);
-	free(input); 
+	free(input);
 }
-void cleanup_shell(t_shell *args)
+
+void	cleanup_shell(t_shell *args)
 {
 	free_lst(args->env);
 	ft_lstclear(&args->tokens, free);
@@ -30,24 +31,24 @@ void cleanup_shell(t_shell *args)
 	free(args);
 	write(1, "exit\n", 5);
 }
-int main(int argc, char **argv, char **env)
+
+int	main(int argc, char **argv, char **env)
 {
-	t_shell		*args;
-	int			exit_status;
-	char		*input;
+	t_shell	*args;
+	int		exit_status;
+	char	*input;
 
 	(void)argc;
 	(void)argv;
-
 	set_upsignals();
-	if(!(args = initialize_shell(env)))
+	if (!(args = initialize_shell(env)))
 		return (1);
 	input = get_input();
-	while(input && args->exit == -1)
+	while (input && args->exit == -1)
 	{
 		process_command(input, args);
 		if (args->exit != -1)
-			break;
+			break ;
 		input = get_input();
 	}
 	if (args->exit == -1)
