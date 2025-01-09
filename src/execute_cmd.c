@@ -559,8 +559,6 @@ void execute_pipeline(t_shell *shell)
     int     fd;
     char    *exec_path;
 
-    //fprintf(stderr, "\n🚀 === Starting Pipeline Execution === 🚀\n");
-
     input_fd = STDIN_FILENO;
     is_last_command = 0;
     tokens = shell->tokens;
@@ -569,27 +567,16 @@ void execute_pipeline(t_shell *shell)
     {
         cmd = parse_command(tokens);
         if (cmd == NULL)
-        {
-            //fprintf(stderr, "❌ Error: Failed to parse command\n");
             break;
-        }
-
-        //fprintf(stderr, "\n📍 Processing command: %s\n", 
-                //cmd->args[0] ? cmd->args[0] : "NULL");
-
         while (tokens && strcmp(tokens->content, "|") != 0)
             tokens = tokens->next;
         is_last_command = (tokens == NULL);
         if (!is_last_command)
             tokens = tokens->next;
-
-        // Debug pour builtin
         if (is_last_command && is_builtin(cmd->args[0]))
         {
-            //fprintf(stderr, "🔧 Executing builtin: %s\n", cmd->args[0]);
             if (input_fd != STDIN_FILENO)
             {
-                //fprintf(stderr, "📥 Redirecting input for builtin (fd: %d)\n", input_fd);
                 saved_stdin = dup(STDIN_FILENO);
                 dup2(input_fd, STDIN_FILENO);
                 execute_builtin(cmd, shell);
@@ -605,39 +592,23 @@ void execute_pipeline(t_shell *shell)
 
         if (pipe(pipefd) == -1)
         {
-           //fprintf(stderr, "❌ Pipe creation failed\n");
             perror("pipe failed");
             free_cmd(cmd);
             exit(EXIT_FAILURE);
         }
-        //fprintf(stderr, "📊 Pipe created - read_fd: %d, write_fd: %d\n", 
-                //pipefd[0], pipefd[1]);
-
         pid = fork();
         if (pid == 0)
         {
-            //fprintf(stderr, "👶 Child process started for: %s\n", cmd->args[0]);
-            
             dup2(input_fd, STDIN_FILENO);
-            //fprintf(stderr, "📥 Child: Input redirected from fd %d\n", input_fd);
-
             if (!is_last_command)
-            {
                 dup2(pipefd[1], STDOUT_FILENO);
-                //fprintf(stderr, "📤 Child: Output redirected to pipe fd %d\n", pipefd[1]);
-            }
-
             close(pipefd[0]);
             close(pipefd[1]);
-
-            // Debug pour redirection d'entrée
             if (cmd->input_mode == 1)
             {
-                //fprintf(stderr, "📂 Opening input file: %s\n", cmd->input_file);
                 fd = open(cmd->input_file, O_RDONLY);
                 if (fd == -1)
                 {
-                    //fprintf(stderr, "❌ Failed to open input file\n");
                     perror("Error opening input file");
                     free_cmd(cmd);
                     exit(EXIT_FAILURE);
@@ -645,19 +616,14 @@ void execute_pipeline(t_shell *shell)
                 dup2(fd, STDIN_FILENO);
                 close(fd);
             }
-
-            // Debug pour redirection de sortie
             if (cmd->output_mode)
             {
-                //fprintf(stderr, "📝 Opening output file: %s (mode: %d)\n", 
-                        //cmd->output_file, cmd->output_mode);
                 fd = open(cmd->output_file, 
                          cmd->output_mode == 1 ? O_WRONLY | O_CREAT | O_TRUNC 
                                              : O_WRONLY | O_CREAT | O_APPEND,
                          0644);
                 if (fd == -1)
                 {
-                    //fprintf(stderr, "❌ Failed to open output file\n");
                     perror("Error opening output file");
                     free_cmd(cmd);
                     exit(EXIT_FAILURE);
@@ -667,7 +633,6 @@ void execute_pipeline(t_shell *shell)
             }
 			if (is_builtin(cmd->args[0]))
             {
-               //fprintf(stderr, "🏠 Executing builtin in child: %s\n", cmd->args[0]);
                 int ret = execute_builtin(cmd, shell);
                 free_cmd(cmd);
                 exit(ret);
@@ -675,15 +640,10 @@ void execute_pipeline(t_shell *shell)
             exec_path = find_executable(cmd->args[0]);
             if (!exec_path)
             {
-                //fprintf(stderr, "❌ Command not found: %s\n", cmd->args[0]);
                 free_cmd(cmd);
                 exit(127);
             }
-
-            //fprintf(stderr, "🚀 Executing: %s\n", exec_path);
             execve(exec_path, cmd->args, shell->environ);
-            
-            //fprintf(stderr, "❌ Execve failed for: %s\n", cmd->args[0]);
             perror("execve failed");
             free(exec_path);
             free_cmd(cmd);
@@ -691,17 +651,12 @@ void execute_pipeline(t_shell *shell)
         }
         else if (pid > 0)
         {
-            //fprintf(stderr, "👨 Parent process: waiting for child pid %d\n", pid);
-            
             close(pipefd[1]);
             if (input_fd != STDIN_FILENO)
                 close(input_fd);
             input_fd = pipefd[0];
 
             waitpid(pid, &status, 0);
-            //fprintf(stderr, "✅ Child process %d finished with status: %d\n", 
-                    //pid, WEXITSTATUS(status));
-
             if (is_last_command)
             {
                 if (WIFEXITED(status))
@@ -710,30 +665,22 @@ void execute_pipeline(t_shell *shell)
                     shell->last_status = 128 + WTERMSIG(status);
                 else
                     shell->last_status = 1;
-                
-                //fprintf(stderr, "🏁 Final command status: %d\n", shell->last_status);
             }
         }
         else
         {
-            //fprintf(stderr, "❌ Fork failed\n");
             perror("fork failed");
             free_cmd(cmd);
             exit(EXIT_FAILURE);
         }
-
         free_cmd(cmd);
         if (is_last_command)
             break;
     }
-
     if (input_fd != STDIN_FILENO)
     {
-        //fprintf(stderr, "🔒 Closing final input fd: %d\n", input_fd);
         close(input_fd);
     }
-
-    //fprintf(stderr, "\n🏁 === Pipeline Execution Completed === 🏁\n\n");
 }
 
 void	execute_command1(t_shell *shell)
