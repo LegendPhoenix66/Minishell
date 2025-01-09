@@ -78,13 +78,38 @@ void	print_lst(t_node **top)
 	t_node	*current;
 
 	current = *top;
-	printf("print my linklist\n");
 	while (current != NULL)
 	{
 		printf("%s\n", current->content);
 		current = current->next;
 	}
 }
+/*int print_lst(t_node **top)
+{
+    t_node *current;
+	fprintf(stderr, "DEBUG: Starting env output\n");
+
+    if (!top || !*top)
+        return (0);
+
+    current = *top;
+    while (current)
+    {
+        if (current->content)
+        {
+			//fprintf(stderr, "DEBUG: Attempting to write: %s\n", current->content);
+            //for a not buffering output
+            if (write(STDOUT_FILENO, current->content, strlen(current->content)) == -1)
+			   	return (1);
+            if (write(STDOUT_FILENO, "\n", 1) == -1)
+                return (1);
+				
+        }
+        current = current->next;
+    }
+	fprintf(stderr, "DEBUG: Finished env output\n");
+    return (0);
+}*/
 
 void	print_list_debug(t_list **top)
 {
