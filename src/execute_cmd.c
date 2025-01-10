@@ -71,7 +71,7 @@ void	free_cmd(t_cmd *cmd)
 }
 
 // Function to add an argument to the command
-void	add_arg(t_cmd *cmd, char *arg)
+/*void	add_arg(t_cmd *cmd, char *arg)
 {
 	int		i;
 	char	**new_args;
@@ -85,7 +85,7 @@ void	add_arg(t_cmd *cmd, char *arg)
 			perror("malloc failed");
 			exit(EXIT_FAILURE);
 		}
-		cmd->args[0] = strdup(arg);
+		cmd->args[0] = ft_strdup(arg);
 		cmd->args[1] = NULL;
 		return ;
 	}
@@ -100,6 +100,45 @@ void	add_arg(t_cmd *cmd, char *arg)
 	cmd->args = new_args;
 	cmd->args[i] = ft_strdup(arg);
 	cmd->args[i + 1] = NULL;
+}*/
+// same fonction but skip realloc
+void    add_arg(t_cmd *cmd, char *arg)
+{
+    int     i;
+	int		j;
+    char    **new_args;
+
+    i = 0;
+	j = 0;
+    if (cmd->args == NULL)
+    {
+        cmd->args = malloc(sizeof(char *) * 2);
+        if (cmd->args == NULL)
+        {
+            perror("malloc failed");
+            exit(EXIT_FAILURE);
+        }
+        cmd->args[0] = ft_strdup(arg);
+        cmd->args[1] = NULL;
+        return ;
+    }
+    while (cmd->args[i] != NULL)
+        i++;
+    new_args = malloc(sizeof(char *) * (i + 2));
+    if (new_args == NULL)
+    {
+        perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
+    while (j < i)
+	{
+        new_args[j] = cmd->args[j];
+		j++;
+	}
+    new_args[i] = ft_strdup(arg);
+    new_args[i + 1] = NULL;
+    free(cmd->args);
+    cmd->args = new_args;
 }
 
 // Helper function to count args

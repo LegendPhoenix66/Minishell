@@ -32,32 +32,13 @@ t_builtin_type	get_builtin_type(const char *cmd)
 		return (BUILTIN_EXIT);
 	return (BUILTIN_NONE);
 }
-int execute_builtin(t_cmd *cmd, t_shell *shell)
+int builtin_execution(t_cmd *cmd, t_shell *shell)
 {
-    t_builtin_type  type;
-    int             ret;
-    int             saved_stdout;
-    int             fd;
-    int             flags;
+    t_builtin_type type;
+    int ret;
 
     type = get_builtin_type(cmd->args[0]);
     ret = 0;
-    saved_stdout = -1;
-    if (cmd->output_mode)
-    {
-        saved_stdout = dup(STDOUT_FILENO);
-        if (cmd->output_mode == 1)
-            flags = O_WRONLY | O_CREAT | O_TRUNC;
-        else
-            flags = O_WRONLY | O_CREAT | O_APPEND;
-            
-        fd = open(cmd->output_file, flags, 0644);
-        if (fd != -1)
-        {
-            dup2(fd, STDOUT_FILENO);
-            close(fd);
-        }
-    }
     if (type == BUILTIN_ECHO)
         ret = builtin_echo(cmd);
     else if (type == BUILTIN_CD)
@@ -74,7 +55,39 @@ int execute_builtin(t_cmd *cmd, t_shell *shell)
         builtin_exit(shell, cmd);
     else
         ret = 1;
+    return (ret);
+}
+int Opening_mode(t_cmd *cmd)
+{
+    int flags;
 
+    if (cmd->output_mode == 1)
+        flags = O_WRONLY | O_CREAT | O_TRUNC;
+    else
+        flags = O_WRONLY | O_CREAT | O_APPEND;
+    return (flags);
+}
+int execute_builtin(t_cmd *cmd, t_shell *shell)
+{
+    int             ret;
+    int             saved_stdout;
+    int             fd;
+    int             flags;
+
+    ret = 0;
+    saved_stdout = -1;
+    if (cmd->output_mode)
+    {
+        saved_stdout = dup(STDOUT_FILENO);
+        flags = Opening_mode(cmd);
+        fd = open(cmd->output_file, flags, 0644);
+        if (fd != -1)
+        {
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+        }
+    }
+    ret = builtin_execution(cmd, shell);
     if (saved_stdout != -1)
     {
         dup2(saved_stdout, STDOUT_FILENO);
