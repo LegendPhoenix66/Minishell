@@ -32,202 +32,225 @@ t_list	*add_token(t_list **list, const char *token, int length)
 	return (new_node);
 }
 
+// Skips a quoted section until the closing quote or throws an error
+int	skip_quoted_section(const char *input, int start_index, char quote)
+{
+	int	end_quote;
+
+	end_quote = start_index + 1;
+	while (input[end_quote] && input[end_quote] != quote)
+		end_quote++;
+	if (!input[end_quote])
+		error("Unmatched quote");
+	return (end_quote + 1);
+}
+
 // Function to split input by spaces
 t_list	*split_by_spaces(const char *input)
 {
 	t_list	*parsed_tokens;
-	int		i;
-	char	quote;
-	int		j;
+	char	single_quote;
+	char	double_quote;
+	int		index;
 
+	single_quote = '\'';
+	double_quote = '"';
 	parsed_tokens = NULL;
-	i = 0;
-	while (input[i])
+	index = 0;
+	while (input[index])
 	{
-		if (input[i] == ' ')
+		if (input[index] == ' ')
 		{
-			add_token(&parsed_tokens, input, i);
-			input += i + 1;
-			i = 0;
+			add_token(&parsed_tokens, input, index);
+			input += index + 1;
+			index = 0;
 		}
-		else if (input[i] == '\"' || input[i] == '\'')
-		{
-			quote = input[i];
-			j = i + 1;
-			while (input[j] && input[j] != quote)
-				j++;
-			if (!input[j])
-				error("unmatched quote");
-			i = j + 1;
-		}
+		else if (input[index] == single_quote || input[index] == double_quote)
+			index = skip_quoted_section(input, index, input[index]);
 		else
-			i++;
+			index++;
 	}
-	add_token(&parsed_tokens, input, i);
+	if (index > 0)
+		add_token(&parsed_tokens, input, index);
 	return (parsed_tokens);
 }
 
-// Function to correct pipes and redirects
+// Extracted helper: Process the quoted section
+int	process_quoted_section(const char *content, int index, char quote)
+{
+	index++;
+	while (content[index] && content[index] != quote)
+		index++;
+	if (!content[index])
+		error("Unmatched quote");
+	return (index + 1);
+}
+
+// Extracted helper: Process pipe or redirect
+int	process_pipe_or_redirect(t_list **tokens_with_pipes, const char *content,
+		int index)
+{
+	int	length;
+
+	if (content[index + 1] == content[index])
+		length = 2;
+	else
+		length = 1;
+	add_token(tokens_with_pipes, content, index);
+	add_token(tokens_with_pipes, content + index, length);
+	return (index + length);
+}
+
 void	correct_pipes_and_redirects(t_list *parsed_tokens)
 {
 	t_list	*tokens_with_pipes;
-	t_list	*current;
-	int		i;
-	int		pipe_pos;
-	char	*content;
-	char	quote;
-	int		length;
+	t_list	*current_token;
+	int		index;
+	int		last_pipe_pos;
+	char	*token_content;
 
 	tokens_with_pipes = NULL;
-	current = parsed_tokens;
-	while (current)
+	current_token = parsed_tokens;
+	while (current_token)
 	{
-		i = 0;
-		pipe_pos = -1;
-		content = current->content;
-		while (content[i])
+		index = 0;
+		last_pipe_pos = -1;
+		token_content = current_token->content;
+		while (token_content[index])
 		{
-			if (content[i] == '\"' || content[i] == '\'')
+			if (token_content[index] == '\"' || token_content[index] == '\'')
+				index = process_quoted_section(token_content, index,
+						token_content[index]);
+			else if (token_content[index] == '|' || token_content[index] == '>'
+				|| token_content[index] == '<')
 			{
-				quote = content[i];
-				i++;
-				while (content[i] != quote)
-				{
-					i++;
-				}
-				i++;
-			}
-			if (content[i] == '|' || content[i] == '<' || content[i] == '>')
-			{
-				length = (content[i + 1] == content[i]) ? 2 : 1;
-				add_token(&tokens_with_pipes, current->content, i);
-				add_token(&tokens_with_pipes, current->content + i, length);
-				pipe_pos = i + length - 1;
-				i += length;
+				index = process_pipe_or_redirect(&tokens_with_pipes,
+						token_content, index);
+				last_pipe_pos = index - 1;
 			}
 			else
-			{
-				i++;
-			}
+				index++;
 		}
-		add_token(&tokens_with_pipes, content + pipe_pos + 1, strlen(content)
-			- pipe_pos - 1);
-		current = current->next;
+		add_token(&tokens_with_pipes, token_content + last_pipe_pos + 1,
+			strlen(token_content) - last_pipe_pos - 1);
+		current_token = current_token->next;
 	}
 	parsed_tokens = tokens_with_pipes;
 	ft_lstclear(&tokens_with_pipes, free);
 }
 
-// Function to remove quotes and substitute variables
+// Helper to copy remaining characters
+static char	*append_char(char *buffer, int *pos, char c)
+{
+	buffer = realloc(buffer, *pos + 2);
+	buffer[(*pos)++] = c;
+	buffer[*pos] = '\0';
+	return (buffer);
+}
+
+// Helper function to process and expand a variable
+static char	*expand_variable(const char *content, int *index, int last_status,
+		char *new_content, int *new_index)
+{
+	int		var_start;
+	char	*var_value;
+	char	status_str[12];
+	char	*var_name;
+	size_t	value_length;
+
+	var_start = *index;
+	var_value = NULL;
+	while (content[*index] && content[*index] != ' ' && content[*index] != '"'
+		&& content[*index] != '\'')
+	{
+		(*index)++;
+	}
+	var_name = strndup(&content[var_start], *index - var_start);
+	if (strcmp(var_name, "?") == 0)
+	{
+		snprintf(status_str, sizeof(status_str), "%d", last_status);
+		var_value = status_str;
+	}
+	else
+	{
+		var_value = getenv(var_name);
+	}
+	if (var_value)
+	{
+		value_length = strlen(var_value);
+		new_content = realloc(new_content, *new_index + value_length + 1);
+		strcpy(&new_content[*new_index], var_value);
+		*new_index += value_length;
+	}
+	free(var_name);
+	return (new_content);
+}
+
+// Helper function to process quoted sections
+static char	*process_string_with_quotes(const char *content, int *index,
+		char quote, int last_status, char *new_content, int *new_index)
+{
+	(*index)++;
+	while (content[*index] && content[*index] != quote)
+	{
+		if (content[*index] == '$' && quote == '"')
+		{
+			(*index)++;
+			new_content = expand_variable(content, index, last_status,
+					new_content, new_index);
+		}
+		else
+		{
+			new_content = append_char(new_content, new_index,
+					content[(*index)++]);
+		}
+	}
+	if (content[*index] == quote)
+	{
+		(*index)++;
+	}
+	return (new_content);
+}
+
+// Refactored main function
 void	remove_quotes_and_substitute_variables(t_list *tokens, int last_status)
 {
 	t_list	*current;
-	char	*new_content;
-	int		i;
-	int		j;
 	char	*content;
-	char	quote;
-	int		var_start;
-	char	*var_name;
-	char	status_str[12];
-	char	*var_value;
+	char	*new_content;
+	int		index;
+	int		new_index;
 
 	current = tokens;
 	while (current)
 	{
-		new_content = NULL;
-		i = 0;
-		j = 0;
 		content = current->content;
-		while (content[i])
+		new_content = NULL;
+		index = 0;
+		new_index = 0;
+		while (content[index])
 		{
-			if (content[i] == '\"' || content[i] == '\'')
+			if (content[index] == '"' || content[index] == '\'')
 			{
-				quote = content[i++];
-				while (content[i] && content[i] != quote)
-				{
-					if (content[i] == '$' && quote == '\"')
-					{
-						var_start = ++i;
-						while (content[i] && content[i] != ' '
-							&& content[i] != quote)
-						{
-							i++;
-						}
-						var_name = malloc(i - var_start + 1);
-						strncpy(var_name, &content[var_start], i - var_start);
-						var_name[i - var_start] = '\0';
-						if (strcmp(var_name, "?") == 0)
-						{
-							snprintf(status_str, sizeof(status_str), "%d",
-								last_status);
-							new_content = realloc(new_content, j
-									+ strlen(status_str) + 1);
-							strcpy(&new_content[j], status_str);
-							j += strlen(status_str);
-						}
-						else
-						{
-							var_value = getenv(var_name);
-							if (var_value)
-							{
-								new_content = realloc(new_content, j
-										+ strlen(var_value) + 1);
-								strcpy(&new_content[j], var_value);
-								j += strlen(var_value);
-							}
-						}
-						free(var_name);
-					}
-					else
-					{
-						new_content = realloc(new_content, j + 2);
-						new_content[j++] = content[i++];
-					}
-				}
-				i++;
+				new_content = process_string_with_quotes(content, &index,
+						content[index], last_status, new_content, &new_index);
 			}
-			else if (content[i] == '$')
+			else if (content[index] == '$')
 			{
-				var_start = ++i;
-				while (content[i] && content[i] != ' ' && content[i] != '\"'
-					&& content[i] != '\'')
-				{
-					i++;
-				}
-				var_name = malloc(i - var_start + 1);
-				strncpy(var_name, &content[var_start], i - var_start);
-				var_name[i - var_start] = '\0';
-				if (strcmp(var_name, "?") == 0)
-				{
-					snprintf(status_str, sizeof(status_str), "%d", last_status);
-					new_content = realloc(new_content, j + strlen(status_str)
-							+ 1);
-					strcpy(&new_content[j], status_str);
-					j += strlen(status_str);
-				}
-				else
-				{
-					var_value = getenv(var_name);
-					if (var_value)
-					{
-						new_content = realloc(new_content, j + strlen(var_value)
-								+ 1);
-						strcpy(&new_content[j], var_value);
-						j += strlen(var_value);
-					}
-				}
-				free(var_name);
+				index++;
+				new_content = expand_variable(content, &index, last_status,
+						new_content, &new_index);
 			}
 			else
 			{
-				new_content = realloc(new_content, j + 2);
-				new_content[j++] = content[i++];
+				new_content = append_char(new_content, &new_index,
+						content[index++]);
 			}
 		}
 		if (new_content)
 		{
-			new_content[j] = '\0';
+			if (new_index > 0)
+				new_content[new_index] = '\0';
 			free(current->content);
 			current->content = new_content;
 		}
