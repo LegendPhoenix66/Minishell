@@ -102,39 +102,47 @@ int	process_pipe_or_redirect(t_list **tokens_with_pipes, const char *content,
 	return (index + length);
 }
 
+// Extracted function to handle tokens of a single content line
+void	process_token_line(const char *token_content,
+		t_list **tokens_with_pipes)
+{
+	int	current_index;
+	int	last_special_char_pos;
+
+	current_index = 0;
+	last_special_char_pos = -1;
+	while (token_content[current_index])
+	{
+		if (token_content[current_index] == '\"'
+			|| token_content[current_index] == '\'')
+			current_index = process_quoted_section(token_content, current_index,
+					token_content[current_index]);
+		else if (token_content[current_index] == '|'
+			|| token_content[current_index] == '>'
+			|| token_content[current_index] == '<')
+		{
+			current_index = process_pipe_or_redirect(tokens_with_pipes,
+					token_content, current_index);
+			last_special_char_pos = current_index - 1;
+		}
+		else
+			current_index++;
+	}
+	if (current_index > last_special_char_pos + 1)
+		add_token(tokens_with_pipes, token_content + last_special_char_pos + 1,
+			strlen(token_content) - last_special_char_pos - 1);
+}
+
 void	correct_pipes_and_redirects(t_list **parsed_tokens)
 {
 	t_list	*tokens_with_pipes;
 	t_list	*current_token;
-	int		index;
-	int		last_pipe_pos;
-	char	*token_content;
 
 	tokens_with_pipes = NULL;
 	current_token = *parsed_tokens;
 	while (current_token)
 	{
-		index = 0;
-		last_pipe_pos = -1;
-		token_content = current_token->content;
-		while (token_content[index])
-		{
-			if (token_content[index] == '\"' || token_content[index] == '\'')
-				index = process_quoted_section(token_content, index,
-						token_content[index]);
-			else if (token_content[index] == '|' || token_content[index] == '>'
-				|| token_content[index] == '<')
-			{
-				index = process_pipe_or_redirect(&tokens_with_pipes,
-						token_content, index);
-				last_pipe_pos = index - 1;
-			}
-			else
-				index++;
-		}
-		if (index > last_pipe_pos + 1)
-			add_token(&tokens_with_pipes, token_content + last_pipe_pos + 1,
-				strlen(token_content) - last_pipe_pos - 1);
+		process_token_line(current_token->content, &tokens_with_pipes);
 		current_token = current_token->next;
 	}
 	ft_lstclear(parsed_tokens, free);
