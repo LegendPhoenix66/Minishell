@@ -12,21 +12,21 @@
 
 #include "../include/minishell.h"
 
-int	find_equal(const char *var)
-{
-	int	i;
-
-	i = 0;
-	while (var[i] != '=' && var[i])
-		i++;
-	if (var[i] == '=')
-	{
-		printf("i vaut %d\n", i);
-		return (i);
-	}
-	else
-		return (-1);
-}
+// int	find_equal(const char *var)
+// {
+// 	int	i;
+//
+// 	i = 0;
+// 	while (var[i] != '=' && var[i])
+// 		i++;
+// 	if (var[i] == '=')
+// 	{
+// 		printf("i vaut %d\n", i);
+// 		return (i);
+// 	}
+// 	else
+// 		return (-1);
+// }
 
 // check the validity of export arg (first charactere of argument)
 int	check_in(const char *var)
@@ -84,30 +84,30 @@ void	print_export(t_shell **args)
 	free_lst(head_exp);
 }
 
-char	*concat_list_content(t_list *list)
-{
-	t_list	*current;
-	char	*result;
-	char	*temp;
-
-	if (!list)
-		return (NULL);
-	result = ft_strdup(list->content);
-	if (!result)
-		return (NULL);
-	current = list->next;
-	while (current)
-	{
-		temp = result;
-		result = ft_strjoin(result, current->content);
-		free(temp);
-		if (!result)
-			return (NULL);
-		current = current->next;
-	}
-	printf("use concatenation fonction");
-	return (result);
-}
+// char	*concat_list_content(t_list *list)
+// {
+// 	t_list	*current;
+// 	char	*result;
+// 	char	*temp;
+//
+// 	if (!list)
+// 		return (NULL);
+// 	result = ft_strdup(list->content);
+// 	if (!result)
+// 		return (NULL);
+// 	current = list->next;
+// 	while (current)
+// 	{
+// 		temp = result;
+// 		result = ft_strjoin(result, current->content);
+// 		free(temp);
+// 		if (!result)
+// 			return (NULL);
+// 		current = current->next;
+// 	}
+// 	printf("use concatenation fonction");
+// 	return (result);
+// }
 
 // Modification de builtin_export pour accepter les arguments
 int	builtin_export(t_shell *shell, char **args)

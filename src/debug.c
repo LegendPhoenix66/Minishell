@@ -109,3 +109,19 @@ char	*ft_strtok(char *str, char *separtors)
 	}
 	return (start_item);
 }
+
+void	print_list_debug(t_list **top)
+{
+	t_list	*current;
+
+	printf("-------list start-------\n");
+	current = *top;
+	while (current != NULL)
+	{
+		printf("Content: %s\n", (char *)(current->content));
+		printf("adresse %p\n", (char *)(current));
+		printf("----------\n");
+		current = current->next;
+	}
+	printf("-------list end-------\n");
+}

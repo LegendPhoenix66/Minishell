@@ -101,6 +101,7 @@ void	free_cmd(t_cmd *cmd)
 	cmd->args[i] = ft_strdup(arg);
 	cmd->args[i + 1] = NULL;
 }*/
+
 // same fonction but skip realloc
 void    add_arg(t_cmd *cmd, char *arg)
 {
@@ -142,24 +143,24 @@ void    add_arg(t_cmd *cmd, char *arg)
 }
 
 // Helper function to count args
-int	count_args(t_list *tokens)
-{
-	int		arg_count;
-	char	*token;
-
-	arg_count = 0;
-	while (tokens != NULL)
-	{
-		token = tokens->content;
-		if (strcmp(token, "|") == 0 || strcmp(token, "<") == 0 || strcmp(token,
-				">") == 0 || strcmp(token, "<<") == 0 || strcmp(token,
-				">>") == 0)
-			break ;
-		arg_count++;
-		tokens = tokens->next;
-	}
-	return (arg_count);
-}
+// int	count_args(t_list *tokens)
+// {
+// 	int		arg_count;
+// 	char	*token;
+//
+// 	arg_count = 0;
+// 	while (tokens != NULL)
+// 	{
+// 		token = tokens->content;
+// 		if (strcmp(token, "|") == 0 || strcmp(token, "<") == 0 || strcmp(token,
+// 				">") == 0 || strcmp(token, "<<") == 0 || strcmp(token,
+// 				">>") == 0)
+// 			break ;
+// 		arg_count++;
+// 		tokens = tokens->next;
+// 	}
+// 	return (arg_count);
+// }
 
 void	handle_heredoc(t_cmd *cmd, const char *delimiter)
 {
@@ -585,6 +586,7 @@ void	execute_simple_command(t_cmd *cmd, t_shell *shell)
 	if (input_fd != STDIN_FILENO)
 		close(input_fd);
 }*/
+
 void execute_pipeline(t_shell *shell)
 {
     int     pipefd[2];

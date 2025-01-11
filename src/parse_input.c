@@ -70,74 +70,74 @@ char	*find_command_in_path(char *cmd)
 	return (NULL);
 }
 
-void	execute_external_command(t_shell *args)
-{
-	char	*cmd_path;
-	pid_t	pid;
-	int		pipe_fd[2];
-	char	buffer[1024];
-	ssize_t	bytes_read;
-	char	*argv[3];
-	t_list	*token_node;
-
-	token_node = args->tokens;
-	argv[0] = (char *)token_node->content;
-	if (token_node->next == NULL)
-		argv[1] = NULL;
-	else
-		argv[1] = (char *)token_node->next->content;
-	argv[2] = NULL;
-	if (((char *)token_node->content)[0] == '/'
-		|| ((char *)token_node->content)[0] == '.')
-	{
-		printf("content %s\n", (char *)(token_node->content));
-		if (access(token_node->content, X_OK) == 0)
-			cmd_path = strdup(token_node->content);
-		else
-		{
-			write(2, "Command not found\n", 18);
-			return ;
-		}
-	}
-	else
-	{
-		cmd_path = find_command_in_path(token_node->content);
-		if (cmd_path == NULL)
-		{
-			write(2, "Command not found\n", 18);
-			return ;
-		}
-	}
-	if (pipe(pipe_fd) == -1)
-	{
-		perror("pipe error");
-		return ;
-	}
-	pid = fork();
-	if (pid == 0)
-	{
-		close(pipe_fd[0]);
-		dup2(pipe_fd[1], STDOUT_FILENO);
-		close(pipe_fd[1]);
-		if (execve(cmd_path, argv, args->environ) == -1)
-		{
-			perror("execve error");
-			exit(EXIT_FAILURE);
-		}
-	}
-	else if (pid > 0)
-	{
-		close(pipe_fd[1]);
-		while ((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0)
-		{
-			buffer[bytes_read] = '\0';
-			write(STDOUT_FILENO, buffer, bytes_read);
-		}
-		close(pipe_fd[0]);
-		waitpid(pid, NULL, 0);
-	}
-	free(cmd_path);
-}
+// void	execute_external_command(t_shell *args)
+// {
+// 	char	*cmd_path;
+// 	pid_t	pid;
+// 	int		pipe_fd[2];
+// 	char	buffer[1024];
+// 	ssize_t	bytes_read;
+// 	char	*argv[3];
+// 	t_list	*token_node;
+//
+// 	token_node = args->tokens;
+// 	argv[0] = (char *)token_node->content;
+// 	if (token_node->next == NULL)
+// 		argv[1] = NULL;
+// 	else
+// 		argv[1] = (char *)token_node->next->content;
+// 	argv[2] = NULL;
+// 	if (((char *)token_node->content)[0] == '/'
+// 		|| ((char *)token_node->content)[0] == '.')
+// 	{
+// 		printf("content %s\n", (char *)(token_node->content));
+// 		if (access(token_node->content, X_OK) == 0)
+// 			cmd_path = strdup(token_node->content);
+// 		else
+// 		{
+// 			write(2, "Command not found\n", 18);
+// 			return ;
+// 		}
+// 	}
+// 	else
+// 	{
+// 		cmd_path = find_command_in_path(token_node->content);
+// 		if (cmd_path == NULL)
+// 		{
+// 			write(2, "Command not found\n", 18);
+// 			return ;
+// 		}
+// 	}
+// 	if (pipe(pipe_fd) == -1)
+// 	{
+// 		perror("pipe error");
+// 		return ;
+// 	}
+// 	pid = fork();
+// 	if (pid == 0)
+// 	{
+// 		close(pipe_fd[0]);
+// 		dup2(pipe_fd[1], STDOUT_FILENO);
+// 		close(pipe_fd[1]);
+// 		if (execve(cmd_path, argv, args->environ) == -1)
+// 		{
+// 			perror("execve error");
+// 			exit(EXIT_FAILURE);
+// 		}
+// 	}
+// 	else if (pid > 0)
+// 	{
+// 		close(pipe_fd[1]);
+// 		while ((bytes_read = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0)
+// 		{
+// 			buffer[bytes_read] = '\0';
+// 			write(STDOUT_FILENO, buffer, bytes_read);
+// 		}
+// 		close(pipe_fd[0]);
+// 		waitpid(pid, NULL, 0);
+// 	}
+// 	free(cmd_path);
+// }
 
 // Example parsing input into tokens
 void	parse_input(char *input, t_shell *shell)

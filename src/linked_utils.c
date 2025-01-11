@@ -84,21 +84,6 @@ void	print_lst(t_node **top)
 		current = current->next;
 	}
 }
-void	print_list_debug(t_list **top)
-{
-	t_list	*current;
-
-	printf("-------list start-------\n");
-	current = *top;
-	while (current != NULL)
-	{
-		printf("Content: %s\n", (char *)(current->content));
-		printf("adresse %p\n", (char *)(current));
-		printf("----------\n");
-		current = current->next;
-	}
-	printf("-------list end-------\n");
-}
 
 void	free_lst(t_node *top)
 {
@@ -224,18 +209,18 @@ t_node	*copy_list(t_node *original)
 	return (new_node);
 }
 
-int	count_node(t_list **top)
-{
-	int		i;
-	t_list	*current;
-
-	i = 0;
-	current = *top;
-	while (current != NULL)
-	{
-		current = current->next;
-		i++;
-	}
-	printf("%d\n", i);
-	return (i);
-}
+// int	count_node(t_list **top)
+// {
+// 	int		i;
+// 	t_list	*current;
+//
+// 	i = 0;
+// 	current = *top;
+// 	while (current != NULL)
+// 	{
+// 		current = current->next;
+// 		i++;
+// 	}
+// 	printf("%d\n", i);
+// 	return (i);
+// }
