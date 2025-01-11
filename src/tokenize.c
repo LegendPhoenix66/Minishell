@@ -96,12 +96,13 @@ int	process_pipe_or_redirect(t_list **tokens_with_pipes, const char *content,
 		length = 2;
 	else
 		length = 1;
-	add_token(tokens_with_pipes, content, index);
+	if (index > 0)
+		add_token(tokens_with_pipes, content, index);
 	add_token(tokens_with_pipes, content + index, length);
 	return (index + length);
 }
 
-void	correct_pipes_and_redirects(t_list *parsed_tokens)
+void	correct_pipes_and_redirects(t_list **parsed_tokens)
 {
 	t_list	*tokens_with_pipes;
 	t_list	*current_token;
@@ -110,7 +111,7 @@ void	correct_pipes_and_redirects(t_list *parsed_tokens)
 	char	*token_content;
 
 	tokens_with_pipes = NULL;
-	current_token = parsed_tokens;
+	current_token = *parsed_tokens;
 	while (current_token)
 	{
 		index = 0;
@@ -131,12 +132,13 @@ void	correct_pipes_and_redirects(t_list *parsed_tokens)
 			else
 				index++;
 		}
-		add_token(&tokens_with_pipes, token_content + last_pipe_pos + 1,
-			strlen(token_content) - last_pipe_pos - 1);
+		if (index > last_pipe_pos + 1)
+			add_token(&tokens_with_pipes, token_content + last_pipe_pos + 1,
+				strlen(token_content) - last_pipe_pos - 1);
 		current_token = current_token->next;
 	}
-	parsed_tokens = tokens_with_pipes;
-	ft_lstclear(&tokens_with_pipes, free);
+	ft_lstclear(parsed_tokens, free);
+	*parsed_tokens = tokens_with_pipes;
 }
 
 static void	append_to_new_content(char **new_content, int *output_index,
@@ -286,7 +288,7 @@ t_list	*tokenize_input(const char *input, int last_status)
 	parsed_tokens = split_by_spaces(input);
 	if (!parsed_tokens)
 		return (NULL);
-	correct_pipes_and_redirects(parsed_tokens);
+	correct_pipes_and_redirects(&parsed_tokens);
 	remove_quotes_and_substitute_variables(parsed_tokens, last_status);
 	return (parsed_tokens);
 }
