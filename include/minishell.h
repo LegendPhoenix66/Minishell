@@ -92,6 +92,13 @@ typedef struct s_shell
 	int				last_status;
 }					t_shell;
 
+typedef struct s_context
+{
+	char			**new_content;
+	int				*output_index;
+	int				last_status;
+}					t_context;
+
 char				*get_input(void);
 void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);

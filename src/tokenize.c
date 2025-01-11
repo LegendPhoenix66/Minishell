@@ -139,120 +139,141 @@ void	correct_pipes_and_redirects(t_list *parsed_tokens)
 	ft_lstclear(&tokens_with_pipes, free);
 }
 
-// Helper to copy remaining characters
-static char	*append_char(char *buffer, int *pos, char c)
+static void	append_to_new_content(char **new_content, int *output_index,
+		const char *str)
 {
-	buffer = realloc(buffer, *pos + 2);
-	buffer[(*pos)++] = c;
-	buffer[*pos] = '\0';
-	return (buffer);
+	size_t	len;
+
+	len = strlen(str);
+	*new_content = realloc(*new_content, *output_index + len + 1);
+	strcpy(&(*new_content)[*output_index], str);
+	*output_index += len;
 }
 
-// Helper function to process and expand a variable
-static char	*expand_variable(const char *content, int *index, int last_status,
-		char *new_content, int *new_index)
+// Helper function to append a variable's value
+static void	append_variable_value(t_context *ctx, const char *value)
 {
-	int		var_start;
-	char	*var_value;
-	char	status_str[12];
-	char	*var_name;
-	size_t	value_length;
+	if (value)
+	{
+		append_to_new_content(ctx->new_content, ctx->output_index, value);
+	}
+}
 
-	var_start = *index;
-	var_value = NULL;
+static void	process_variable_substitution(const char *content, int *index,
+		t_context *ctx)
+{
+	int		start_index;
+	char	status_str[12];
+	int		var_length;
+	char	*variable_name;
+	char	*env_value;
+
+	start_index = (*index)++;
 	while (content[*index] && content[*index] != ' ' && content[*index] != '"'
 		&& content[*index] != '\'')
-	{
 		(*index)++;
-	}
-	var_name = strndup(&content[var_start], *index - var_start);
-	if (strcmp(var_name, "?") == 0)
+	var_length = *index - start_index;
+	variable_name = malloc(var_length + 1);
+	strncpy(variable_name, &content[start_index], var_length);
+	variable_name[var_length] = '\0';
+	if (strcmp(variable_name, "?") == 0)
 	{
-		snprintf(status_str, sizeof(status_str), "%d", last_status);
-		var_value = status_str;
+		snprintf(status_str, sizeof(status_str), "%d", ctx->last_status);
+		append_variable_value(ctx, status_str);
 	}
 	else
 	{
-		var_value = getenv(var_name);
+		env_value = getenv(variable_name);
+		append_variable_value(ctx, env_value);
 	}
-	if (var_value)
-	{
-		value_length = strlen(var_value);
-		new_content = realloc(new_content, *new_index + value_length + 1);
-		strcpy(&new_content[*new_index], var_value);
-		*new_index += value_length;
-	}
-	free(var_name);
-	return (new_content);
+	free(variable_name);
 }
 
-// Helper function to process quoted sections
-static char	*process_string_with_quotes(const char *content, int *index,
-		char quote, int last_status, char *new_content, int *new_index)
+static void	process_quoted_content(const char *content, int *index,
+		t_context *ctx, char quote)
 {
 	(*index)++;
 	while (content[*index] && content[*index] != quote)
 	{
 		if (content[*index] == '$' && quote == '"')
 		{
-			(*index)++;
-			new_content = expand_variable(content, index, last_status,
-					new_content, new_index);
+			process_variable_substitution(content, index, ctx);
 		}
 		else
 		{
-			new_content = append_char(new_content, new_index,
-					content[(*index)++]);
+			*ctx->new_content = realloc(*ctx->new_content, *ctx->output_index
+					+ 2);
+			(*ctx->new_content)[(*ctx->output_index)++] = content[(*index)++];
 		}
 	}
-	if (content[*index] == quote)
-	{
-		(*index)++;
-	}
-	return (new_content);
+	(*index)++;
 }
 
-// Refactored main function
+/**
+ * Helper function to process a single character, performing different actions
+ * like handling quotes, variable substitution,
+	or appending as-is to new_content.
+ */
+static void	process_character(const char current_char,
+		const char *input_content, int *current_char_index, t_context *ctx)
+{
+	if (current_char == '"' || current_char == '\'')
+	{
+		process_quoted_content(input_content, current_char_index, ctx,
+			current_char);
+	}
+	else if (current_char == '$')
+	{
+		process_variable_substitution(input_content, current_char_index, ctx);
+	}
+	else
+	{
+		*(ctx->new_content) = realloc(*(ctx->new_content), *(ctx->output_index)
+				+ 2);
+		(*(ctx->new_content))[(*(ctx->output_index))++] = current_char;
+		(*current_char_index)++;
+	}
+}
+
+void	process_token_content(char *input_content, t_context *ctx)
+{
+	int		char_index;
+	char	char_to_process;
+
+	char_index = 0;
+	while (input_content[char_index])
+	{
+		char_to_process = input_content[char_index];
+		process_character(char_to_process, input_content, &char_index, ctx);
+	}
+	if (*(ctx->new_content))
+	{
+		(*(ctx->new_content))[*(ctx->output_index)] = '\0';
+	}
+}
+
 void	remove_quotes_and_substitute_variables(t_list *tokens, int last_status)
 {
-	t_list	*current;
-	char	*content;
-	char	*new_content;
-	int		index;
-	int		new_index;
+	t_list		*current;
+	t_context	ctx;
+	char		*input_content;
+	char		*processed_content;
+	int			processed_length;
 
 	current = tokens;
 	while (current)
 	{
-		content = current->content;
-		new_content = NULL;
-		index = 0;
-		new_index = 0;
-		while (content[index])
+		input_content = current->content;
+		processed_content = NULL;
+		processed_length = 0;
+		ctx.last_status = last_status;
+		ctx.new_content = &processed_content;
+		ctx.output_index = &processed_length;
+		process_token_content(input_content, &ctx);
+		if (processed_content)
 		{
-			if (content[index] == '"' || content[index] == '\'')
-			{
-				new_content = process_string_with_quotes(content, &index,
-						content[index], last_status, new_content, &new_index);
-			}
-			else if (content[index] == '$')
-			{
-				index++;
-				new_content = expand_variable(content, &index, last_status,
-						new_content, &new_index);
-			}
-			else
-			{
-				new_content = append_char(new_content, &new_index,
-						content[index++]);
-			}
-		}
-		if (new_content)
-		{
-			if (new_index > 0)
-				new_content[new_index] = '\0';
 			free(current->content);
-			current->content = new_content;
+			current->content = processed_content;
 		}
 		current = current->next;
 	}
