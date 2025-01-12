@@ -12,56 +12,57 @@
 
 #include "../include/minishell.h"
 
-static int    handle_token(t_cmd *cmd, t_list **tokens, int *status)
+static int	handle_token(t_cmd *cmd, t_list **tokens, int *status)
 {
-    char    *token;
+	char	*token;
 
-    *status = 1;
-    token = (*tokens)->content;
-    if (ft_strcmp(token, "<") == 0)
-        *status = handle_input(cmd, tokens);
-    else if (ft_strcmp(token, ">") == 0)
-        *status = handle_output(cmd, tokens);
-    else if (ft_strcmp(token, ">>") == 0)
-        *status = handle_append(cmd, tokens);
-    else if (ft_strcmp(token, "<<") == 0)
-        *status = handle_heredoc1(cmd, tokens);
-    else
-        add_arg(cmd, token);
-    return (1);
-}
-static int  process_tokens(t_cmd *cmd, t_list **tokens)
-{
-    char *token;
-    int status;
-
-    while (*tokens)
-    {
-        token = (*tokens)->content;
-        if (ft_strcmp(token, "|") == 0)
-            break;
-        if (!handle_token(cmd, tokens, &status))
-            return (0);
-        if(!status)
-            return (0);
-        *tokens = (*tokens)->next;
-    }
-    return (1);
-}
-t_cmd    *parse_command(t_list *tokens)
-{
-    t_cmd *cmd;
-
-    if (!tokens)
-        return (NULL);
-    cmd = init_cmd();
-    if (!cmd)
-        return (NULL);
-    if (!process_tokens(cmd, &tokens))
-    {
-        free_cmd(cmd);
-        return (NULL);
-    }
-    return (cmd);
+	*status = 1;
+	token = (*tokens)->content;
+	if (ft_strcmp(token, "<") == 0)
+		*status = handle_input(cmd, tokens);
+	else if (ft_strcmp(token, ">") == 0)
+		*status = handle_output(cmd, tokens);
+	else if (ft_strcmp(token, ">>") == 0)
+		*status = handle_append(cmd, tokens);
+	else if (ft_strcmp(token, "<<") == 0)
+		*status = handle_heredoc1(cmd, tokens);
+	else
+		add_arg(cmd, token);
+	return (1);
 }
 
+static int	process_tokens(t_cmd *cmd, t_list **tokens)
+{
+	char	*token;
+	int		status;
+
+	while (*tokens)
+	{
+		token = (*tokens)->content;
+		if (ft_strcmp(token, "|") == 0)
+			break ;
+		if (!handle_token(cmd, tokens, &status))
+			return (0);
+		if (!status)
+			return (0);
+		*tokens = (*tokens)->next;
+	}
+	return (1);
+}
+
+t_cmd	*parse_command(t_list *tokens)
+{
+	t_cmd	*cmd;
+
+	if (!tokens)
+		return (NULL);
+	cmd = init_cmd();
+	if (!cmd)
+		return (NULL);
+	if (!process_tokens(cmd, &tokens))
+	{
+		free_cmd(cmd);
+		return (NULL);
+	}
+	return (cmd);
+}

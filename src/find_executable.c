@@ -34,18 +34,20 @@ char	*ft_strtok(char *str, char *separtors)
 	}
 	return (start_item);
 }
-char    *build_path(const char *dir, const char *command)
-{
-    char    *temp;
-    char    *result;
 
-    temp = ft_strjoin(dir, "/");
-    if (!temp)
-        return (NULL);
-    result = ft_strjoin(temp, command);
-    free(temp);
-    return (result);
+char	*build_path(const char *dir, const char *command)
+{
+	char	*temp;
+	char	*result;
+
+	temp = ft_strjoin(dir, "/");
+	if (!temp)
+		return (NULL);
+	result = ft_strjoin(temp, command);
+	free(temp);
+	return (result);
 }
+
 // Helper to search for a command in PATH
 char	*find_executable(const char *command)
 {
@@ -69,7 +71,7 @@ char	*find_executable(const char *command)
 	dir = ft_strtok(dirs, ":");
 	while (dir)
 	{
-        full_path = build_path(dir, command);
+		full_path = build_path(dir, command);
 		if (access(full_path, X_OK) == 0)
 		{
 			free(dirs);

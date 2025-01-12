@@ -12,66 +12,69 @@
 
 #include "../include/minishell.h"
 
-int    handle_input(t_cmd *cmd, t_list **tokens)
+int	handle_input(t_cmd *cmd, t_list **tokens)
 {
-    *tokens = (*tokens)->next;
-    if (*tokens == NULL)
-    {
-        perror("Error: Missing filename after <\n");
-        return (0);
-    }
-    cmd->input_file = ft_strdup((*tokens)->content);
-    if (!cmd->input_file)
-    {
-        perror("strdup failed");
-        return (0);
-    }
-    cmd->input_mode = 1;
-    return (1);
+	*tokens = (*tokens)->next;
+	if (*tokens == NULL)
+	{
+		perror("Error: Missing filename after <\n");
+		return (0);
+	}
+	cmd->input_file = ft_strdup((*tokens)->content);
+	if (!cmd->input_file)
+	{
+		perror("strdup failed");
+		return (0);
+	}
+	cmd->input_mode = 1;
+	return (1);
 }
-int    handle_output(t_cmd *cmd, t_list **tokens)
+
+int	handle_output(t_cmd *cmd, t_list **tokens)
 {
-    *tokens = (*tokens)->next;
-    if (*tokens == NULL)
-    {
-        perror("Error: Missing filename after >\n");
-        return (0);
-    }
-    cmd->output_file = ft_strdup((*tokens)->content);
-    if (!cmd->output_file)
-    {
-        perror("strdup failed");
-        return (0);
-    }
-    cmd->output_mode = 1;
-    return (1);
+	*tokens = (*tokens)->next;
+	if (*tokens == NULL)
+	{
+		perror("Error: Missing filename after >\n");
+		return (0);
+	}
+	cmd->output_file = ft_strdup((*tokens)->content);
+	if (!cmd->output_file)
+	{
+		perror("strdup failed");
+		return (0);
+	}
+	cmd->output_mode = 1;
+	return (1);
 }
-int    handle_append(t_cmd *cmd, t_list **tokens)
+
+int	handle_append(t_cmd *cmd, t_list **tokens)
 {
-    *tokens = (*tokens)->next;
-    if (*tokens == NULL)
-    {
-        perror("Error: Missing filename after >>\n");
-        return (0);
-    }
-    cmd->output_file = ft_strdup((*tokens)->content);
-    if (!cmd->output_file)
-    {
-        perror("strdup failed");
-        return (0);
-    }
-    cmd->output_mode = 2;
-    return (1);
+	*tokens = (*tokens)->next;
+	if (*tokens == NULL)
+	{
+		perror("Error: Missing filename after >>\n");
+		return (0);
+	}
+	cmd->output_file = ft_strdup((*tokens)->content);
+	if (!cmd->output_file)
+	{
+		perror("strdup failed");
+		return (0);
+	}
+	cmd->output_mode = 2;
+	return (1);
 }
-int    handle_heredoc1(t_cmd *cmd, t_list **tokens)
+
+int	handle_heredoc1(t_cmd *cmd, t_list **tokens)
 {
-    *tokens = (*tokens)->next;
-    if (*tokens == NULL)
-    {
-        perror("Error: Missing delimiter after <<\n");
-        return (0);
-    }
-    cmd->input_mode = 2;
-    handle_heredoc(cmd, (*tokens)->content);
-    return (1);
+	*tokens = (*tokens)->next;
+	if (*tokens == NULL)
+	{
+		perror("Error: Missing delimiter after <<\n");
+		return (0);
+	}
+	cmd->input_mode = 2;
+	handle_heredoc(cmd, (*tokens)->content);
+	return (1);
 }

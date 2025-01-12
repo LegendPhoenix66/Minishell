@@ -89,7 +89,7 @@ void	debug_list(t_node **head)
 // work with one argument no try yet with more
 void	print_list_debug(t_list **top)
 {
-	t_list	*current;
+	t_list *current;
 
 	printf("-------list start-------\n");
 	current = *top;

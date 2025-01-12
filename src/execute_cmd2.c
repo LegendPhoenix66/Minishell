@@ -15,20 +15,21 @@
 int	is_builtin(const char *token)
 {
 	const char	*builtins[] = {"exit", "cd", "pwd", "echo", "env", "unset",
-		"export"};
+			"export"};
 	size_t		i;
 
-    i = 0;
+	i = 0;
 	if (!token)
 		return (0);
 	while (i < sizeof(builtins) / sizeof(builtins[0]))
 	{
 		if (strcmp(token, builtins[i]) == 0)
 			return (1);
-        i++;
+		i++;
 	}
 	return (0);
 }
+
 t_cmd	*init_cmd(void)
 {
 	t_cmd	*cmd;
@@ -48,6 +49,7 @@ t_cmd	*init_cmd(void)
 	cmd->output_mode = 0;
 	return (cmd);
 }
+
 void	free_cmd(t_cmd *cmd)
 {
 	int	i;
@@ -68,43 +70,45 @@ void	free_cmd(t_cmd *cmd)
 		free(cmd);
 	}
 }
-void *safe_malloc(size_t size)
+
+void	*safe_malloc(size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	ptr = malloc(size);
 	if (!ptr)
 	{
 		perror("malloc failled");
-		exit (EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 	return (ptr);
 }
-void    add_arg(t_cmd *cmd, char *arg)
-{
-    int     i;
-	int		j;
-    char    **new_args;
 
-    i = 0;
+void	add_arg(t_cmd *cmd, char *arg)
+{
+	int		i;
+	int		j;
+	char	**new_args;
+
+	i = 0;
 	j = 0;
-    if (cmd->args == NULL)
-    {
-        cmd->args = safe_malloc(sizeof(char *) * 2);
-        cmd->args[0] = ft_strdup(arg);
-        cmd->args[1] = NULL;
-        return ;
-    }
-    while (cmd->args[i] != NULL)
-        i++;
-    new_args = safe_malloc(sizeof(char *) * (i + 2));
-    while (j < i)
+	if (cmd->args == NULL)
 	{
-        new_args[j] = cmd->args[j];
+		cmd->args = safe_malloc(sizeof(char *) * 2);
+		cmd->args[0] = ft_strdup(arg);
+		cmd->args[1] = NULL;
+		return ;
+	}
+	while (cmd->args[i] != NULL)
+		i++;
+	new_args = safe_malloc(sizeof(char *) * (i + 2));
+	while (j < i)
+	{
+		new_args[j] = cmd->args[j];
 		j++;
 	}
-    new_args[i] = ft_strdup(arg);
-    new_args[i + 1] = NULL;
-    free(cmd->args);
-    cmd->args = new_args;
+	new_args[i] = ft_strdup(arg);
+	new_args[i + 1] = NULL;
+	free(cmd->args);
+	cmd->args = new_args;
 }
