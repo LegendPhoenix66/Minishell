@@ -87,29 +87,6 @@ void	debug_list(t_node **head)
 }
 
 // work with one argument no try yet with more
-char	*ft_strtok(char *str, char *separtors)
-{
-	static char	*item;
-	char		*start_item;
-
-	if (str != NULL)
-		item = str;
-	if (item == NULL || *item == '\0')
-		return (NULL);
-	start_item = item;
-	while (*item != '\0')
-	{
-		if (ft_strchr(separtors, *item) != NULL)
-		{
-			*item = '\0';
-			item++;
-			break ;
-		}
-		item++;
-	}
-	return (start_item);
-}
-
 void	print_list_debug(t_list **top)
 {
 	t_list	*current;

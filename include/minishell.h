@@ -99,9 +99,32 @@ typedef struct s_context
 	int				last_status;
 }					t_context;
 
+
+//main
 char				*get_input(void);
 void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);
+
+//handle heredoc
+t_cmd				*init_cmd(void);
+void				free_cmd(t_cmd *cmd);
+int					is_builtin(const char *token);
+void				add_arg(t_cmd *cmd, char *arg);
+void				handle_heredoc(t_cmd *cmd, char *delimiter);
+int					ft_strcmp(char *str1, char *str2);
+int					setup_heredoc_pipe(int pipe_fd[2]);
+void				process_heredoc_input(int fd, char *delimiter);
+void				write_heredoc_line(int fd, const char *line);
+int					process_heredoc_line(char *line, char *delimiter, int fd);
+
+//parse red and pipe
+t_cmd	*parse_command(t_list *tokens);
+int    	handle_input(t_cmd *cmd, t_list **tokens);
+int		handle_output(t_cmd *cmd, t_list **tokens);
+int		handle_append(t_cmd *cmd, t_list **tokens);
+int		handle_heredoc1(t_cmd *cmd, t_list **tokens);
+
+char	*find_executable(const char *command);
 
 void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);
