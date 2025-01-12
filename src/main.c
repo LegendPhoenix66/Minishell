@@ -41,7 +41,8 @@ int	main(int argc, char **argv, char **env)
 	(void)argc;
 	(void)argv;
 	set_upsignals();
-	if (!(args = initialize_shell(env)))
+	args = initialize_shell(env);
+	if (!args)
 		return (1);
 	input = get_input();
 	while (input && args->exit == -1)

@@ -125,36 +125,53 @@ void	swap_nodes(t_node **top, t_node *prev)
 	}
 }
 
+void	advance_to_next_node(t_node **top, t_node **current_node,
+		t_node **prev_node)
+{
+	if (*prev_node == NULL)
+		*prev_node = *top;
+	else
+		*prev_node = (*prev_node)->next;
+	*current_node = (*prev_node)->next;
+}
+
 void	sort_lst(t_node **top)
 {
-	int		swaped;
-	t_node	*current;
-	t_node	*prev;
-	t_node	*next;
+	int		swapped;
+	t_node	*current_node;
+	t_node	*prev_node;
 
 	if (top == NULL || *top == NULL || (*top)->next == NULL)
 		return ;
-	swaped = 1;
-	while (swaped)
+	swapped = 1;
+	while (swapped)
 	{
-		swaped = 0;
-		current = *top;
-		prev = NULL;
-		while (current->next != NULL)
+		swapped = 0;
+		current_node = *top;
+		prev_node = NULL;
+		while (current_node->next != NULL)
 		{
-			next = current->next;
-			if (strcmp(current->content, next->content) > 0)
+			if (strcmp(current_node->content, current_node->next->content) > 0)
 			{
-				swap_nodes(top, prev);
-				swaped = 1;
+				swap_nodes(top, prev_node);
+				swapped = 1;
 			}
-			if (prev == NULL)
-				prev = *top;
-			else
-				prev = prev->next;
-			current = prev->next;
+			advance_to_next_node(top, &current_node, &prev_node);
 		}
 	}
+}
+
+void	remove_node(t_node **top, t_node **current, t_node *previous,
+		t_node *to_remove)
+{
+	to_remove = *current;
+	if (previous == NULL)
+		*top = (*current)->next;
+	else
+		previous->next = (*current)->next;
+	*current = (*current)->next;
+	free(to_remove->content);
+	free(to_remove);
 }
 
 // useful when export define a already existing variable
@@ -173,14 +190,7 @@ void	remove_if(t_node **top, const char *var_name)
 		if (strncmp(current->content, var_name, strchr(var_name, '=')
 				- var_name) == 0)
 		{
-			to_remove = current;
-			if (previous == NULL)
-				*top = current->next;
-			else
-				previous->next = current->next;
-			current = current->next;
-			free(to_remove->content);
-			free(to_remove);
+			remove_node(top, &current, previous, to_remove);
 		}
 		else
 		{
