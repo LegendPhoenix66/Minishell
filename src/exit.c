@@ -12,10 +12,30 @@
 
 #include "../include/minishell.h"
 
+int	is_numeric_argument(const char *arg)
+{
+	int	i;
+
+	i = 0;
+	while (arg[i])
+	{
+		if (!ft_isdigit(arg[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void	print_error_message(char *arg, int fd)
+{
+	ft_putstr_fd("minishell: exit: ", fd);
+	ft_putstr_fd(arg, fd);
+	ft_putstr_fd(": numeric argument required\n", fd);
+}
+
 int	builtin_exit(t_shell *shell, t_cmd *cmd)
 {
 	char	*arg;
-	int		i;
 
 	ft_putendl_fd("exit", STDOUT_FILENO);
 	if (!cmd->args[1])
@@ -23,24 +43,17 @@ int	builtin_exit(t_shell *shell, t_cmd *cmd)
 		shell->exit = 0;
 		return (0);
 	}
-	if (cmd->args[1] && cmd->args[2])
+	if (cmd->args[2])
 	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		return (1);
 	}
 	arg = cmd->args[1];
-	i = 0;
-	while (arg[i])
+	if (!is_numeric_argument(arg))
 	{
-		if (!ft_isdigit(arg[i]))
-		{
-			ft_putstr_fd("minishell: exit: ", 2);
-			ft_putstr_fd(arg, 2);
-			ft_putstr_fd(": numeric argument required\n", 2);
-			shell->exit = 255;
-			return (255);
-		}
-		i++;
+		print_error_message(arg, STDERR_FILENO);
+		shell->exit = 255;
+		return (255);
 	}
 	shell->exit = ft_atoi(arg) % 256;
 	return (shell->exit);

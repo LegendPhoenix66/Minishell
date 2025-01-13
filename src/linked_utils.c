@@ -183,15 +183,14 @@ void	remove_if(t_node **top, const char *var_name)
 
 	current = *top;
 	previous = NULL;
+	to_remove = NULL;
 	if (*top == NULL)
 		return ;
 	while (current != NULL)
 	{
 		if (strncmp(current->content, var_name, strchr(var_name, '=')
 				- var_name) == 0)
-		{
 			remove_node(top, &current, previous, to_remove);
-		}
 		else
 		{
 			previous = current;

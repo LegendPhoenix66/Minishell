@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 15:54:55 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/12 15:54:55 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/12 20:27:07 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,10 @@ char	*build_path(const char *dir, const char *command)
 	return (result);
 }
 
-// Helper to search for a command in PATH
-char	*find_executable(const char *command)
+char	*get_path_dirs(void)
 {
 	char	*path;
-	char	*dirs;
-	char	*dir;
-	char	*full_path;
+	char	*path_dirs;
 
 	path = getenv("PATH");
 	if (!path)
@@ -62,24 +59,44 @@ char	*find_executable(const char *command)
 		perror("Error: PATH not set\n");
 		return (NULL);
 	}
-	dirs = ft_strdup(path);
-	if (!dirs)
+	path_dirs = ft_strdup(path);
+	if (!path_dirs)
 	{
-		perror("strdup failed");
-		return (NULL);
+		perror("Error: memory allocation failed\n");
 	}
-	dir = ft_strtok(dirs, ":");
-	while (dir)
+	return (path_dirs);
+}
+
+char	*find_executable_in_path(const char *path_dirs, const char *command)
+{
+	char	*current_dir;
+	char	*full_path;
+
+	current_dir = strtok((char *)path_dirs, ":");
+	while (current_dir)
 	{
-		full_path = build_path(dir, command);
+		full_path = build_path(current_dir, command);
 		if (access(full_path, X_OK) == 0)
 		{
-			free(dirs);
 			return (full_path);
 		}
 		free(full_path);
-		dir = ft_strtok(NULL, ":");
+		current_dir = strtok(NULL, ":");
 	}
-	free(dirs);
 	return (NULL);
+}
+
+char	*find_executable(const char *command)
+{
+	char	*path_dirs;
+	char	*executable_path;
+
+	path_dirs = get_path_dirs();
+	if (!path_dirs)
+	{
+		return (NULL);
+	}
+	executable_path = find_executable_in_path(path_dirs, command);
+	free(path_dirs);
+	return (executable_path);
 }
