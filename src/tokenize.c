@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 15:49:31 by lhopp             #+#    #+#             */
-/*   Updated: 2024/11/27 11:31:23 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/14 12:29:28 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 
 void	error(const char *msg)
 {
-	fprintf(stderr, "Error: %s\n", msg);
+	write(2, "Error: ", 7);
+	write(2, msg, ft_strlen(msg));
+	write(2, "\n", 1);
 	exit(EXIT_FAILURE);
 }
 
@@ -22,7 +24,7 @@ t_list	*add_token(t_list **list, const char *token, int length)
 {
 	t_list	*new_node;
 
-	new_node = ft_lstnew(strndup(token, length));
+	new_node = ft_lstnew(ft_substr(token, 0, length));
 	if (new_node == NULL)
 	{
 		error("malloc token");
@@ -130,7 +132,7 @@ void	process_token_line(const char *token_content,
 	}
 	if (current_index > last_special_char_pos + 1)
 		add_token(tokens_with_pipes, token_content + last_special_char_pos + 1,
-			strlen(token_content) - last_special_char_pos - 1);
+			ft_strlen(token_content) - last_special_char_pos - 1);
 }
 
 void	correct_pipes_and_redirects(t_list **parsed_tokens)
@@ -149,15 +151,37 @@ void	correct_pipes_and_redirects(t_list **parsed_tokens)
 	*parsed_tokens = tokens_with_pipes;
 }
 
+void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
+{
+	void	*new_ptr;
+
+	if (new_size == 0)
+	{
+		free(ptr);
+		return (NULL);
+	}
+	new_ptr = malloc(new_size);
+	if (!new_ptr)
+		return (NULL);
+	if (ptr)
+	{
+		ft_memcpy(new_ptr, ptr, old_size);
+		free(ptr);
+	}
+	return (new_ptr);
+}
+
 static void	append_to_new_content(char **new_content, int *output_index,
 		const char *str)
 {
 	size_t	len;
 
 	len = strlen(str);
-	*new_content = realloc(*new_content, *output_index + len + 1);
-	strcpy(&(*new_content)[*output_index], str);
+	*new_content = ft_realloc(*new_content, *output_index, *output_index + len
+			+ 1);
+	ft_memcpy(&(*new_content)[*output_index], str, len);
 	*output_index += len;
+	(*new_content)[*output_index] = '\0';
 }
 
 // Helper function to append a variable's value
@@ -173,10 +197,10 @@ static void	process_variable_substitution(const char *content, int *index,
 		t_context *ctx)
 {
 	int		start_index;
-	char	status_str[12];
 	int		var_length;
 	char	*variable_name;
 	char	*env_value;
+	char	*status_str;
 
 	start_index = (*index)++;
 	while (content[*index] && content[*index] != ' ' && content[*index] != '"'
@@ -184,12 +208,12 @@ static void	process_variable_substitution(const char *content, int *index,
 		(*index)++;
 	var_length = *index - start_index;
 	variable_name = malloc(var_length + 1);
-	strncpy(variable_name, &content[start_index], var_length);
-	variable_name[var_length] = '\0';
-	if (strcmp(variable_name, "?") == 0)
+	ft_strlcpy(variable_name, &content[start_index], var_length + 1);
+	if (ft_strncmp(variable_name, "?", var_length) == 0 && var_length == 1)
 	{
-		snprintf(status_str, sizeof(status_str), "%d", ctx->last_status);
+		status_str = ft_itoa(ctx->last_status);
 		append_variable_value(ctx, status_str);
+		free(status_str);
 	}
 	else
 	{
@@ -211,8 +235,8 @@ static void	process_quoted_content(const char *content, int *index,
 		}
 		else
 		{
-			*ctx->new_content = realloc(*ctx->new_content, *ctx->output_index
-					+ 2);
+			*ctx->new_content = ft_realloc(*ctx->new_content,
+					*(ctx->output_index), *ctx->output_index + 2);
 			(*ctx->new_content)[(*ctx->output_index)++] = content[(*index)++];
 		}
 	}
@@ -238,8 +262,8 @@ static void	process_character(const char current_char,
 	}
 	else
 	{
-		*(ctx->new_content) = realloc(*(ctx->new_content), *(ctx->output_index)
-				+ 2);
+		*(ctx->new_content) = ft_realloc(*(ctx->new_content),
+				*(ctx->output_index), *(ctx->output_index) + 2);
 		(*(ctx->new_content))[(*(ctx->output_index))++] = current_char;
 		(*current_char_index)++;
 	}
