@@ -15,7 +15,7 @@
 int	is_builtin(const char *token)
 {
 	const char	*builtins[] = {"exit", "cd", "pwd", "echo", "env", "unset",
-			"export"};
+		"export"};
 	size_t		i;
 
 	i = 0;

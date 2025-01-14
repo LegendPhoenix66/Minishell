@@ -86,7 +86,7 @@ char	*get_input(void)
 	char	*prompt;
 	char	*trimmed_line;
 
-	if (isatty(fileno(stdin)))
+	if (isatty(STDIN_FILENO))
 	{
 		prompt = get_prompt();
 		line = readline(prompt);
@@ -94,7 +94,7 @@ char	*get_input(void)
 	}
 	else
 	{
-		line = get_next_line(fileno(stdin));
+		line = get_next_line(STDIN_FILENO);
 		trimmed_line = ft_strtrim(line, "\n");
 		free(line);
 		line = trimmed_line;

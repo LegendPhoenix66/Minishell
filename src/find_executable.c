@@ -72,7 +72,7 @@ char	*find_executable_in_path(const char *path_dirs, const char *command)
 	char	*current_dir;
 	char	*full_path;
 
-	current_dir = strtok((char *)path_dirs, ":");
+	current_dir = ft_strtok((char *)path_dirs, ":");
 	while (current_dir)
 	{
 		full_path = build_path(current_dir, command);
@@ -81,7 +81,7 @@ char	*find_executable_in_path(const char *path_dirs, const char *command)
 			return (full_path);
 		}
 		free(full_path);
-		current_dir = strtok(NULL, ":");
+		current_dir = ft_strtok(NULL, ":");
 	}
 	return (NULL);
 }

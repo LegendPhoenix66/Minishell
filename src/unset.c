@@ -40,7 +40,7 @@ int	builtin_unset(t_node **env_list, const char *var)
 	previous = NULL;
 	while (current != NULL)
 	{
-		if (strncmp(current->content, var, len) == 0
+		if (ft_memcmp(current->content, var, len) == 0
 			&& current->content[len] == '=')
 		{
 			remove_env_node(env_list, current, previous);

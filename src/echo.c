@@ -19,7 +19,7 @@ int	builtin_echo(t_cmd *cmd)
 
 	i = 1;
 	newline = 1;
-	if (cmd->args[i] && !strcmp(cmd->args[i], "-n"))
+	if (cmd->args[i] && !ft_strncmp(cmd->args[i], "-n", ft_strlen("-n") + 1))
 	{
 		newline = 0;
 		i++;
