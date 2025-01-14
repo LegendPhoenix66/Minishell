@@ -124,7 +124,14 @@ int		handle_output(t_cmd *cmd, t_list **tokens);
 int		handle_append(t_cmd *cmd, t_list **tokens);
 int		handle_heredoc1(t_cmd *cmd, t_list **tokens);
 
+//find executable
 char	*find_executable(const char *command);
+
+//execute_simple_command
+void	execute_simple_command(t_cmd *cmd, t_shell *shell);
+
+//execute_pipeline
+void	execute_pipeline(t_shell *shell);
 
 void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);
