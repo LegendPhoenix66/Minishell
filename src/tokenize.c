@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 15:49:31 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/14 12:29:28 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/14 13:38:11 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,9 +206,9 @@ static void	process_variable_substitution(const char *content, int *index,
 	while (content[*index] && content[*index] != ' ' && content[*index] != '"'
 		&& content[*index] != '\'')
 		(*index)++;
-	var_length = *index - start_index;
+	var_length = *index - (start_index + 1);
 	variable_name = malloc(var_length + 1);
-	ft_strlcpy(variable_name, &content[start_index], var_length + 1);
+	ft_strlcpy(variable_name, &content[start_index + 1], var_length + 1);
 	if (ft_strncmp(variable_name, "?", var_length) == 0 && var_length == 1)
 	{
 		status_str = ft_itoa(ctx->last_status);
