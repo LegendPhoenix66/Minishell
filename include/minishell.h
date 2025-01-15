@@ -99,6 +99,18 @@ typedef struct s_context
 	int				last_status;
 }					t_context;
 
+typedef struct s_p
+{
+    int     pipefd[2];
+    pid_t   pid;
+    int     status;
+	int 	input_fd;
+    int     is_last_command;
+    int     saved_stdin;
+	int		fd;
+	char	*exec_path;
+	int		ret;
+} t_p;
 
 //main
 char				*get_input(void);
@@ -132,6 +144,11 @@ void	execute_simple_command(t_cmd *cmd, t_shell *shell);
 
 //execute_pipeline
 void	execute_pipeline(t_shell *shell);
+void    handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell);
+void    initialize_pipeline_data(t_p *data);
+void    process_tokens1(t_list **tokens, t_p *data);
+int		create_pipe(t_p *data, t_cmd *cmd);
+void    handle_parent_process(t_p *data, t_shell *shell);
 
 void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);
