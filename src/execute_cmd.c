@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 23:17:58 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/15 13:49:06 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/15 13:51:57 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int	check_for_pipe(t_list *tokens)
 {
+	char	*token;
+
 	while (tokens)
 	{
 		token = tokens->content;
