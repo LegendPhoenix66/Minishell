@@ -207,6 +207,11 @@ static void	process_variable_substitution(const char *content, int *index,
 		&& content[*index] != '\'')
 		(*index)++;
 	var_length = *index - (start_index + 1);
+	if (var_length == 0)
+	{
+		append_to_new_content(ctx->new_content, ctx->output_index, "$");
+		return ;
+	}
 	variable_name = malloc(var_length + 1);
 	ft_strlcpy(variable_name, &content[start_index + 1], var_length + 1);
 	if (ft_strncmp(variable_name, "?", var_length) == 0 && var_length == 1)
