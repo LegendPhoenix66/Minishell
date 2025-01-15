@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2024/11/27 12:21:56 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/15 13:50:12 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,23 +101,23 @@ typedef struct s_context
 
 typedef struct s_p
 {
-    int     pipefd[2];
-    pid_t   pid;
-    int     status;
-	int 	input_fd;
-    int     is_last_command;
-    int     saved_stdin;
-	int		fd;
-	char	*exec_path;
-	int		ret;
-} t_p;
+	int				pipefd[2];
+	pid_t			pid;
+	int				status;
+	int				input_fd;
+	int				is_last_command;
+	int				saved_stdin;
+	int				fd;
+	char			*exec_path;
+	int				ret;
+}					t_p;
 
-//main
+// main
 char				*get_input(void);
 void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);
 
-//handle heredoc
+// handle heredoc
 t_cmd				*init_cmd(void);
 void				free_cmd(t_cmd *cmd);
 int					is_builtin(const char *token);
@@ -129,26 +129,26 @@ void				process_heredoc_input(int fd, char *delimiter);
 void				write_heredoc_line(int fd, const char *line);
 int					process_heredoc_line(char *line, char *delimiter, int fd);
 
-//parse red and pipe
-t_cmd	*parse_command(t_list *tokens);
-int    	handle_input(t_cmd *cmd, t_list **tokens);
-int		handle_output(t_cmd *cmd, t_list **tokens);
-int		handle_append(t_cmd *cmd, t_list **tokens);
-int		handle_heredoc1(t_cmd *cmd, t_list **tokens);
+// parse red and pipe
+t_cmd				*parse_command(t_list *tokens);
+int					handle_input(t_cmd *cmd, t_list **tokens);
+int					handle_output(t_cmd *cmd, t_list **tokens);
+int					handle_append(t_cmd *cmd, t_list **tokens);
+int					handle_heredoc1(t_cmd *cmd, t_list **tokens);
 
-//find executable
-char	*find_executable(const char *command);
+// find executable
+char				*find_executable(const char *command);
 
-//execute_simple_command
-void	execute_simple_command(t_cmd *cmd, t_shell *shell);
+// execute_simple_command
+void				execute_simple_command(t_cmd *cmd, t_shell *shell);
 
-//execute_pipeline
-void	execute_pipeline(t_shell *shell);
-void    handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell);
-void    initialize_pipeline_data(t_p *data);
-void    process_tokens1(t_list **tokens, t_p *data);
-int		create_pipe(t_p *data, t_cmd *cmd);
-void    handle_parent_process(t_p *data, t_shell *shell);
+// execute_pipeline
+void				execute_pipeline(t_shell *shell);
+void				handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell);
+void				initialize_pipeline_data(t_p *data);
+void				process_tokens1(t_list **tokens, t_p *data);
+int					create_pipe(t_p *data, t_cmd *cmd);
+void				handle_parent_process(t_p *data, t_shell *shell);
 
 void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);
