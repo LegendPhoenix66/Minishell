@@ -227,6 +227,11 @@ static void	process_quoted_content(const char *content, int *index,
 		t_context *ctx, char quote)
 {
 	(*index)++;
+	if (*ctx->new_content == NULL)
+	{
+		*ctx->new_content = ft_realloc(*ctx->new_content, 0, 1);
+		(*ctx->new_content)[0] = '\0';
+	}
 	while (content[*index] && content[*index] != quote)
 	{
 		if (content[*index] == '$' && quote == '"')
