@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:50:15 by lhopp             #+#    #+#             */
-/*   Updated: 2024/12/01 15:50:20 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/16 14:38:58 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,18 +57,37 @@ int	builtin_cd(t_shell *shell, t_cmd *cmd)
 
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
+	{
+		shell->last_status = 1;
 		return (1);
+	}
+	if (cmd->args[2])
+	{
+		ft_putendl_fd("cd: too many arguments", STDERR_FILENO);
+		free(old_pwd);
+		shell->last_status = 1;
+		return (1);
+	}
 	if (!cmd->args[1] || !strcmp(cmd->args[1], "~"))
 		path = getenv("HOME");
 	else
 		path = cmd->args[1];
+	if (access(path, F_OK) != 0)
+	{
+		ft_putstr_fd("cd: no such file or directory", STDERR_FILENO);
+		free(old_pwd);
+		shell->last_status = 1;
+		return (1);
+	}
 	if (chdir(path) != 0)
 	{
 		free(old_pwd);
+		shell->last_status = 1;
 		return (1);
 	}
 	free(shell->current_directory);
 	shell->current_directory = getcwd(NULL, 0);
 	free(old_pwd);
+	shell->last_status = 0;
 	return (0);
 }
