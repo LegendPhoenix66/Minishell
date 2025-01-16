@@ -12,16 +12,65 @@
 
 #include "../include/minishell.h"
 
-// check the validity of export arg (first charactere of argument)
-int	check_in(const char *var)
+// Messages d'erreur constants
+#define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not a valid identifier\n"
+
+static int is_valid_var_char(char c)
 {
-	if (ft_isalpha(var[0]))
-		return (1);
-	else if (var[0] == '_')
-		return (1);
-	else if ((var[0]) == '"' && var[ft_strlen(var) - 1] == '"')
-		return (1);
-	return (0);
+    return (ft_isalnum(c) || c == '_');
+}
+
+static int check_var_name(const char *var, size_t len)
+{
+    size_t i;
+
+    i = 1;
+    while (i < len)
+    {
+        if (!is_valid_var_char(var[i]))
+            return (0);
+        i++;
+    }
+    return (1);
+}
+
+int check_in(const char *var, t_shell *shell)
+{
+    size_t  len;
+    char    *equal_pos;
+
+    if (!var || !*var)
+    {
+        fprintf(stderr, ERR_INVALID_IDENTIFIER, "");
+		shell->last_status = 1;
+        return (0);
+    }
+
+    if (var[0] == '=')
+    {
+        fprintf(stderr, ERR_INVALID_IDENTIFIER, var);
+		shell->last_status = 1;
+        return (0);
+    }
+
+    if (!ft_isalpha(var[0]) && var[0] != '_')
+    {
+        fprintf(stderr, ERR_INVALID_IDENTIFIER, var);
+		shell->last_status = 1;
+        return (0);
+    }
+
+    equal_pos = ft_strchr(var, '=');
+    len = equal_pos ? (size_t)(equal_pos - var) : ft_strlen(var);
+
+    if (!check_var_name(var, len))
+    {
+        fprintf(stderr, ERR_INVALID_IDENTIFIER, var);
+		shell->last_status = 1;
+        return (0);
+    }
+
+    return (1);
 }
 
 void	add_double_quotes(char *var)
@@ -136,7 +185,7 @@ int	builtin_export(t_shell *shell, char **args)
 	while (args[i])
 	{
 		input = args[i];
-		if (!check_in(input))
+		if (!check_in(input, shell))
 		{
 			i++;
 			continue ;
