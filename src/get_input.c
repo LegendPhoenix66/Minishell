@@ -52,32 +52,48 @@ char	*get_prompt(void)
 	return (prompt);
 }
 
-void	ft_strtrim1(char *str)
+static int	skip_leading_whitespace(const char *str)
 {
-	int	i;
-	int	j;
+	int	index;
 
-	i = 0;
-	j = 0;
-	while (str[i] == ' ' || str[i] == '\t')
-		i++;
-	while (str[i])
+	index = 0;
+	while (str[index] == ' ' || str[index] == '\t')
+		index++;
+	return (index);
+}
+
+static int	is_whitespace(char c)
+{
+	return (c == ' ' || c == '\t' || c == '\n');
+}
+
+void	trim_and_remove_whitespace(char *str)
+{
+	int		read_pos;
+	int		write_pos;
+	char	quote;
+
+	read_pos = skip_leading_whitespace(str);
+	write_pos = 0;
+	quote = '\0';
+	while (str[read_pos])
 	{
-		if (!(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') || (j > 0
-				&& !(str[j - 1] == ' ' || str[j - 1] == '\t'
-					|| str[i] == '\n')))
+		if (str[read_pos] == '\'' || str[read_pos] == '\"')
 		{
-			str[j++] = str[i];
+			if (quote == '\0')
+				quote = str[read_pos];
+			else if (quote == str[read_pos])
+				quote = '\0';
 		}
-		i++;
+		if (quote || !is_whitespace(str[read_pos]) || (write_pos > 0
+				&& !is_whitespace(str[write_pos - 1])))
+			str[write_pos++] = str[read_pos];
+		read_pos++;
 	}
-	str[j] = '\0';
-	j--;
-	while (j >= 0 && (str[j] == ' ' || str[j] == '\t'))
-	{
-		str[j] = '\0';
-		j--;
-	}
+	str[write_pos] = '\0';
+	write_pos--;
+	while (write_pos >= 0 && is_whitespace(str[write_pos]))
+		str[write_pos--] = '\0';
 }
 
 char	*get_input(void)
@@ -101,7 +117,7 @@ char	*get_input(void)
 	}
 	if (line == NULL)
 		return (NULL);
-	ft_strtrim1(line);
+	trim_and_remove_whitespace(line);
 	if (*line)
 		add_history(line);
 	return (line);
