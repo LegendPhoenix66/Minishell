@@ -23,6 +23,7 @@
 # include <unistd.h>
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
+# define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not a valid identifier\n"
 
 typedef enum e_dir
 {
@@ -149,6 +150,16 @@ void				initialize_pipeline_data(t_p *data);
 void				process_tokens1(t_list **tokens, t_p *data);
 int					create_pipe(t_p *data, t_cmd *cmd);
 void				handle_parent_process(t_p *data, t_shell *shell);
+
+//cd_utils
+char *get_cd_path(t_cmd *cmd);
+int execute_cd(char *path, char *old_pwd, t_shell *shell);
+void update_directory(t_shell *shell, char *old_pwd);
+int set_error(t_shell *shell, int status);
+
+//export_utils
+int		check_in(char *var, t_shell *shell);
+void	print_export(t_shell **args);
 
 void				parse_input(char *input, t_shell *shell);
 t_node				*init_lst(void);

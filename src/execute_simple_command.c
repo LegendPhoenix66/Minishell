@@ -41,48 +41,96 @@ static void	execute_command(t_cmd *cmd, t_shell *shell)
 	exit(EXIT_FAILURE);
 }
 
-static int	handle_fd_error(t_cmd *cmd)
+static int handle_fd_error(t_cmd *cmd, int mode)
 {
-	int	fd;
+    int fd;
+    int flags;
 
-	fd = open(cmd->input_file, O_WRONLY);
-	if (fd == -1)
-	{
-		perror("Error opening input file");
-		free_cmd(cmd);
-		exit(EXIT_FAILURE);
-	}
-	return (fd);
+    if (mode == 1)
+        flags = O_RDONLY;
+    else
+    {
+        if (cmd->output_mode == 1)
+            flags = O_WRONLY | O_CREAT | O_TRUNC;
+        else
+            flags = O_WRONLY | O_CREAT | O_APPEND;
+    }
+    fd = open(cmd->input_file, flags, 0644);
+    if (fd == -1)
+    {
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(cmd->input_file, 2);
+        ft_putstr_fd(": ", 2);
+        ft_putstr_fd("error", 2);
+        ft_putstr_fd("\n", 2);
+        return (-1);
+    }
+    return (fd);
 }
 
-static void	handle_io_redirection(t_cmd *cmd)
+/*static void handle_io_redirection(t_cmd *cmd)
 {
-	int	fd;
+    int fd;
 
-	if (cmd->input_mode == 1)
-	{
-		fd = handle_fd_error(cmd);
-		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	else if (cmd->input_mode == 2 && cmd->input_fd > 0)
-	{
-		dup2(cmd->input_fd, STDIN_FILENO);
-		close(cmd->input_fd);
-	}
-	if (cmd->output_mode == 1)
-	{
-		fd = handle_fd_error(cmd);
-		dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
-	else if (cmd->output_mode == 2)
-	{
-		fd = handle_fd_error(cmd);
-		dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
+    if (cmd->input_mode == 1 && cmd->input_file)
+    {
+        fd = handle_fd_error(cmd, 1);
+        if (fd == -1)
+            exit(1);
+        if (dup2(fd, STDIN_FILENO) == -1)
+        {
+            close(fd);
+            perror("minishell: dup2");
+            exit(1);
+        }
+        close(fd);
+    }
+    if (cmd->output_mode)
+    {
+        fd = handle_fd_error(cmd, 2);
+        if (fd == -1)
+            exit(1);
+        if (dup2(fd, STDOUT_FILENO) == -1)
+        {
+            close(fd);
+            perror("minishell: dup2");
+            exit(1);
+        }
+        close(fd);
+    }
+}*/
+static int setup_redirection(t_cmd *cmd, int mode, int target_fd)
+{
+    int fd;
+
+    fd = handle_fd_error(cmd, mode);
+    if (fd == -1)
+        return (-1);
+    
+    if (dup2(fd, target_fd) == -1)
+    {
+        close(fd);
+        perror("minishell: dup2");
+        return (-1);
+    }
+    close(fd);
+    return (0);
 }
+
+static void handle_io_redirection(t_cmd *cmd)
+{
+    if (cmd->input_mode == 1 && cmd->input_file)
+    {
+        if (setup_redirection(cmd, 1, STDIN_FILENO) == -1)
+            exit(1);
+    }
+    if (cmd->output_mode)
+    {
+        if (setup_redirection(cmd, 2, STDOUT_FILENO) == -1)
+            exit(1);
+    }
+}
+
 
 void	execute_simple_command(t_cmd *cmd, t_shell *shell)
 {

@@ -50,44 +50,36 @@ int	builtin_pwd(void)
 	return (0);
 }
 
-int	builtin_cd(t_shell *shell, t_cmd *cmd)
+static int save_old_pwd(char **old_pwd)
 {
-	char	*path;
-	char	*old_pwd;
+    *old_pwd = getcwd(NULL, 0);
+    return (*old_pwd != NULL);
+}
 
-	old_pwd = getcwd(NULL, 0);
-	if (!old_pwd)
-	{
-		shell->last_status = 1;
-		return (1);
-	}
-	if (cmd->args[2])
-	{
-		ft_putendl_fd("cd: too many arguments", STDERR_FILENO);
-		free(old_pwd);
-		shell->last_status = 1;
-		return (1);
-	}
-	if (!cmd->args[1] || !strcmp(cmd->args[1], "~"))
-		path = getenv("HOME");
-	else
-		path = cmd->args[1];
-	if (access(path, F_OK) != 0)
-	{
-		ft_putstr_fd("cd: no such file or directory", STDERR_FILENO);
-		free(old_pwd);
-		shell->last_status = 1;
-		return (1);
-	}
-	if (chdir(path) != 0)
-	{
-		free(old_pwd);
-		shell->last_status = 1;
-		return (1);
-	}
-	free(shell->current_directory);
-	shell->current_directory = getcwd(NULL, 0);
-	free(old_pwd);
-	shell->last_status = 0;
-	return (0);
+static int check_cd_args(t_cmd *cmd, char *old_pwd, t_shell *shell)
+{
+    if (cmd->args[2])
+    {
+        ft_putendl_fd("cd: too many arguments", STDERR_FILENO);
+        free(old_pwd);
+        shell->last_status = 1;
+        return (1);
+    }
+    return (0);
+}
+
+int builtin_cd(t_shell *shell, t_cmd *cmd)
+{
+    char *old_pwd;
+    char *path;
+
+    if (!save_old_pwd(&old_pwd))
+        return (set_error(shell, 1));
+    if (check_cd_args(cmd, old_pwd, shell))
+        return (1);
+    path = get_cd_path(cmd);
+    if (execute_cd(path, old_pwd, shell))
+        return (1);
+    update_directory(shell, old_pwd);
+    return (0);
 }
