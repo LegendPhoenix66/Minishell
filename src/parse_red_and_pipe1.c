@@ -38,6 +38,8 @@ int	handle_output(t_cmd *cmd, t_list **tokens)
 		perror("Error: Missing filename after >\n");
 		return (0);
 	}
+	if (cmd->output_file != NULL)
+		free(cmd->output_file);
 	cmd->output_file = ft_strdup((*tokens)->content);
 	if (!cmd->output_file)
 	{

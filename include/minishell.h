@@ -24,6 +24,7 @@
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
 # define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not a valid identifier\n"
+# define MAX_FD 1024
 
 typedef enum e_dir
 {
@@ -140,8 +141,11 @@ int					handle_heredoc1(t_cmd *cmd, t_list **tokens);
 // find executable
 char				*find_executable(const char *command);
 
-// execute_simple_command
+// execute_simple_command and simple_cmd_utils
 void				execute_simple_command(t_cmd *cmd, t_shell *shell);
+void				wait_for_child(pid_t pid, int *status, t_shell *shell);
+void				handle_io_redirection(t_cmd *cmd);
+int					handle_fd_error(t_cmd *cmd, int mode);
 
 // execute_pipeline
 void				execute_pipeline(t_shell *shell);
@@ -152,33 +156,54 @@ int					create_pipe(t_p *data, t_cmd *cmd);
 void				handle_parent_process(t_p *data, t_shell *shell);
 
 //cd_utils
-char *get_cd_path(t_cmd *cmd);
-int execute_cd(char *path, char *old_pwd, t_shell *shell);
-void update_directory(t_shell *shell, char *old_pwd);
-int set_error(t_shell *shell, int status);
+char 				*get_cd_path(t_cmd *cmd);
+int					execute_cd(char *path, char *old_pwd, t_shell *shell);
+void				update_directory(t_shell *shell, char *old_pwd);
+int					set_error(t_shell *shell, int status);
 
 //export_utils
-int		check_in(char *var, t_shell *shell);
-void	print_export(t_shell **args);
+int					check_in(char *var, t_shell *shell);
+void				print_export(t_shell **args);
+
+//get_input and get_input_utils
+void				trim_and_remove_whitespace(char *str);
+
+//get_next_line and gnl_utils.c
+char				*get_next_line(int fd);
+void				append_line(char **line, const char *buffer);
+
+//linked_utils and linked_utils1
+int					count_node(t_list **top);
+t_node				*init_lst(void);
+void				print_lst(t_node **top);
+t_node				*copy_list(t_node *original);
+void				sort_lst(t_node **top);
+void				remove_if(t_node **top, const char *var_name);
+void				free_lst(t_node *top);
+void				add_node(t_node **top, const char *env);
+
+//tokenize fonctions
+void				error(const char *msg);
+t_list				*add_token(t_list **list, const char *token, int length);
+t_list				*tokenize_input(const char *input, int last_status);
+void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+void				append_to_new_content(char **new_content, int *output_index,
+		const char *str);
+void	append_variable_value(t_context *ctx, const char *value);
+void	process_variable_substitution(const char *content, int *index,
+		t_context *ctx);
+void	process_quoted_content(const char *content, int *index,
+		t_context *ctx, char quote);
+void	correct_pipes_and_redirects(t_list **parsed_tokens);
+t_list	*split_by_spaces(const char *input);
 
 void				parse_input(char *input, t_shell *shell);
-t_node				*init_lst(void);
-void				free_lst(t_node *top);
-void				print_lst(t_node **top);
 void				print_list_debug(t_list **top);
-char				*get_next_line(int fd);
-void				sort_lst(t_node **top);
-t_node				*copy_list(t_node *original);
-void				add_node(t_node **top, const char *env);
 int					find_equal(const char *var);
-void				remove_if(t_node **top, const char *var_name);
-t_list				*tokenize_input(const char *input, int last_status);
 void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
 t_list				*remove_quotes_and_substitue_variables1(const char *input,
 						t_shell *args);
-t_list				*add_token(t_list **list, const char *token, int length);
-void				error(const char *msg);
 t_list				*is_a_redirecton(t_shell *args);
 void				save_std_fds(int *saved_stdin, int *saved_stdout);
 int					handle_output_redir(char *file, int flags);
@@ -186,7 +211,6 @@ void				restore_std_fds(int saved_stdin, int saved_stdout);
 void				execute_external_command1(t_shell *args);
 int					is_redir(char *node_content);
 int					handle_redirection(t_list *token);
-int					count_node(t_list **top);
 void				execute_command1(t_shell *shell);
 int					execute_builtin(t_cmd *cmd, t_shell *shell);
 

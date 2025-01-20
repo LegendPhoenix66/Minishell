@@ -12,17 +12,6 @@
 
 #include "../include/minishell.h"
 
-static void	wait_for_child(pid_t pid, int *status, t_shell *shell)
-{
-	waitpid(pid, status, 0);
-	if (WIFEXITED(*status))
-		shell->last_status = WEXITSTATUS(*status);
-	else if (WIFSIGNALED(*status))
-		shell->last_status = 128 + WTERMSIG(*status);
-	else
-		shell->last_status = 1;
-}
-
 static void	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	char	*exec_path;
@@ -41,96 +30,50 @@ static void	execute_command(t_cmd *cmd, t_shell *shell)
 	exit(EXIT_FAILURE);
 }
 
-static int handle_fd_error(t_cmd *cmd, int mode)
+static int get_filename(t_cmd *cmd, int mode, const char **filename)
+{
+    if (mode == 1)
+        *filename = cmd->input_file;
+    else
+        *filename = cmd->output_file;
+    if (!filename)
+    {
+        ft_putstr_fd("minishell: No file specified\n", 2);
+        return (0);
+    }
+    return (1);
+}
+
+static int get_flags(t_cmd *cmd, int mode)
+{
+    if (mode == 1)
+        return (O_RDONLY);
+    if (cmd->output_mode == 1)
+        return (O_WRONLY | O_CREAT | O_TRUNC);
+    return (O_WRONLY | O_CREAT | O_APPEND);
+}
+
+int handle_fd_error(t_cmd *cmd, int mode)
 {
     int fd;
     int flags;
+    const char *filename;
 
-    if (mode == 1)
-        flags = O_RDONLY;
-    else
-    {
-        if (cmd->output_mode == 1)
-            flags = O_WRONLY | O_CREAT | O_TRUNC;
-        else
-            flags = O_WRONLY | O_CREAT | O_APPEND;
-    }
-    fd = open(cmd->input_file, flags, 0644);
+
+    if (!get_filename(cmd, mode, &filename))
+        return (-1);
+    flags = get_flags(cmd, mode);
+    fd = open(filename, flags, 0644);
     if (fd == -1)
     {
         ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd->input_file, 2);
+        ft_putstr_fd("file error", 2);
         ft_putstr_fd(": ", 2);
-        ft_putstr_fd("error", 2);
-        ft_putstr_fd("\n", 2);
+        perror("");
         return (-1);
     }
     return (fd);
 }
-
-/*static void handle_io_redirection(t_cmd *cmd)
-{
-    int fd;
-
-    if (cmd->input_mode == 1 && cmd->input_file)
-    {
-        fd = handle_fd_error(cmd, 1);
-        if (fd == -1)
-            exit(1);
-        if (dup2(fd, STDIN_FILENO) == -1)
-        {
-            close(fd);
-            perror("minishell: dup2");
-            exit(1);
-        }
-        close(fd);
-    }
-    if (cmd->output_mode)
-    {
-        fd = handle_fd_error(cmd, 2);
-        if (fd == -1)
-            exit(1);
-        if (dup2(fd, STDOUT_FILENO) == -1)
-        {
-            close(fd);
-            perror("minishell: dup2");
-            exit(1);
-        }
-        close(fd);
-    }
-}*/
-static int setup_redirection(t_cmd *cmd, int mode, int target_fd)
-{
-    int fd;
-
-    fd = handle_fd_error(cmd, mode);
-    if (fd == -1)
-        return (-1);
-    
-    if (dup2(fd, target_fd) == -1)
-    {
-        close(fd);
-        perror("minishell: dup2");
-        return (-1);
-    }
-    close(fd);
-    return (0);
-}
-
-static void handle_io_redirection(t_cmd *cmd)
-{
-    if (cmd->input_mode == 1 && cmd->input_file)
-    {
-        if (setup_redirection(cmd, 1, STDIN_FILENO) == -1)
-            exit(1);
-    }
-    if (cmd->output_mode)
-    {
-        if (setup_redirection(cmd, 2, STDOUT_FILENO) == -1)
-            exit(1);
-    }
-}
-
 
 void	execute_simple_command(t_cmd *cmd, t_shell *shell)
 {

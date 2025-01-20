@@ -54,6 +54,7 @@ void	handle_output_redirection(t_p *data, t_cmd *cmd)
 			free_cmd(cmd);
 			exit(EXIT_FAILURE);
 		}
+		printf("handle output redirection");
 		dup2(data->fd, STDOUT_FILENO);
 		close(data->fd);
 	}
