@@ -22,8 +22,6 @@ void	remove_env_node(t_node **env_list, t_node *current, t_node *previous)
 	free(current);
 }
 
-// compare variable value and remove all the line
-// if the function finds this one
 int	builtin_unset(t_node **env_list, const char *var)
 {
 	size_t	len;

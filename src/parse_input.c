@@ -27,7 +27,6 @@ void	free_split(char **split)
 	free(split);
 }
 
-// Helper function to join path and command
 char	*join_path_command(const char *path, const char *cmd)
 {
 	char	*full_path;
@@ -43,7 +42,6 @@ char	*join_path_command(const char *path, const char *cmd)
 	return (full_path);
 }
 
-// Search command in PATH and return a full path or NULL
 char	*find_command_in_path(char *cmd)
 {
 	char	*path_env;
@@ -70,7 +68,6 @@ char	*find_command_in_path(char *cmd)
 	return (NULL);
 }
 
-// Example parsing input into tokens
 void	parse_input(char *input, t_shell *shell)
 {
 	shell->tokens = tokenize_input(input, shell->last_status);

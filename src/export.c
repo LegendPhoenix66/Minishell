@@ -12,85 +12,6 @@
 
 #include "../include/minishell.h"
 
-/*int check_in(const char *var, t_shell *shell)
-{
-    size_t  len;
-    char    *equal_pos;
-
-    if (!var || !*var)
-    {
-        fprintf(stderr, ERR_INVALID_IDENTIFIER, "");
-		shell->last_status = 1;
-        return (0);
-    }
-    if (var[0] == '=')
-    {
-        fprintf(stderr, ERR_INVALID_IDENTIFIER, var);
-		shell->last_status = 1;
-        return (0);
-    }
-    if (!ft_isalpha(var[0]) && var[0] != '_')
-    {
-        fprintf(stderr, ERR_INVALID_IDENTIFIER, var);
-		shell->last_status = 1;
-        return (0);
-    }
-    equal_pos = ft_strchr(var, '=');
-    len = equal_pos ? (size_t)(equal_pos - var) : ft_strlen(var);
-    if (!check_var_name(var, len))
-    {
-        fprintf(stderr, ERR_INVALID_IDENTIFIER, var);
-		shell->last_status = 1;
-        return (0);
-    }
-    return (1);
-}*/
-
-void	add_double_quotes(char *var)
-{
-	int	i;
-
-	i = 0;
-	write(1, "declare -x ", 11);
-	while (var[i] != '\0')
-	{
-		write(1, &var[i], 1);
-		if (var[i] == '=')
-			write(1, "\"", 1);
-		i++;
-	}
-	write(1, "\"", 1);
-	write(1, "\n", 1);
-}
-
-void	print_export(t_shell **args)
-{
-	t_node	*copy;
-	t_node	*head;
-	t_node	*copy_exp;
-	t_node	*head_exp;
-
-	copy = copy_list((*args)->env);
-	sort_lst(&copy);
-	head = copy;
-	while (copy != NULL)
-	{
-		add_double_quotes(copy->content);
-		copy = copy->next;
-	}
-	copy_exp = copy_list((*args)->export);
-	head_exp = copy_exp;
-	while (copy_exp != NULL)
-	{
-		write(1, "declare -x ", 11);
-		printf("%s\n", copy_exp->content);
-		copy_exp = copy_exp->next;
-	}
-	free_lst(head);
-	free_lst(head_exp);
-}
-
-// Extracted function to handle variables with values
 void	handle_value_variable(t_shell *shell, const char *input,
 		const char *equal_pos)
 {
@@ -120,7 +41,6 @@ void	handle_value_variable(t_shell *shell, const char *input,
 	free(var_value);
 }
 
-// Extracted function to handle variables without values
 void	handle_no_value_variable(t_shell *shell, const char *input)
 {
 	char	*no_value;

@@ -23,7 +23,7 @@
 # include <unistd.h>
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
-# define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not a valid identifier\n" // line too long
+# define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not valid\n"
 # define MAX_FD 1024
 
 typedef enum e_dir
@@ -49,8 +49,8 @@ typedef struct s_cmd
 	char			*output_file;
 	int				input_fd;
 	int				output_fd;
-	int				input_mode; // 0: stdin, 1: file <, 2: heredoc <<
-	int				output_mode; // 0: stdout, 1: file >, 2: file >>
+	int				input_mode;
+	int				output_mode;
 }					t_cmd;
 
 typedef enum e_builtin_type
@@ -122,7 +122,7 @@ t_shell				*initialize_shell(char **env);
 // handle heredoc
 t_cmd				*init_cmd(void);
 void				free_cmd(t_cmd *cmd);
-int					is_builtin(const char *token);
+int					is_builtin(char *token);
 void				add_arg(t_cmd *cmd, char *arg);
 void				handle_heredoc(t_cmd *cmd, char *delimiter);
 int					ft_strcmp(char *str1, char *str2);
@@ -197,22 +197,16 @@ void				process_quoted_content(const char *content, int *index,
 void				correct_pipes_and_redirects(t_list **parsed_tokens);
 t_list				*split_by_spaces(const char *input);
 
+// parse_input
 void				parse_input(char *input, t_shell *shell);
-void				print_list_debug(t_list **top);
-int					find_equal(const char *var);
-void				debug_list(t_node **head);
 char				*find_command_in_path(char *cmd);
-t_list				*remove_quotes_and_substitue_variables1(const char *input,
-						t_shell *args);
-t_list				*is_a_redirecton(t_shell *args);
-void				save_std_fds(int *saved_stdin, int *saved_stdout);
-int					handle_output_redir(char *file, int flags);
-void				restore_std_fds(int saved_stdin, int saved_stdout);
-void				execute_external_command1(t_shell *args);
-int					is_redir(char *node_content);
-int					handle_redirection(t_list *token);
+
+// execute_cmd
 void				execute_command1(t_shell *shell);
 int					execute_builtin(t_cmd *cmd, t_shell *shell);
+
+//print_export
+void				print_export(t_shell **args);
 
 // builtins
 int					builtin_echo(t_cmd *cmd);

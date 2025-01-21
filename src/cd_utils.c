@@ -14,7 +14,7 @@
 
 char	*get_cd_path(t_cmd *cmd)
 {
-	if (!cmd->args[1] || !strcmp(cmd->args[1], "~"))
+	if (!cmd->args[1] || !ft_strcmp(cmd->args[1], "~"))
 		return (getenv("HOME"));
 	return (cmd->args[1]);
 }

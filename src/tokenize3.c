@@ -25,7 +25,6 @@ void	append_to_new_content(char **new_content, int *output_index,
 	(*new_content)[*output_index] = '\0';
 }
 
-// Helper function to append a variable's value
 void	append_variable_value(t_context *ctx, const char *value)
 {
 	if (value)

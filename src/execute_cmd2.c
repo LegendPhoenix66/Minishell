@@ -6,24 +6,30 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:18:30 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/10 16:18:50 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/21 12:45:41 by drenquin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	is_builtin(const char *token)
+int	is_builtin(char *token)
 {
-	const char	*builtins[] = {"exit", "cd", "pwd", "echo", "env", "unset",
-		"export"};
+	char		*builtins[7];
 	size_t		i;
 
 	i = 0;
+	builtins[0] = "exit";
+	builtins[1] = "cd";
+	builtins[2] = "pwd";
+	builtins[3] = "echo";
+	builtins[4] = "env";
+	builtins[5] = "unset";
+	builtins[6] = "export";
 	if (!token)
 		return (0);
 	while (i < sizeof(builtins) / sizeof(builtins[0]))
 	{
-		if (strcmp(token, builtins[i]) == 0)
+		if (ft_strcmp(token, builtins[i]) == 0)
 			return (1);
 		i++;
 	}

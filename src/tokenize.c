@@ -32,11 +32,6 @@ void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
 	return (new_ptr);
 }
 
-/**
- * Helper function to process a single character, performing different actions
- * like handling quotes, variable substitution,
-	or appending as-is to new_content.
- */
 static void	process_character(const char current_char,
 		const char *input_content, int *current_char_index, t_context *ctx)
 {

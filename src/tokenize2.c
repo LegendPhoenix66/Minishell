@@ -12,7 +12,6 @@
 
 #include "../include/minishell.h"
 
-// Extracted helper: Process the quoted section
 int	process_quoted_section(const char *content, int index, char quote)
 {
 	index++;
@@ -23,7 +22,6 @@ int	process_quoted_section(const char *content, int index, char quote)
 	return (index + 1);
 }
 
-// Extracted helper: Process pipe or redirect
 int	process_pipe_or_redirect(t_list **tokens_with_pipes, const char *content,
 		int index)
 {
@@ -39,7 +37,6 @@ int	process_pipe_or_redirect(t_list **tokens_with_pipes, const char *content,
 	return (index + length);
 }
 
-// Extracted function to handle tokens of a single content line
 void	process_token_line(const char *token_content,
 		t_list **tokens_with_pipes)
 {

@@ -34,7 +34,6 @@ t_list	*add_token(t_list **list, const char *token, int length)
 	return (new_node);
 }
 
-// Skips a quoted section until the closing quote or throws an error
 int	skip_quoted_section(const char *input, int start_index, char quote)
 {
 	int	end_quote;
@@ -47,7 +46,6 @@ int	skip_quoted_section(const char *input, int start_index, char quote)
 	return (end_quote + 1);
 }
 
-// Function to split input by spaces
 t_list	*split_by_spaces(const char *input)
 {
 	t_list	*parsed_tokens;
