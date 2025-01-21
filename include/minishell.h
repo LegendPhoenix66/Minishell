@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/15 13:50:12 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/21 10:28:48 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <unistd.h>
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
-# define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not a valid identifier\n"
+# define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not a valid identifier\n" // line too long
 # define MAX_FD 1024
 
 typedef enum e_dir
@@ -155,24 +155,24 @@ void				process_tokens1(t_list **tokens, t_p *data);
 int					create_pipe(t_p *data, t_cmd *cmd);
 void				handle_parent_process(t_p *data, t_shell *shell);
 
-//cd_utils
-char 				*get_cd_path(t_cmd *cmd);
+// cd_utils
+char				*get_cd_path(t_cmd *cmd);
 int					execute_cd(char *path, char *old_pwd, t_shell *shell);
 void				update_directory(t_shell *shell, char *old_pwd);
 int					set_error(t_shell *shell, int status);
 
-//export_utils
+// export_utils
 int					check_in(char *var, t_shell *shell);
 void				print_export(t_shell **args);
 
-//get_input and get_input_utils
+// get_input and get_input_utils
 void				trim_and_remove_whitespace(char *str);
 
-//get_next_line and gnl_utils.c
+// get_next_line and gnl_utils.c
 char				*get_next_line(int fd);
 void				append_line(char **line, const char *buffer);
 
-//linked_utils and linked_utils1
+// linked_utils and linked_utils1
 int					count_node(t_list **top);
 t_node				*init_lst(void);
 void				print_lst(t_node **top);
@@ -182,20 +182,20 @@ void				remove_if(t_node **top, const char *var_name);
 void				free_lst(t_node *top);
 void				add_node(t_node **top, const char *env);
 
-//tokenize fonctions
+// tokenize fonctions
 void				error(const char *msg);
 t_list				*add_token(t_list **list, const char *token, int length);
 t_list				*tokenize_input(const char *input, int last_status);
 void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
 void				append_to_new_content(char **new_content, int *output_index,
-		const char *str);
-void	append_variable_value(t_context *ctx, const char *value);
-void	process_variable_substitution(const char *content, int *index,
-		t_context *ctx);
-void	process_quoted_content(const char *content, int *index,
-		t_context *ctx, char quote);
-void	correct_pipes_and_redirects(t_list **parsed_tokens);
-t_list	*split_by_spaces(const char *input);
+						const char *str);
+void				append_variable_value(t_context *ctx, const char *value);
+void				process_variable_substitution(const char *content,
+						int *index, t_context *ctx);
+void				process_quoted_content(const char *content, int *index,
+						t_context *ctx, char quote);
+void				correct_pipes_and_redirects(t_list **parsed_tokens);
+t_list				*split_by_spaces(const char *input);
 
 void				parse_input(char *input, t_shell *shell);
 void				print_list_debug(t_list **top);

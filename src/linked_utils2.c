@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   linked_utils2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 21:50:38 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/20 21:50:38 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/21 10:33:49 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ void	sort_lst(t_node **top)
 		prev_node = NULL;
 		while (current_node->next != NULL)
 		{
-			if (ft_strcmp(current_node->content, current_node->next->content) > 0)
+			if (ft_strcmp(current_node->content,
+					current_node->next->content) > 0)
 			{
 				swap_nodes(top, prev_node);
 				swapped = 1;

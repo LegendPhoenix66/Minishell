@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenize3.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 22:09:03 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/20 22:09:03 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/21 10:32:03 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,23 +34,23 @@ void	append_variable_value(t_context *ctx, const char *value)
 	}
 }
 
-static void handle_variable_value(const char *variable_name, int var_length, 
-                                t_context *ctx)
+static void	handle_variable_value(const char *variable_name, int var_length,
+		t_context *ctx)
 {
-    char *status_str;
-    char *env_value;
+	char	*status_str;
+	char	*env_value;
 
-    if (ft_strncmp(variable_name, "?", var_length) == 0 && var_length == 1)
-    {
-        status_str = ft_itoa(ctx->last_status);
-        append_variable_value(ctx, status_str);
-        free(status_str);
-    }
-    else
-    {
-        env_value = getenv(variable_name);
-        append_variable_value(ctx, env_value);
-    }
+	if (ft_strncmp(variable_name, "?", var_length) == 0 && var_length == 1)
+	{
+		status_str = ft_itoa(ctx->last_status);
+		append_variable_value(ctx, status_str);
+		free(status_str);
+	}
+	else
+	{
+		env_value = getenv(variable_name);
+		append_variable_value(ctx, env_value);
+	}
 }
 
 void	process_variable_substitution(const char *content, int *index,
@@ -72,12 +72,12 @@ void	process_variable_substitution(const char *content, int *index,
 	}
 	variable_name = malloc(var_length + 1);
 	ft_strlcpy(variable_name, &content[start_index + 1], var_length + 1);
-    handle_variable_value(variable_name, var_length, ctx);
+	handle_variable_value(variable_name, var_length, ctx);
 	free(variable_name);
 }
 
-void	process_quoted_content(const char *content, int *index,
-		t_context *ctx, char quote)
+void	process_quoted_content(const char *content, int *index, t_context *ctx,
+		char quote)
 {
 	(*index)++;
 	if (*ctx->new_content == NULL)
