@@ -84,9 +84,7 @@ typedef struct s_shell
 	t_node			*env;
 	int				exit;
 	char			*current_directory;
-	t_list			*tmp_tokens;
 	t_list			*tokens;
-	t_list			*tokens1;
 	t_node			*export;
 	int				saved_stdin;
 	int				saved_stdout;

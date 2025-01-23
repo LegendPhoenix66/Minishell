@@ -34,8 +34,6 @@ void	init_args(t_shell *args)
 	args->current_directory = getcwd(NULL, 0);
 	args->tokens = NULL;
 	args->export = NULL;
-	args->tmp_tokens = NULL;
-	args->tokens1 = NULL;
 	args->redirections = NULL;
 	args->last_status = 0;
 }
