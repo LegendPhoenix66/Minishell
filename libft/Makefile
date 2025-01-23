@@ -1,8 +1,8 @@
 # Compiler
-CC = gcc
+CC = cc
 
 # Compiler flags
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 
 # Header file
 HEADER = libft.h
@@ -32,14 +32,17 @@ BONUS_OBJS = $(addprefix $(OBJDIR),$(notdir $(BONUS_SRCS:.c=.o)))
 # libft library
 LIBFT = libft.a
 
+# Create obj directory
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
 $(LIBFT): $(OBJS)
 	ar rcs $(LIBFT) $(OBJS)
 
 $(NAME): $(OBJS)
 	ar rcs $(NAME) $(OBJS)
 
-$(OBJDIR)%.o: %.c
-	mkdir -p $(OBJDIR)
+$(OBJDIR)%.o: %.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(LIBFT) $(NAME)
