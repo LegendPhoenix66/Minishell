@@ -18,8 +18,9 @@ void	append_to_new_content(char **new_content, int *output_index,
 	size_t	len;
 
 	len = ft_strlen(str);
-	*new_content = ft_realloc(*new_content, *output_index, *output_index + len
-			+ 1);
+	ft_realloc((void **)new_content, *output_index, *output_index + len + 1);
+	if (!*new_content)
+		return ;
 	ft_memcpy(&(*new_content)[*output_index], str, len);
 	*output_index += len;
 	(*new_content)[*output_index] = '\0';
@@ -81,7 +82,9 @@ void	process_quoted_content(const char *content, int *index, t_context *ctx,
 	(*index)++;
 	if (*ctx->new_content == NULL)
 	{
-		*ctx->new_content = ft_realloc(*ctx->new_content, 0, 1);
+		ft_realloc((void **)ctx->new_content, 0, 1);
+		if (!*(ctx->new_content))
+			return ;
 		(*ctx->new_content)[0] = '\0';
 	}
 	while (content[*index] && content[*index] != quote)
@@ -92,8 +95,10 @@ void	process_quoted_content(const char *content, int *index, t_context *ctx,
 		}
 		else
 		{
-			*ctx->new_content = ft_realloc(*ctx->new_content,
+			ft_realloc((void **)ctx->new_content,
 					*(ctx->output_index), *ctx->output_index + 2);
+			if (!*(ctx->new_content))
+				return ;
 			(*ctx->new_content)[(*ctx->output_index)++] = content[(*index)++];
 		}
 	}

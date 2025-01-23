@@ -46,7 +46,7 @@ t_cmd	*process_command1(t_p *data, t_list **tokens, t_shell *shell)
 {
 	t_cmd	*cmd;
 
-	cmd = parse_command(*tokens);
+	cmd = parse_command(*tokens, shell->last_status);
 	if (!cmd)
 		return (NULL);
 	process_tokens1(tokens, data);

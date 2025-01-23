@@ -70,6 +70,6 @@ char	*find_command_in_path(char *cmd)
 
 void	parse_input(char *input, t_shell *shell)
 {
-	shell->tokens = tokenize_input(input, shell->last_status);
+	shell->tokens = tokenize_input(input);
 	execute_command1(shell);
 }

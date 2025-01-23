@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-static int	handle_token(t_cmd *cmd, t_list **tokens, int *status)
+static int	handle_token(t_cmd *cmd, t_list **tokens, int *status, int last_status)
 {
 	char	*token;
 
@@ -27,11 +27,14 @@ static int	handle_token(t_cmd *cmd, t_list **tokens, int *status)
 	else if (ft_strcmp(token, "<<") == 0)
 		*status = handle_heredoc1(cmd, tokens);
 	else
-		add_arg(cmd, token);
+	{
+		add_arg(cmd, token, last_status);
+		(*tokens)->content = token;
+	}
 	return (1);
 }
 
-static int	process_tokens(t_cmd *cmd, t_list **tokens)
+static int	process_tokens(t_cmd *cmd, t_list **tokens, int last_status)
 {
 	char	*token;
 	int		status;
@@ -41,7 +44,7 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens)
 		token = (*tokens)->content;
 		if (ft_strcmp(token, "|") == 0)
 			break ;
-		if (!handle_token(cmd, tokens, &status))
+		if (!handle_token(cmd, tokens, &status, last_status))
 			return (0);
 		if (!status)
 			return (0);
@@ -50,7 +53,7 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens)
 	return (1);
 }
 
-t_cmd	*parse_command(t_list *tokens)
+t_cmd	*parse_command(t_list *tokens, int last_status)
 {
 	t_cmd	*cmd;
 
@@ -59,7 +62,7 @@ t_cmd	*parse_command(t_list *tokens)
 	cmd = init_cmd();
 	if (!cmd)
 		return (NULL);
-	if (!process_tokens(cmd, &tokens))
+	if (!process_tokens(cmd, &tokens, last_status))
 	{
 		free_cmd(cmd);
 		return (NULL);

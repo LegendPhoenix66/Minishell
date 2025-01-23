@@ -90,7 +90,7 @@ void	*safe_malloc(size_t size)
 	return (ptr);
 }
 
-void	add_arg(t_cmd *cmd, char *arg)
+void	add_arg(t_cmd *cmd, char *arg, int last_status)
 {
 	int		i;
 	int		j;
@@ -98,6 +98,7 @@ void	add_arg(t_cmd *cmd, char *arg)
 
 	i = 0;
 	j = 0;
+	clean_arg(&arg, last_status);
 	if (cmd->args == NULL)
 	{
 		cmd->args = safe_malloc(sizeof(char *) * 2);

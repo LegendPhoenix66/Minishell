@@ -15,7 +15,8 @@
 void	process_command(char *input, t_shell *shell)
 {
 	parse_input(input, shell);
-	ft_lstclear(&shell->tokens, free);
+	if (shell->tokens)
+		ft_lstclear(&shell->tokens, free);
 	free(input);
 }
 

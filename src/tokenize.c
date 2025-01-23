@@ -12,24 +12,26 @@
 
 #include "../include/minishell.h"
 
-void	*ft_realloc(void *ptr, size_t old_size, size_t new_size)
+void	ft_realloc(void **ptr, size_t old_size, size_t new_size)
 {
 	void	*new_ptr;
 
 	if (new_size == 0)
 	{
-		free(ptr);
-		return (NULL);
+		if (*ptr)
+            free(*ptr);
+		ptr = NULL;
+		return ;
 	}
 	new_ptr = malloc(new_size);
 	if (!new_ptr)
-		return (NULL);
-	if (ptr)
+		return ;
+	if (*ptr)
 	{
-		ft_memcpy(new_ptr, ptr, old_size);
-		free(ptr);
+		ft_memcpy(new_ptr, *ptr, old_size);
+		free(*ptr);
 	}
-	return (new_ptr);
+	*ptr = new_ptr;
 }
 
 static void	process_character(const char current_char,
@@ -46,8 +48,9 @@ static void	process_character(const char current_char,
 	}
 	else
 	{
-		*(ctx->new_content) = ft_realloc(*(ctx->new_content),
-				*(ctx->output_index), *(ctx->output_index) + 2);
+		ft_realloc((void **)ctx->new_content, *(ctx->output_index), *(ctx->output_index) + 2);
+		if (!*(ctx->new_content))
+	        return ;
 		(*(ctx->new_content))[(*(ctx->output_index))++] = current_char;
 		(*current_char_index)++;
 	}
@@ -70,34 +73,29 @@ void	process_token_content(char *input_content, t_context *ctx)
 	}
 }
 
-void	remove_quotes_and_substitute_variables(t_list *tokens, int last_status)
+void	clean_arg(char **token, int last_status)
 {
-	t_list		*current;
 	t_context	ctx;
-	char		*input_content;
 	char		*processed_content;
 	int			processed_length;
 
-	current = tokens;
-	while (current)
+	processed_content = NULL;
+	processed_length = 0;
+	if (!token || !*token)
+		return ;
+	ctx.last_status = last_status;
+	ctx.new_content = &processed_content;
+	ctx.output_index = &processed_length;
+	process_token_content(*token, &ctx);
+	if (processed_content)
 	{
-		input_content = current->content;
-		processed_content = NULL;
-		processed_length = 0;
-		ctx.last_status = last_status;
-		ctx.new_content = &processed_content;
-		ctx.output_index = &processed_length;
-		process_token_content(input_content, &ctx);
-		if (processed_content)
-		{
-			free(current->content);
-			current->content = processed_content;
-		}
-		current = current->next;
+		if (*token)
+			free(*token);
+		*token = processed_content;
 	}
 }
 
-t_list	*tokenize_input(const char *input, int last_status)
+t_list	*tokenize_input(const char *input)
 {
 	t_list	*parsed_tokens;
 
@@ -105,6 +103,5 @@ t_list	*tokenize_input(const char *input, int last_status)
 	if (!parsed_tokens)
 		return (NULL);
 	correct_pipes_and_redirects(&parsed_tokens);
-	remove_quotes_and_substitute_variables(parsed_tokens, last_status);
 	return (parsed_tokens);
 }

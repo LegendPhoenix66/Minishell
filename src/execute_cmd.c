@@ -38,7 +38,7 @@ void	execute_command1(t_shell *shell)
 		execute_pipeline(shell);
 	else
 	{
-		cmd = parse_command(shell->tokens);
+		cmd = parse_command(shell->tokens, shell->last_status);
 		if (cmd)
 		{
 			execute_simple_command(cmd, shell);

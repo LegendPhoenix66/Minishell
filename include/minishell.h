@@ -121,7 +121,7 @@ t_shell				*initialize_shell(char **env);
 t_cmd				*init_cmd(void);
 void				free_cmd(t_cmd *cmd);
 int					is_builtin(char *token);
-void				add_arg(t_cmd *cmd, char *arg);
+void				add_arg(t_cmd *cmd, char *arg, int last_status);
 void				handle_heredoc(t_cmd *cmd, char *delimiter);
 int					ft_strcmp(char *str1, char *str2);
 int					setup_heredoc_pipe(int pipe_fd[2]);
@@ -130,7 +130,7 @@ void				write_heredoc_line(int fd, const char *line);
 int					process_heredoc_line(char *line, char *delimiter, int fd);
 
 // parse red and pipe
-t_cmd				*parse_command(t_list *tokens);
+t_cmd				*parse_command(t_list *tokens, int last_status);
 int					handle_input(t_cmd *cmd, t_list **tokens);
 int					handle_output(t_cmd *cmd, t_list **tokens);
 int					handle_append(t_cmd *cmd, t_list **tokens);
@@ -183,8 +183,8 @@ void				add_node(t_node **top, const char *env);
 // tokenize fonctions
 void				error(const char *msg);
 t_list				*add_token(t_list **list, const char *token, int length);
-t_list				*tokenize_input(const char *input, int last_status);
-void				*ft_realloc(void *ptr, size_t old_size, size_t new_size);
+t_list				*tokenize_input(const char *input);
+void				ft_realloc(void **ptr, size_t old_size, size_t new_size);
 void				append_to_new_content(char **new_content, int *output_index,
 						const char *str);
 void				append_variable_value(t_context *ctx, const char *value);
@@ -194,6 +194,7 @@ void				process_quoted_content(const char *content, int *index,
 						t_context *ctx, char quote);
 void				correct_pipes_and_redirects(t_list **parsed_tokens);
 t_list				*split_by_spaces(const char *input);
+void				clean_arg(char **token, int last_status);
 
 // parse_input
 void				parse_input(char *input, t_shell *shell);
