@@ -81,7 +81,7 @@ void	execute_simple_command(t_cmd *cmd, t_shell *shell)
 
 	if (is_builtin(cmd->args[0]))
 	{
-		execute_builtin(cmd, shell);
+		shell->last_status = execute_builtin(cmd, shell);
 		return ;
 	}
 	pid = fork();
