@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_cmd2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:18:30 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/21 12:45:41 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/24 11:21:19 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	is_builtin(char *token)
 {
-	char		*builtins[7];
-	size_t		i;
+	char	*builtins[7];
+	size_t	i;
 
 	i = 0;
 	builtins[0] = "exit";
@@ -75,50 +75,4 @@ void	free_cmd(t_cmd *cmd)
 			free(cmd->output_file);
 		free(cmd);
 	}
-}
-
-void	*safe_malloc(size_t size)
-{
-	void	*ptr;
-
-	ptr = malloc(size);
-	if (!ptr)
-	{
-		perror("malloc failled");
-		exit(EXIT_FAILURE);
-	}
-	return (ptr);
-}
-
-void	add_arg(t_cmd *cmd, char *arg, int last_status)
-{
-	int		i;
-	int		j;
-	char	**new_args;
-	char	*cleaned_arg;
-
-	i = 0;
-	j = 0;
-	cleaned_arg = clean_arg(arg, last_status);
-	if (!cleaned_arg)
-		return ;
-	if (cmd->args == NULL)
-	{
-		cmd->args = safe_malloc(sizeof(char *) * 2);
-		cmd->args[0] = cleaned_arg;
-		cmd->args[1] = NULL;
-		return ;
-	}
-	while (cmd->args[i] != NULL)
-		i++;
-	new_args = safe_malloc(sizeof(char *) * (i + 2));
-	while (j < i)
-	{
-		new_args[j] = cmd->args[j];
-		j++;
-	}
-	new_args[i] = cleaned_arg;
-	new_args[i + 1] = NULL;
-	free(cmd->args);
-	cmd->args = new_args;
 }

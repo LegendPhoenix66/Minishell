@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   parse_red_and_pipe.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 20:36:15 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/10 20:36:41 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/24 11:10:30 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static int	handle_token(t_cmd *cmd, t_list **tokens, int *status, int last_status)
+static int	handle_token(t_cmd *cmd, t_list **tokens, int *status,
+		int last_status)
 {
 	char	*token;
 
