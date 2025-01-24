@@ -95,14 +95,17 @@ void	add_arg(t_cmd *cmd, char *arg, int last_status)
 	int		i;
 	int		j;
 	char	**new_args;
+	char	*cleaned_arg;
 
 	i = 0;
 	j = 0;
-	clean_arg(&arg, last_status);
+	cleaned_arg = clean_arg(arg, last_status);
+	if (!cleaned_arg)
+		return ;
 	if (cmd->args == NULL)
 	{
 		cmd->args = safe_malloc(sizeof(char *) * 2);
-		cmd->args[0] = ft_strdup(arg);
+		cmd->args[0] = cleaned_arg;
 		cmd->args[1] = NULL;
 		return ;
 	}
@@ -114,7 +117,7 @@ void	add_arg(t_cmd *cmd, char *arg, int last_status)
 		new_args[j] = cmd->args[j];
 		j++;
 	}
-	new_args[i] = ft_strdup(arg);
+	new_args[i] = cleaned_arg;
 	new_args[i + 1] = NULL;
 	free(cmd->args);
 	cmd->args = new_args;

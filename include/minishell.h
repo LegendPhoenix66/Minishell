@@ -194,7 +194,7 @@ void				process_quoted_content(const char *content, int *index,
 						t_context *ctx, char quote);
 void				correct_pipes_and_redirects(t_list **parsed_tokens);
 t_list				*split_by_spaces(const char *input);
-void				clean_arg(char **token, int last_status);
+char				*clean_arg(char *token, int last_status);
 
 // parse_input
 void				parse_input(char *input, t_shell *shell);

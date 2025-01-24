@@ -95,8 +95,8 @@ void	process_quoted_content(const char *content, int *index, t_context *ctx,
 		}
 		else
 		{
-			ft_realloc((void **)ctx->new_content,
-					*(ctx->output_index), *ctx->output_index + 2);
+			ft_realloc((void **)ctx->new_content, *(ctx->output_index),
+				*ctx->output_index + 2);
 			if (!*(ctx->new_content))
 				return ;
 			(*ctx->new_content)[(*ctx->output_index)++] = content[(*index)++];

@@ -19,7 +19,7 @@ void	ft_realloc(void **ptr, size_t old_size, size_t new_size)
 	if (new_size == 0)
 	{
 		if (*ptr)
-            free(*ptr);
+			free(*ptr);
 		ptr = NULL;
 		return ;
 	}
@@ -48,9 +48,10 @@ static void	process_character(const char current_char,
 	}
 	else
 	{
-		ft_realloc((void **)ctx->new_content, *(ctx->output_index), *(ctx->output_index) + 2);
+		ft_realloc((void **)ctx->new_content, *(ctx->output_index),
+			*(ctx->output_index) + 2);
 		if (!*(ctx->new_content))
-	        return ;
+			return ;
 		(*(ctx->new_content))[(*(ctx->output_index))++] = current_char;
 		(*current_char_index)++;
 	}
@@ -73,7 +74,7 @@ void	process_token_content(char *input_content, t_context *ctx)
 	}
 }
 
-void	clean_arg(char **token, int last_status)
+char	*clean_arg(char *token, int last_status)
 {
 	t_context	ctx;
 	char		*processed_content;
@@ -81,18 +82,13 @@ void	clean_arg(char **token, int last_status)
 
 	processed_content = NULL;
 	processed_length = 0;
-	if (!token || !*token)
-		return ;
+	if (!token)
+		return (NULL);
 	ctx.last_status = last_status;
 	ctx.new_content = &processed_content;
 	ctx.output_index = &processed_length;
-	process_token_content(*token, &ctx);
-	if (processed_content)
-	{
-		if (*token)
-			free(*token);
-		*token = processed_content;
-	}
+	process_token_content(token, &ctx);
+	return (processed_content);
 }
 
 t_list	*tokenize_input(const char *input)
