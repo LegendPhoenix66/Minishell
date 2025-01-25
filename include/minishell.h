@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/21 10:28:48 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:51:03 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 # include <readline/readline.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/stat.h>
+# include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
-# include <sys/types.h>
-# include <sys/stat.h>
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
 # define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not valid\n"
@@ -98,7 +98,7 @@ typedef struct s_context
 {
 	char			**new_content;
 	int				*output_index;
-	int				last_status;
+	t_shell			*shell;
 }					t_context;
 
 typedef struct s_p
@@ -123,7 +123,7 @@ t_shell				*initialize_shell(char **env);
 t_cmd				*init_cmd(void);
 void				free_cmd(t_cmd *cmd);
 int					is_builtin(char *token);
-void				add_arg(t_cmd *cmd, char *arg, int last_status);
+void				add_arg(t_cmd *cmd, char *arg, t_shell *shell);
 void				handle_heredoc(t_cmd *cmd, char *delimiter);
 int					ft_strcmp(char *str1, char *str2);
 int					setup_heredoc_pipe(int pipe_fd[2]);
@@ -132,14 +132,14 @@ void				write_heredoc_line(int fd, const char *line);
 int					process_heredoc_line(char *line, char *delimiter, int fd);
 
 // parse red and pipe
-t_cmd				*parse_command(t_list *tokens, int last_status);
+t_cmd				*parse_command(t_shell *shell);
 int					handle_input(t_cmd *cmd, t_list **tokens);
 int					handle_output(t_cmd *cmd, t_list **tokens);
 int					handle_append(t_cmd *cmd, t_list **tokens);
 int					handle_heredoc1(t_cmd *cmd, t_list **tokens);
 
 // find executable
-char				*find_executable(const char *command);
+char				*find_executable(t_shell *shell, const char *command);
 
 // execute_simple_command and simple_cmd_utils
 void				execute_simple_command(t_cmd *cmd, t_shell *shell);
@@ -152,12 +152,13 @@ void				execute_pipeline(t_shell *shell);
 void				handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell);
 void				initialize_pipeline_data(t_p *data);
 void				process_tokens1(t_list **tokens, t_p *data);
-//int					create_pipe(t_p *data, t_cmd *cmd);
-//void				handle_parent_process(t_p *data, t_shell *shell);
-t_cmd				*process_command1(t_p *data, t_list **tokens, t_shell *shell);
+// int					create_pipe(t_p *data, t_cmd *cmd);
+// void				handle_parent_process(t_p *data, t_shell *shell);
+t_cmd				*process_command1(t_p *data, t_list **tokens,
+						t_shell *shell);
 
 // cd_utils
-char				*get_cd_path(t_cmd *cmd);
+char				*get_cd_path(t_shell *shell, t_cmd *cmd);
 int					execute_cd(char *path, char *old_pwd, t_shell *shell);
 void				update_directory(t_shell *shell, char *old_pwd);
 int					set_error(t_shell *shell, int status);
@@ -182,6 +183,7 @@ void				sort_lst(t_node **top);
 void				remove_if(t_node **top, const char *var_name);
 void				free_lst(t_node *top);
 void				add_node(t_node **top, const char *env);
+char				*get_node(t_node **top, const char *var_name);
 
 // tokenize fonctions
 void				error(const char *msg);
@@ -197,17 +199,17 @@ void				process_quoted_content(const char *content, int *index,
 						t_context *ctx, char quote);
 void				correct_pipes_and_redirects(t_list **parsed_tokens);
 t_list				*split_by_spaces(const char *input);
-char				*clean_arg(char *token, int last_status);
+char				*clean_arg(char *token, t_shell *shell);
 
 // parse_input
 void				parse_input(char *input, t_shell *shell);
-char				*find_command_in_path(char *cmd);
+char				*find_command_in_path(t_shell *shell, char *cmd);
 
 // execute_cmd
 void				execute_command1(t_shell *shell);
 int					execute_builtin(t_cmd *cmd, t_shell *shell);
 
-//print_export
+// print_export
 void				print_export(t_shell **args);
 
 // builtins

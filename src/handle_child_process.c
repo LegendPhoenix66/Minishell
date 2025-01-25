@@ -6,20 +6,11 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 10:41:41 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/15 13:47:01 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 23:04:21 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-/*void	setup_child_pipes(t_p *data)
-{
-	dup2(data->input_fd, STDIN_FILENO);
-	if (!data->is_last_command)
-		dup2(data->pipefd[1], STDOUT_FILENO);
-	close(data->pipefd[0]);
-	close(data->pipefd[1]);
-}*/
 
 void	handle_input_redirection(t_p *data, t_cmd *cmd)
 {
@@ -62,7 +53,7 @@ void	handle_output_redirection(t_p *data, t_cmd *cmd)
 
 void	execute_external_command(t_p *data, t_cmd *cmd, t_shell *shell)
 {
-	data->exec_path = find_executable(cmd->args[0]);
+	data->exec_path = find_executable(shell, cmd->args[0]);
 	if (!data->exec_path)
 	{
 		free_cmd(cmd);
@@ -77,7 +68,6 @@ void	execute_external_command(t_p *data, t_cmd *cmd, t_shell *shell)
 
 void	handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell)
 {
-	//setup_child_pipes(data);
 	handle_input_redirection(data, cmd);
 	handle_output_redirection(data, cmd);
 	if (is_builtin(cmd->args[0]))

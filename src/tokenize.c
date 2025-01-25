@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 15:49:31 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/14 13:38:11 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:46:22 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	process_token_content(char *input_content, t_context *ctx)
 	}
 }
 
-char	*clean_arg(char *token, int last_status)
+char	*clean_arg(char *token, t_shell *shell)
 {
 	t_context	ctx;
 	char		*processed_content;
@@ -84,7 +84,7 @@ char	*clean_arg(char *token, int last_status)
 	processed_length = 0;
 	if (!token)
 		return (NULL);
-	ctx.last_status = last_status;
+	ctx.shell = shell;
 	ctx.new_content = &processed_content;
 	ctx.output_index = &processed_length;
 	process_token_content(token, &ctx);

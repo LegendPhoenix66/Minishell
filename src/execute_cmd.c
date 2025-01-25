@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 23:17:58 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/15 13:51:57 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:51:03 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	execute_command1(t_shell *shell)
 		execute_pipeline(shell);
 	else
 	{
-		cmd = parse_command(shell->tokens, shell->last_status);
+		cmd = parse_command(shell);
 		if (cmd)
 		{
 			execute_simple_command(cmd, shell);

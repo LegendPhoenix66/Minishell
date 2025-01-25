@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 20:46:54 by lhopp             #+#    #+#             */
-/*   Updated: 2024/11/27 11:26:07 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:43:10 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,14 @@ char	*join_path_command(const char *path, const char *cmd)
 	return (full_path);
 }
 
-char	*find_command_in_path(char *cmd)
+char	*find_command_in_path(t_shell *shell, char *cmd)
 {
 	char	*path_env;
 	char	*full_path;
 	int		i;
 	char	**paths;
 
-	path_env = getenv("PATH");
+	path_env = get_node(&shell->env, "PATH");
 	paths = ft_split(path_env, ':');
 	full_path = NULL;
 	i = 0;

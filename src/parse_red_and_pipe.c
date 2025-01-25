@@ -6,14 +6,14 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 20:36:15 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/24 11:10:30 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:59:55 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 static int	handle_token(t_cmd *cmd, t_list **tokens, int *status,
-		int last_status)
+		t_shell *shell)
 {
 	char	*token;
 
@@ -29,13 +29,13 @@ static int	handle_token(t_cmd *cmd, t_list **tokens, int *status,
 		*status = handle_heredoc1(cmd, tokens);
 	else
 	{
-		add_arg(cmd, token, last_status);
+		add_arg(cmd, token, shell);
 		(*tokens)->content = token;
 	}
 	return (1);
 }
 
-static int	process_tokens(t_cmd *cmd, t_list **tokens, int last_status)
+static int	process_tokens(t_cmd *cmd, t_list **tokens, t_shell *shell)
 {
 	char	*token;
 	int		status;
@@ -45,7 +45,7 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens, int last_status)
 		token = (*tokens)->content;
 		if (ft_strcmp(token, "|") == 0)
 			break ;
-		if (!handle_token(cmd, tokens, &status, last_status))
+		if (!handle_token(cmd, tokens, &status, shell))
 			return (0);
 		if (!status)
 			return (0);
@@ -54,16 +54,18 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens, int last_status)
 	return (1);
 }
 
-t_cmd	*parse_command(t_list *tokens, int last_status)
+t_cmd	*parse_command(t_shell *shell)
 {
 	t_cmd	*cmd;
+	t_list	*tokens;
 
+	tokens = shell->tokens;
 	if (!tokens)
 		return (NULL);
 	cmd = init_cmd();
 	if (!cmd)
 		return (NULL);
-	if (!process_tokens(cmd, &tokens, last_status))
+	if (!process_tokens(cmd, &tokens, shell))
 	{
 		free_cmd(cmd);
 		return (NULL);

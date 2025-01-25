@@ -6,11 +6,11 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 11:27:07 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/24 11:27:09 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:48:04 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 void	*safe_malloc(size_t size)
 {
@@ -54,11 +54,11 @@ void	append_arg(t_cmd *cmd, char *cleaned_arg)
 	cmd->args = new_args;
 }
 
-void	add_arg(t_cmd *cmd, char *arg, int last_status)
+void	add_arg(t_cmd *cmd, char *arg, t_shell *shell)
 {
 	char	*cleaned_arg;
 
-	cleaned_arg = clean_arg(arg, last_status);
+	cleaned_arg = clean_arg(arg, shell);
 	if (!cleaned_arg)
 		return ;
 	if (cmd->args == NULL)

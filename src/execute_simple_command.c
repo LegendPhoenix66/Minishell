@@ -6,79 +6,66 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 15:54:55 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/21 10:29:43 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 23:02:31 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static int    is_executable(const char *path)
+static int	is_executable(const char *path)
 {
-    struct stat    s;
+	struct stat	s;
 
-    if (!path)
-        return (0);
-        
-    if (access(path, F_OK) == 0)// folder exist
-    {
-        if (access(path, X_OK) == 0) // we are able to execute
-        {
-            if (stat(path, &s) == 0)//get some information
-            {
-                if (S_ISREG(s.st_mode))  //is it a file and not something else
-                    return (1);
-            }
-        }
-    }
-    return (0);
+	if (!path)
+		return (0);
+	if (access(path, F_OK) == 0)
+	{
+		if (access(path, X_OK) == 0)
+		{
+			if (stat(path, &s) == 0)
+			{
+				if (S_ISREG(s.st_mode))
+					return (1);
+			}
+		}
+	}
+	return (0);
 }
 
-static char    *resolve_command_path(const char *cmd)
+static char	*resolve_command_path(t_shell *shell, const char *cmd)
 {
-    if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-    {
-        if (is_executable(cmd))
-            return (ft_strdup(cmd));
-        return (NULL);
-    }
-    return (find_executable(cmd));
+	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
+	{
+		if (is_executable(cmd))
+			return (ft_strdup(cmd));
+		return (NULL);
+	}
+	return (find_executable(shell, cmd));
 }
 
-static void    execute_command(t_cmd *cmd, t_shell *shell)
-{
-    char    *exec_path;
-
-    if (!cmd || !cmd->args || !cmd->args[0])
-    {
-        fprintf(stderr, "minishell: empty command\n");
-        exit(EXIT_FAILURE);
-    }
-    exec_path = resolve_command_path(cmd->args[0]);
-    if (!exec_path)
-    {
-        if (access(cmd->args[0], F_OK) == 0)
-            fprintf(stderr, "minishell: %s: Permission denied\n", cmd->args[0]);
-        else
-            fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
-            
-        free_cmd(cmd);
-        exit(127);
-    }
-    execve(exec_path, cmd->args, shell->environ);
-    perror("execve failed");
-    free(exec_path);
-    free_cmd(cmd);
-    exit(EXIT_FAILURE);
-}
-
-/*static void	execute_command(t_cmd *cmd, t_shell *shell)
+static void	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	char	*exec_path;
 
-	exec_path = find_executable(cmd->args[0]);
+	if (!cmd || !cmd->args || !cmd->args[0])
+	{
+		ft_putendl_fd("minishell: empty command", STDERR_FILENO);
+		exit(EXIT_FAILURE);
+	}
+	exec_path = resolve_command_path(shell, cmd->args[0]);
 	if (!exec_path)
 	{
-		fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
+		if (access(cmd->args[0], F_OK) == 0)
+		{
+			ft_putstr_fd("minishell: ", STDERR_FILENO);
+			ft_putstr_fd(cmd->args[0], STDERR_FILENO);
+			ft_putendl_fd(": Permission denied", STDERR_FILENO);
+		}
+		else
+		{
+			ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
+			ft_putendl_fd(cmd->args[0], STDERR_FILENO);
+		}
 		free_cmd(cmd);
 		exit(127);
 	}
@@ -87,7 +74,7 @@ static void    execute_command(t_cmd *cmd, t_shell *shell)
 	free(exec_path);
 	free_cmd(cmd);
 	exit(EXIT_FAILURE);
-}*/
+}
 
 static int	get_filename(t_cmd *cmd, int mode, const char **filename)
 {

@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:33:28 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/15 13:46:24 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:51:56 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,26 +27,11 @@ void	handle_builtin(t_cmd *cmd, t_shell *shell, t_p *data)
 		execute_builtin(cmd, shell);
 }
 
-/*void	handle_pipeline_execution(t_p *data, t_cmd *cmd, t_shell *shell)
-{
-	data->pid = fork();
-	if (data->pid == 0)
-		handle_child_process(data, cmd, shell);
-	else if (data->pid > 0)
-		handle_parent_process(data, shell);
-	else
-	{
-		perror("fork failed");
-		free_cmd(cmd);
-		exit(EXIT_FAILURE);
-	}
-}*/
-
 t_cmd	*process_command1(t_p *data, t_list **tokens, t_shell *shell)
 {
 	t_cmd	*cmd;
 
-	cmd = parse_command(*tokens, shell->last_status);
+	cmd = parse_command(shell);
 	if (!cmd)
 		return (NULL);
 	process_tokens1(tokens, data);
@@ -58,27 +43,3 @@ t_cmd	*process_command1(t_p *data, t_list **tokens, t_shell *shell)
 	}
 	return (cmd);
 }
-
-/*void	execute_pipeline(t_shell *shell)
-{
-	t_p		data;
-	t_list	*tokens;
-	t_cmd	*cmd;
-
-	initialize_pipeline_data(&data);
-	tokens = shell->tokens;
-	while (tokens)
-	{
-		cmd = process_command1(&data, &tokens, shell);
-		if (cmd == NULL)
-			break ;
-		if (!create_pipe(&data, cmd))
-			continue ;
-		handle_pipeline_execution(&data, cmd, shell);
-		free_cmd(cmd);
-		if (data.is_last_command)
-			break ;
-	}
-	if (data.input_fd != STDIN_FILENO)
-		close(data.input_fd);
-}*/

@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:50:15 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/21 10:29:25 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:41:23 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static int	save_old_pwd(char **old_pwd)
 
 static int	check_cd_args(t_cmd *cmd, char *old_pwd, t_shell *shell)
 {
-	if (cmd->args[2])
+	if (cmd->args[1] && cmd->args[2])
 	{
 		ft_putendl_fd("cd: too many arguments", STDERR_FILENO);
 		free(old_pwd);
@@ -77,7 +77,7 @@ int	builtin_cd(t_shell *shell, t_cmd *cmd)
 		return (set_error(shell, 1));
 	if (check_cd_args(cmd, old_pwd, shell))
 		return (1);
-	path = get_cd_path(cmd);
+	path = get_cd_path(shell, cmd);
 	if (execute_cd(path, old_pwd, shell))
 		return (1);
 	update_directory(shell, old_pwd);

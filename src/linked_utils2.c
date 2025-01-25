@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 21:50:38 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/21 10:33:49 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 23:00:16 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,4 +74,26 @@ void	sort_lst(t_node **top)
 			advance_to_next_node(top, &current_node, &prev_node);
 		}
 	}
+}
+
+char	*get_node(t_node **top, const char *var_name)
+{
+	t_node	*current;
+	char	*equal_sign;
+	int		size;
+
+	current = *top;
+	while (current != NULL)
+	{
+		equal_sign = ft_strchr(current->content, '=');
+		if (equal_sign != NULL)
+		{
+			size = equal_sign - current->content;
+			if (ft_strncmp(current->content, var_name, size) == 0
+				&& var_name[size] == '\0')
+				return (equal_sign + 1);
+		}
+		current = current->next;
+	}
+	return (NULL);
 }

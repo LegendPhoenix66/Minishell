@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 22:09:03 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/21 10:32:03 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:45:03 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,13 @@ static void	handle_variable_value(const char *variable_name, int var_length,
 
 	if (ft_strncmp(variable_name, "?", var_length) == 0 && var_length == 1)
 	{
-		status_str = ft_itoa(ctx->last_status);
+		status_str = ft_itoa(ctx->shell->last_status);
 		append_variable_value(ctx, status_str);
 		free(status_str);
 	}
 	else
 	{
-		env_value = getenv(variable_name);
+		env_value = get_node(&ctx->shell->env, variable_name);
 		append_variable_value(ctx, env_value);
 	}
 }
