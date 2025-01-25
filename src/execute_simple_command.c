@@ -12,7 +12,66 @@
 
 #include "../include/minishell.h"
 
-static void	execute_command(t_cmd *cmd, t_shell *shell)
+static int    is_executable(const char *path)
+{
+    struct stat    s;
+
+    if (!path)
+        return (0);
+        
+    if (access(path, F_OK) == 0)// folder exist
+    {
+        if (access(path, X_OK) == 0) // we are able to execute
+        {
+            if (stat(path, &s) == 0)//get some information
+            {
+                if (S_ISREG(s.st_mode))  //is it a file and not something else
+                    return (1);
+            }
+        }
+    }
+    return (0);
+}
+
+static char    *resolve_command_path(const char *cmd)
+{
+    if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
+    {
+        if (is_executable(cmd))
+            return (ft_strdup(cmd));
+        return (NULL);
+    }
+    return (find_executable(cmd));
+}
+
+static void    execute_command(t_cmd *cmd, t_shell *shell)
+{
+    char    *exec_path;
+
+    if (!cmd || !cmd->args || !cmd->args[0])
+    {
+        fprintf(stderr, "minishell: empty command\n");
+        exit(EXIT_FAILURE);
+    }
+    exec_path = resolve_command_path(cmd->args[0]);
+    if (!exec_path)
+    {
+        if (access(cmd->args[0], F_OK) == 0)
+            fprintf(stderr, "minishell: %s: Permission denied\n", cmd->args[0]);
+        else
+            fprintf(stderr, "minishell: command not found: %s\n", cmd->args[0]);
+            
+        free_cmd(cmd);
+        exit(127);
+    }
+    execve(exec_path, cmd->args, shell->environ);
+    perror("execve failed");
+    free(exec_path);
+    free_cmd(cmd);
+    exit(EXIT_FAILURE);
+}
+
+/*static void	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	char	*exec_path;
 
@@ -28,7 +87,7 @@ static void	execute_command(t_cmd *cmd, t_shell *shell)
 	free(exec_path);
 	free_cmd(cmd);
 	exit(EXIT_FAILURE);
-}
+}*/
 
 static int	get_filename(t_cmd *cmd, int mode, const char **filename)
 {

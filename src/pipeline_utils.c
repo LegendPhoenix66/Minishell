@@ -32,7 +32,7 @@ void	process_tokens1(t_list **tokens, t_p *data)
 		*tokens = (*tokens)->next;
 }
 
-int	create_pipe(t_p *data, t_cmd *cmd)
+/*int	create_pipe(t_p *data, t_cmd *cmd)
 {
 	if (pipe(data->pipefd) == -1)
 	{
@@ -42,7 +42,7 @@ int	create_pipe(t_p *data, t_cmd *cmd)
 		return (0);
 	}
 	return (1);
-}
+}*/
 
 void	handle_parent_process(t_p *data, t_shell *shell)
 {

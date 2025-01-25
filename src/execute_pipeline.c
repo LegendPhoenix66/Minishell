@@ -27,7 +27,7 @@ void	handle_builtin(t_cmd *cmd, t_shell *shell, t_p *data)
 		execute_builtin(cmd, shell);
 }
 
-void	handle_pipeline_execution(t_p *data, t_cmd *cmd, t_shell *shell)
+/*void	handle_pipeline_execution(t_p *data, t_cmd *cmd, t_shell *shell)
 {
 	data->pid = fork();
 	if (data->pid == 0)
@@ -40,7 +40,7 @@ void	handle_pipeline_execution(t_p *data, t_cmd *cmd, t_shell *shell)
 		free_cmd(cmd);
 		exit(EXIT_FAILURE);
 	}
-}
+}*/
 
 t_cmd	*process_command1(t_p *data, t_list **tokens, t_shell *shell)
 {
@@ -59,7 +59,7 @@ t_cmd	*process_command1(t_p *data, t_list **tokens, t_shell *shell)
 	return (cmd);
 }
 
-void	execute_pipeline(t_shell *shell)
+/*void	execute_pipeline(t_shell *shell)
 {
 	t_p		data;
 	t_list	*tokens;
@@ -81,4 +81,4 @@ void	execute_pipeline(t_shell *shell)
 	}
 	if (data.input_fd != STDIN_FILENO)
 		close(data.input_fd);
-}
+}*/

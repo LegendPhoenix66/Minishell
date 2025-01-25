@@ -21,6 +21,8 @@
 # include <stdlib.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
 # define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not valid\n"
@@ -150,8 +152,9 @@ void				execute_pipeline(t_shell *shell);
 void				handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell);
 void				initialize_pipeline_data(t_p *data);
 void				process_tokens1(t_list **tokens, t_p *data);
-int					create_pipe(t_p *data, t_cmd *cmd);
-void				handle_parent_process(t_p *data, t_shell *shell);
+//int					create_pipe(t_p *data, t_cmd *cmd);
+//void				handle_parent_process(t_p *data, t_shell *shell);
+t_cmd				*process_command1(t_p *data, t_list **tokens, t_shell *shell);
 
 // cd_utils
 char				*get_cd_path(t_cmd *cmd);
