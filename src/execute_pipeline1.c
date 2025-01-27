@@ -150,6 +150,23 @@ void    free_pid_array(pid_t *pid_array)
     free(pid_array);
 }
 
+int     last_is_pipe(t_list **top)
+{
+    t_list *current;
+
+    current = *top;
+    if (top == NULL || *top == NULL)
+	    return (0);
+    while (current != NULL)
+    {
+         if (ft_strcmp(current->content, "|") == 0
+         && current->next == NULL)
+            return (1);
+        current = current->next;  
+    }
+    return (0);
+}
+
 /*void    execute_pipeline(t_shell *shell)
 {
     t_p     data;
@@ -234,6 +251,59 @@ void    free_pid_array(pid_t *pid_array)
     free_pid_array(pids);
 }*/
 
+char    *get_pipe_prompt(void)
+{
+    char    *prompt;
+    char    *elements[4];
+    size_t  size;
+    int     i;
+
+    elements[0] = COLOR_GREEN;
+    elements[1] = ">";
+    elements[2] = COLOR_RESET;
+    elements[3] = NULL;
+
+    size = calculate_size(elements);
+    prompt = malloc(size);
+    if (!prompt)
+        return (NULL);
+    i = 1;
+    ft_strlcpy(prompt, elements[0], size);
+    while (elements[i])
+    {
+        ft_strlcat(prompt, elements[i], size);
+        i++;
+    }
+    return (prompt);
+}
+
+char	*get_input1(void)
+{
+	char	*line;
+	char	*prompt;
+	char	*trimmed_line;
+
+	if (isatty(STDIN_FILENO))
+	{
+		prompt = get_pipe_prompt();
+		line = readline(prompt);
+		free(prompt);
+	}
+	else
+	{
+		line = get_next_line(STDIN_FILENO);
+		trimmed_line = ft_strtrim(line, "\n");
+		free(line);
+		line = trimmed_line;
+	}
+	if (line == NULL)
+		return (NULL);
+	trim_and_remove_whitespace(line);
+	if (*line)
+		add_history(line);
+	return (line);
+}
+
 void    execute_pipeline(t_shell *shell)
 {
     t_p     data;
@@ -245,11 +315,34 @@ void    execute_pipeline(t_shell *shell)
     pid_t   *pids;
     int     i;
     int     status;
+    const char    *cmd_end;
+    t_list  *new_tokens_end;
+    t_list  *new_current_end;
 
     initialize_pipeline_data(&data);
     tokens = shell->tokens;
+    print_list_debug(&shell->tokens);
     nb_pipe = count_pipe(&shell->tokens);
     nb_child = count_processes(&shell->tokens);
+    i = 0;
+    while (nb_pipe == nb_child && last_is_pipe(&shell->tokens))
+    {
+        cmd_end = get_input1();
+        if (cmd_end == NULL)
+            return;
+        new_tokens_end = tokenize_input(cmd_end);
+        free((char *)cmd_end);
+        new_current_end = new_tokens_end;
+        while (new_current_end)
+        {
+            add_token(&shell->tokens, new_current_end->content, ft_strlen(new_current_end->content));
+            new_current_end = new_current_end->next;
+        }
+        ft_lstclear(&new_tokens_end, free);
+        nb_pipe = count_pipe(&shell->tokens);
+        nb_child = count_processes(&shell->tokens);
+        //print_list_debug(&shell->tokens);
+    }
     pipes = create_pipe_array(nb_pipe);
     pids = create_pid_array(nb_child);
     if (!pipes || !pids)
@@ -258,13 +351,11 @@ void    execute_pipeline(t_shell *shell)
         free_pid_array(pids);
         return;
     }
-    i = 0;
     while (tokens && i < nb_child)
     {
         cmd = process_command1(&data, &tokens, shell);
         if (cmd == NULL)
             break;
-
         pids[i] = fork();
         if (pids[i] < 0)
         {

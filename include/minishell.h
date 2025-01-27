@@ -118,6 +118,7 @@ typedef struct s_p
 char				*get_input(void);
 void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);
+size_t				calculate_size(char **elements);
 
 // handle heredoc
 t_cmd				*init_cmd(void);
@@ -219,5 +220,7 @@ int					builtin_export(t_shell *shell, char **args);
 int					builtin_exit(t_shell *shell, t_cmd *cmd);
 int					builtin_pwd(void);
 int					builtin_cd(t_shell *shell, t_cmd *cmd);
+
+void	print_list_debug(t_list **top);
 
 #endif
