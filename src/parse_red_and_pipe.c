@@ -54,12 +54,10 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens, t_shell *shell)
 	return (1);
 }
 
-t_cmd	*parse_command(t_shell *shell)
+t_cmd	*parse_command(t_shell *shell, t_list *tokens)
 {
 	t_cmd	*cmd;
-	t_list	*tokens;
 
-	tokens = shell->tokens;
 	if (!tokens)
 		return (NULL);
 	cmd = init_cmd();

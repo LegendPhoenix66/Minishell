@@ -133,7 +133,7 @@ void				write_heredoc_line(int fd, const char *line);
 int					process_heredoc_line(char *line, char *delimiter, int fd);
 
 // parse red and pipe
-t_cmd				*parse_command(t_shell *shell);
+t_cmd				*parse_command(t_shell *shell, t_list *tokens);
 int					handle_input(t_cmd *cmd, t_list **tokens);
 int					handle_output(t_cmd *cmd, t_list **tokens);
 int					handle_append(t_cmd *cmd, t_list **tokens);
