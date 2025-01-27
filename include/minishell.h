@@ -221,6 +221,4 @@ int					builtin_exit(t_shell *shell, t_cmd *cmd);
 int					builtin_pwd(void);
 int					builtin_cd(t_shell *shell, t_cmd *cmd);
 
-void	print_list_debug(t_list **top);
-
 #endif
