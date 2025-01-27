@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/25 22:51:03 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/27 13:10:30 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,8 +160,8 @@ t_cmd				*process_command1(t_p *data, t_list **tokens,
 
 // cd_utils
 char				*get_cd_path(t_shell *shell, t_cmd *cmd);
-int					execute_cd(char *path, char *old_pwd, t_shell *shell);
-void				update_directory(t_shell *shell, char *old_pwd);
+int					execute_cd(char *path, t_shell *shell);
+void				update_directory(t_shell *shell);
 int					set_error(t_shell *shell, int status);
 
 // export_utils

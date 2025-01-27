@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:27 by lhopp             #+#    #+#             */
-/*   Updated: 2024/10/09 15:34:09 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/27 14:31:14 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,32 +28,33 @@ void	cleanup_shell(t_shell *args)
 	if (args->export != NULL)
 		free_lst(args->export);
 	free(args);
+	rl_clear_history();
 	write(1, "exit\n", 5);
 }
 
 int	main(int argc, char **argv, char **env)
 {
-	t_shell	*args;
+	t_shell	*shell;
 	int		exit_status;
 	char	*input;
 
 	(void)argc;
 	(void)argv;
 	set_upsignals();
-	args = initialize_shell(env);
-	if (!args)
+	shell = initialize_shell(env);
+	if (!shell)
 		return (1);
 	input = get_input();
-	while (input && args->exit == -1)
+	while (input && shell->exit == -1)
 	{
-		process_command(input, args);
-		if (args->exit != -1)
+		process_command(input, shell);
+		if (shell->exit != -1)
 			break ;
 		input = get_input();
 	}
-	if (args->exit == -1)
-		args->exit = 0;
-	exit_status = args->exit;
-	cleanup_shell(args);
+	if (shell->exit == -1)
+		shell->exit = shell->last_status;
+	exit_status = shell->exit;
+	cleanup_shell(shell);
 	return (exit_status);
 }

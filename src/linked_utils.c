@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 18:44:35 by drenquin          #+#    #+#             */
-/*   Updated: 2024/11/27 11:26:19 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/27 14:29:15 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	remove_if(t_node **top, const char *var_name)
 	t_node	*current;
 	t_node	*previous;
 	t_node	*to_remove;
+	char	*equal_sign;
+	int		size;
 
 	current = *top;
 	previous = NULL;
@@ -38,8 +40,9 @@ void	remove_if(t_node **top, const char *var_name)
 		return ;
 	while (current != NULL)
 	{
-		if (ft_strncmp(current->content, var_name, ft_strchr(var_name, '=')
-				- var_name) == 0)
+		equal_sign = ft_strchr(current->content, '=');
+		size = equal_sign - current->content;
+		if (ft_strncmp(current->content, var_name, size) == 0)
 			remove_node(top, &current, previous, to_remove);
 		else
 		{
