@@ -39,16 +39,24 @@ typedef enum e_dir
 
 typedef struct s_redir
 {
-	t_dir			type;
-	char			*file;
-	int				fd;
+	pid_t			pid;
+	char			*delimiter;
+	int				fd[2];
 }					t_redir;
+
+typedef struct s_heredoc
+{
+    int     pipe_fd[2]; 
+    pid_t   process_pid;
+	char	*delimiter;      
+} t_heredoc;
 
 typedef struct s_cmd
 {
 	char			**args;
 	char			*input_file;
 	char			*output_file;
+	char			*delimiter;
 	int				input_fd;
 	int				output_fd;
 	int				input_mode;
@@ -131,6 +139,10 @@ int					setup_heredoc_pipe(int pipe_fd[2]);
 void				process_heredoc_input(int fd, char *delimiter);
 void				write_heredoc_line(int fd, const char *line);
 int					process_heredoc_line(char *line, char *delimiter, int fd);
+int	check_for_heredoc(t_list *tokens);
+void execute_heredoc(t_heredoc *data, t_cmd *cmd, t_shell *shell);
+t_list *cmd_befor_heredoc(t_list **top);
+t_list *cmd_after_heredoc(t_list **top);
 
 // parse red and pipe
 t_cmd				*parse_command(t_shell *shell, t_list *tokens);
@@ -147,6 +159,9 @@ void				execute_simple_command(t_cmd *cmd, t_shell *shell);
 void				wait_for_child(pid_t pid, int *status, t_shell *shell);
 void				handle_io_redirection(t_cmd *cmd);
 int					handle_fd_error(t_cmd *cmd, int mode);
+int					is_executable(const char *path);
+char				*resolve_command_path(t_shell *shell, const char *cmd);
+void				execute_command(t_cmd *cmd, t_shell *shell);
 
 // execute_pipeline
 void				execute_pipeline(t_shell *shell);
@@ -157,6 +172,7 @@ void				process_tokens1(t_list **tokens, t_p *data);
 // void				handle_parent_process(t_p *data, t_shell *shell);
 t_cmd				*process_command1(t_p *data, t_list **tokens,
 						t_shell *shell);
+char	*get_input1(void);
 
 // cd_utils
 char				*get_cd_path(t_shell *shell, t_cmd *cmd);

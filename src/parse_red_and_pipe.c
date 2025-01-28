@@ -26,7 +26,10 @@ static int	handle_token(t_cmd *cmd, t_list **tokens, int *status,
 	else if (ft_strcmp(token, ">>") == 0)
 		*status = handle_append(cmd, tokens);
 	else if (ft_strcmp(token, "<<") == 0)
-		*status = handle_heredoc1(cmd, tokens);
+	{
+		printf("handle token go to handle heredoc\n");
+		*status = handle_heredoc1(cmd, tokens);	
+	}
 	else
 	{
 		add_arg(cmd, token, shell);
@@ -42,9 +45,12 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens, t_shell *shell)
 
 	while (*tokens)
 	{
+		
 		token = (*tokens)->content;
 		if (ft_strcmp(token, "|") == 0)
 			break ;
+		if (ft_strcmp(token, "<<") == 0)
+			break;
 		if (!handle_token(cmd, tokens, &status, shell))
 			return (0);
 		if (!status)

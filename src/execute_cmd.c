@@ -12,6 +12,20 @@
 
 #include "../include/minishell.h"
 
+int	check_for_heredoc(t_list *tokens)
+{
+	char	*token;
+
+	while (tokens)
+	{
+		token = tokens->content;
+		if (ft_strcmp(token, "<<") == 0)
+			return (1);
+		tokens = tokens->next;
+	}
+	return (0);
+}
+
 int	check_for_pipe(t_list *tokens)
 {
 	char	*token;

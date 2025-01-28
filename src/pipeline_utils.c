@@ -32,18 +32,6 @@ void	process_tokens1(t_list **tokens, t_p *data)
 		*tokens = (*tokens)->next;
 }
 
-/*int	create_pipe(t_p *data, t_cmd *cmd)
-{
-	if (pipe(data->pipefd) == -1)
-	{
-		perror("pipe failed");
-		free_cmd(cmd);
-		exit(EXIT_FAILURE);
-		return (0);
-	}
-	return (1);
-}*/
-
 void	handle_parent_process(t_p *data, t_shell *shell)
 {
 	close(data->pipefd[1]);

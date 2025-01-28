@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-static int	is_executable(const char *path)
+int	is_executable(const char *path)
 {
 	struct stat	s;
 
@@ -32,7 +32,7 @@ static int	is_executable(const char *path)
 	return (0);
 }
 
-static char	*resolve_command_path(t_shell *shell, const char *cmd)
+char	*resolve_command_path(t_shell *shell, const char *cmd)
 {
 	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
 	{
@@ -43,7 +43,7 @@ static char	*resolve_command_path(t_shell *shell, const char *cmd)
 	return (find_executable(shell, cmd));
 }
 
-static void	execute_command(t_cmd *cmd, t_shell *shell)
+void	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	char	*exec_path;
 
@@ -124,7 +124,16 @@ void	execute_simple_command(t_cmd *cmd, t_shell *shell)
 {
 	pid_t	pid;
 	int		status;
-
+	t_heredoc *data;
+	
+	data = NULL;
+	printf("execute simple cmd\n");
+	if (check_for_heredoc(shell->tokens))
+	{
+		printf("heredoc detected\n");
+		execute_heredoc(data, cmd, shell);
+		return;
+	}
 	if (is_builtin(cmd->args[0]))
 	{
 		shell->last_status = execute_builtin(cmd, shell);

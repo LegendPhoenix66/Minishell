@@ -12,6 +12,11 @@
 
 #include "../include/minishell.h"
 
+t_list *cmd_befor_heredoc(t_list **top);
+int start_process(int *pipe_fd, t_cmd *cmd, t_shell *shell);
+//static char **list_to_array(t_list *list);
+//static void free_array(char **array);
+
 void	handle_heredoc_parent(t_cmd *cmd, int pipe_fd[2], pid_t pid)
 {
 	int	status;
@@ -61,3 +66,46 @@ void	handle_heredoc(t_cmd *cmd, char *delimiter)
 	else if (pid > 0)
 		handle_heredoc_parent(cmd, pipe_fd, pid);
 }
+
+t_list *cmd_befor_heredoc(t_list **top)
+{
+    t_list *current;
+    t_list *befor;
+
+	befor = NULL;
+    current = *top;
+    if (top == NULL || *top == NULL)
+	    return (0);
+    while (current != NULL)
+    {
+        if (ft_strcmp(current->content, "<<") == 0)
+            break;
+        add_token(&befor, current->content, ft_strlen(current->content));
+        current = current->next;
+    }
+    return(befor);
+}
+
+t_list *cmd_after_heredoc(t_list **top)
+{
+    t_list *current;
+    t_list *after;
+
+    after = NULL;
+    current = *top;
+    if (top == NULL || *top == NULL)
+        return (0);
+    while (current != NULL)
+    {
+        if (ft_strcmp(current->content, "<<") == 0)
+        {
+            add_token(&after, current->next->content, ft_strlen(current->next->content));
+            break;
+        }
+        current = current->next;
+    }
+    return (after);
+}
+
+
+
