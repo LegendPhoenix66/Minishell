@@ -28,6 +28,47 @@ int	is_numeric_argument(const char *arg)
 	return (1);
 }
 
+int	ft_isspace(int c)
+{
+	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
+		|| c == '\r')
+		return (1);
+	return (0);
+}
+
+long long	ft_atoll(const char *str)
+{
+	long long	num;
+	int			sign;
+
+	num = 0;
+	sign = 1;
+	while (ft_isspace(*str))
+		str++;
+	if (*str == '+' || *str == '-')
+	{
+		if (*str == '-')
+			sign = -1;
+		str++;
+	}
+	while (ft_isdigit(*str))
+	{
+		num = num * 10 + *str - '0';
+		str++;
+	}
+	return (num * sign);
+}
+
+int	is_out_of_range(const char *arg)
+{
+	long long	num;
+
+	num = ft_atoll(arg);
+	if (num > LONG_MAX || num < LONG_MIN)
+		return (1);
+	return (0);
+}
+
 void	print_error_message(char *arg, int fd)
 {
 	ft_putstr_fd("minishell: exit: ", fd);
@@ -51,12 +92,12 @@ int	builtin_exit(t_shell *shell, t_cmd *cmd)
 		return (1);
 	}
 	arg = cmd->args[1];
-	if (!is_numeric_argument(arg))
+	if (!is_numeric_argument(arg) || is_out_of_range(arg))
 	{
 		print_error_message(arg, STDERR_FILENO);
 		shell->exit = 255;
 		return (255);
 	}
-	shell->exit = ft_atoi(arg) % 256;
+	shell->exit = ft_atoll(arg) % 256;
 	return (shell->exit);
 }
