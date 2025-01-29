@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 15:54:55 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/25 23:02:31 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 11:00:49 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,9 @@ void	execute_command(t_cmd *cmd, t_shell *shell)
 		}
 		else
 		{
-			ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
-			ft_putendl_fd(cmd->args[0], STDERR_FILENO);
+			ft_putstr_fd("minishell: ", STDERR_FILENO);
+			ft_putstr_fd(cmd->args[0], STDERR_FILENO);
+            ft_putendl_fd(": command not found", STDERR_FILENO);
 		}
 		free_cmd(cmd);
 		exit(127);
@@ -122,17 +123,15 @@ int	handle_fd_error(t_cmd *cmd, int mode)
 
 void	execute_simple_command(t_cmd *cmd, t_shell *shell)
 {
-	pid_t	pid;
-	int		status;
-	t_heredoc *data;
-	
+	pid_t		pid;
+	int			status;
+	t_heredoc	*data;
+
 	data = NULL;
-	printf("execute simple cmd\n");
 	if (check_for_heredoc(shell->tokens))
 	{
-		printf("heredoc detected\n");
 		execute_heredoc(data, cmd, shell);
-		return;
+		return ;
 	}
 	if (is_builtin(cmd->args[0]))
 	{

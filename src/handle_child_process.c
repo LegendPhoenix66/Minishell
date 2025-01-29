@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 10:41:41 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/25 23:04:21 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 11:14:50 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ void	handle_output_redirection(t_p *data, t_cmd *cmd)
 			free_cmd(cmd);
 			exit(EXIT_FAILURE);
 		}
-		printf("handle output redirection");
 		dup2(data->fd, STDOUT_FILENO);
 		close(data->fd);
 	}

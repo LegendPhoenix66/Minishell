@@ -3,19 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   handle_heredoc.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:43:38 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/10 16:44:17 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/29 10:58:38 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-t_list *cmd_befor_heredoc(t_list **top);
-int start_process(int *pipe_fd, t_cmd *cmd, t_shell *shell);
-//static char **list_to_array(t_list *list);
-//static void free_array(char **array);
 
 void	handle_heredoc_parent(t_cmd *cmd, int pipe_fd[2], pid_t pid)
 {
@@ -67,45 +62,43 @@ void	handle_heredoc(t_cmd *cmd, char *delimiter)
 		handle_heredoc_parent(cmd, pipe_fd, pid);
 }
 
-t_list *cmd_befor_heredoc(t_list **top)
+t_list	*cmd_befor_heredoc(t_list **top)
 {
-    t_list *current;
-    t_list *befor;
+	t_list	*current;
+	t_list	*befor;
 
 	befor = NULL;
-    current = *top;
-    if (top == NULL || *top == NULL)
-	    return (0);
-    while (current != NULL)
-    {
-        if (ft_strcmp(current->content, "<<") == 0)
-            break;
-        add_token(&befor, current->content, ft_strlen(current->content));
-        current = current->next;
-    }
-    return(befor);
+	current = *top;
+	if (top == NULL || *top == NULL)
+		return (0);
+	while (current != NULL)
+	{
+		if (ft_strcmp(current->content, "<<") == 0)
+			break ;
+		add_token(&befor, current->content, ft_strlen(current->content));
+		current = current->next;
+	}
+	return (befor);
 }
 
-t_list *cmd_after_heredoc(t_list **top)
+t_list	*cmd_after_heredoc(t_list **top)
 {
-    t_list *current;
-    t_list *after;
+	t_list	*current;
+	t_list	*after;
 
-    after = NULL;
-    current = *top;
-    if (top == NULL || *top == NULL)
-        return (0);
-    while (current != NULL)
-    {
-        if (ft_strcmp(current->content, "<<") == 0)
-        {
-            add_token(&after, current->next->content, ft_strlen(current->next->content));
-            break;
-        }
-        current = current->next;
-    }
-    return (after);
+	after = NULL;
+	current = *top;
+	if (top == NULL || *top == NULL)
+		return (0);
+	while (current != NULL)
+	{
+		if (ft_strcmp(current->content, "<<") == 0)
+		{
+			add_token(&after, current->next->content,
+				ft_strlen(current->next->content));
+			break ;
+		}
+		current = current->next;
+	}
+	return (after);
 }
-
-
-

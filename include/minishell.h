@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/27 13:10:30 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 10:57:30 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,10 @@ typedef struct s_redir
 
 typedef struct s_heredoc
 {
-    int     pipe_fd[2]; 
-    pid_t   process_pid;
-	char	*delimiter;      
-} t_heredoc;
+	int				pipe_fd[2];
+	pid_t			process_pid;
+	char			*delimiter;
+}					t_heredoc;
 
 typedef struct s_cmd
 {
@@ -139,10 +139,11 @@ int					setup_heredoc_pipe(int pipe_fd[2]);
 void				process_heredoc_input(int fd, char *delimiter);
 void				write_heredoc_line(int fd, const char *line);
 int					process_heredoc_line(char *line, char *delimiter, int fd);
-int	check_for_heredoc(t_list *tokens);
-void execute_heredoc(t_heredoc *data, t_cmd *cmd, t_shell *shell);
-t_list *cmd_befor_heredoc(t_list **top);
-t_list *cmd_after_heredoc(t_list **top);
+int					check_for_heredoc(t_list *tokens);
+void				execute_heredoc(t_heredoc *data, t_cmd *cmd,
+						t_shell *shell);
+t_list				*cmd_befor_heredoc(t_list **top);
+t_list				*cmd_after_heredoc(t_list **top);
 
 // parse red and pipe
 t_cmd				*parse_command(t_shell *shell, t_list *tokens);
@@ -172,7 +173,7 @@ void				process_tokens1(t_list **tokens, t_p *data);
 // void				handle_parent_process(t_p *data, t_shell *shell);
 t_cmd				*process_command1(t_p *data, t_list **tokens,
 						t_shell *shell);
-char	*get_input1(void);
+char				*get_input1(void);
 
 // cd_utils
 char				*get_cd_path(t_shell *shell, t_cmd *cmd);

@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 21:50:16 by lhopp             #+#    #+#             */
-/*   Updated: 2024/12/03 21:50:16 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 11:51:07 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,30 @@ long long	ft_atoll(const char *str)
 
 int	is_out_of_range(const char *arg)
 {
-	long long	num;
+	const char	*long_max_str = "9223372036854775807";
+	const char	*long_min_str = "9223372036854775808";
+	int			sign;
+	size_t		input_len;
+	const char	*long_str;
 
-	num = ft_atoll(arg);
-	if (num > LONG_MAX || num < LONG_MIN)
+	sign = 1;
+	if (*arg == '-')
+	{
+		sign = -1;
+		arg++;
+	}
+	else if (*arg == '+')
+		arg++;
+	input_len = strlen(arg);
+	if (sign == 1)
+		long_str = long_max_str;
+	else
+		long_str = long_min_str;
+	if (input_len > ft_strlen(long_str))
 		return (1);
-	return (0);
+	if (input_len < ft_strlen(long_str))
+		return (0);
+	return (ft_strncmp(arg, long_str, input_len) > 0);
 }
 
 void	print_error_message(char *arg, int fd)
@@ -95,8 +113,8 @@ int	builtin_exit(t_shell *shell, t_cmd *cmd)
 	if (!is_numeric_argument(arg) || is_out_of_range(arg))
 	{
 		print_error_message(arg, STDERR_FILENO);
-		shell->exit = 255;
-		return (255);
+		shell->exit = 2;
+		return (2);
 	}
 	shell->exit = ft_atoll(arg) % 256;
 	return (shell->exit);

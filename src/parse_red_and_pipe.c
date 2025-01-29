@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 20:36:15 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/25 22:59:55 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 11:00:41 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static int	handle_token(t_cmd *cmd, t_list **tokens, int *status,
 	else if (ft_strcmp(token, "<<") == 0)
 	{
 		printf("handle token go to handle heredoc\n");
-		*status = handle_heredoc1(cmd, tokens);	
+		*status = handle_heredoc1(cmd, tokens);
 	}
 	else
 	{
@@ -45,12 +45,11 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens, t_shell *shell)
 
 	while (*tokens)
 	{
-		
 		token = (*tokens)->content;
 		if (ft_strcmp(token, "|") == 0)
 			break ;
 		if (ft_strcmp(token, "<<") == 0)
-			break;
+			break ;
 		if (!handle_token(cmd, tokens, &status, shell))
 			return (0);
 		if (!status)
