@@ -92,7 +92,7 @@ t_list	*cmd_after_heredoc(t_list **top)
 		return (0);
 	while (current != NULL)
 	{
-		if (ft_strcmp(current->content, "<<") == 0)
+		if (ft_strcmp(current->content, "<<") == 0 && current->next)
 		{
 			add_token(&after, current->next->content,
 				ft_strlen(current->next->content));
