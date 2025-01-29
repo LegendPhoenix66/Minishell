@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 16:10:33 by drenquin          #+#    #+#             */
-/*   Updated: 2024/12/31 16:10:33 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/29 12:10:00 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	builtin_execution(t_cmd *cmd, t_shell *shell)
 	else if (type == BUILTIN_CD)
 		ret = builtin_cd(shell, cmd);
 	else if (type == BUILTIN_PWD)
-		ret = builtin_pwd();
+		ret = builtin_pwd(shell);
 	else if (type == BUILTIN_EXPORT)
 		ret = builtin_export(shell, cmd->args);
 	else if (type == BUILTIN_UNSET)

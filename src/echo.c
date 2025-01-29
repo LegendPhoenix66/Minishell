@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:50:15 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/27 14:37:31 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 12:10:00 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,17 +36,9 @@ int	builtin_echo(t_cmd *cmd)
 	return (0);
 }
 
-int	builtin_pwd(void)
+int	builtin_pwd(t_shell *shell)
 {
-	char	*pwd;
-
-	pwd = getcwd(NULL, 0);
-	if (!pwd)
-	{
-		return (1);
-	}
-	ft_putendl_fd(pwd, STDOUT_FILENO);
-	free(pwd);
+	ft_putendl_fd(shell->current_directory, STDOUT_FILENO);
 	return (0);
 }
 

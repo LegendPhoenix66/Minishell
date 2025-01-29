@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/29 10:57:30 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 12:10:00 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,7 +235,7 @@ int					builtin_echo(t_cmd *cmd);
 int					builtin_unset(t_node **env_list, const char *var);
 int					builtin_export(t_shell *shell, char **args);
 int					builtin_exit(t_shell *shell, t_cmd *cmd);
-int					builtin_pwd(void);
+int					builtin_pwd(t_shell *shell);
 int					builtin_cd(t_shell *shell, t_cmd *cmd);
 
 #endif
