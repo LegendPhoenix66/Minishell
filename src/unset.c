@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 18:09:48 by drenquin          #+#    #+#             */
-/*   Updated: 2024/12/04 18:09:48 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/29 13:41:57 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,7 @@ int	builtin_unset(t_node **env_list, const char *var)
 	t_node	*previous;
 
 	if (var == NULL || *var == '\0')
-	{
-		perror("var error");
-		return (-1);
-	}
+		return (0);
 	len = ft_strlen(var);
 	current = *env_list;
 	previous = NULL;
