@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 15:54:55 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/29 11:00:49 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 15:07:17 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,18 +55,12 @@ void	execute_command(t_cmd *cmd, t_shell *shell)
 	exec_path = resolve_command_path(shell, cmd->args[0]);
 	if (!exec_path)
 	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(cmd->args[0], STDERR_FILENO);
 		if (access(cmd->args[0], F_OK) == 0)
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd->args[0], STDERR_FILENO);
 			ft_putendl_fd(": Permission denied", STDERR_FILENO);
-		}
 		else
-		{
-			ft_putstr_fd("minishell: ", STDERR_FILENO);
-			ft_putstr_fd(cmd->args[0], STDERR_FILENO);
-            ft_putendl_fd(": command not found", STDERR_FILENO);
-		}
+			ft_putendl_fd(": command not found", STDERR_FILENO);
 		free_cmd(cmd);
 		exit(127);
 	}
