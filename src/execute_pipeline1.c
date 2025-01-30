@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 15:06:36 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/27 12:37:55 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 13:05:05 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,6 +220,7 @@ void	execute_pipeline(t_shell *shell)
 	const char	*cmd_end;
 	t_list		*new_tokens_end;
 	t_list		*new_current_end;
+	int			j;
 
 	initialize_pipeline_data(&data);
 	tokens = shell->tokens;
@@ -278,22 +279,27 @@ void	execute_pipeline(t_shell *shell)
 				dup2(pipes[i - 1][0], STDIN_FILENO);
 				dup2(pipes[i][1], STDOUT_FILENO);
 			}
-			for (int j = 0; j < nb_pipe; j++)
+			j = 0;
+			while (j < nb_pipe)
 			{
 				close(pipes[j][0]);
 				close(pipes[j][1]);
+				j++;
 			}
 			handle_child_process(&data, cmd, shell);
 		}
 		free_cmd(cmd);
 		i++;
 	}
-	for (i = 0; i < nb_pipe; i++)
+	i = 0;
+	while (i < nb_pipe)
 	{
 		close(pipes[i][0]);
 		close(pipes[i][1]);
+		i++;
 	}
-	for (i = 0; i < nb_child; i++)
+	i = 0;
+	while (i < nb_child)
 	{
 		waitpid(pids[i], &status, 0);
 		if (i == nb_child - 1)
@@ -305,6 +311,7 @@ void	execute_pipeline(t_shell *shell)
 			else
 				shell->last_status = 1;
 		}
+		i++;
 	}
 	free_pipe_array(pipes, nb_pipe);
 	free_pid_array(pids);

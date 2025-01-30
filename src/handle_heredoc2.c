@@ -6,14 +6,14 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 15:26:11 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/29 11:01:09 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 13:05:23 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-t_context *init_context(t_shell *shell);
-void free_context(t_context *ctx);
+t_context	*init_context(t_shell *shell);
+void		free_context(t_context *ctx);
 
 t_heredoc	*init_pipe_data(void)
 {
@@ -56,38 +56,43 @@ int	start_process(t_heredoc *data, t_cmd *cmd, t_shell *shell)
 
 void	free_message_array(char **messages)
 {
+	int	i;
+
 	if (!messages)
 		return ;
-	for (int i = 0; messages[i]; i++)
+	i = 0;
+	while (messages[i])
+	{
 		free(messages[i]);
+		i++;
+	}
 	free(messages);
 }
 
-int find_index(char *input)
+int	find_index(char *input)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (input[0] == '$')
 		return (0);
-	while(input[i] != '$' && input[i] != '\0')
+	while (input[i] != '$' && input[i] != '\0')
 		i++;
-	if(input[i] == '$')
+	if (input[i] == '$')
 		return (i);
-	if(input[i] == '\0')
+	if (input[i] == '\0')
 		return (-1);
 	return (-1);
 }
 
 char	**create_message_array(char *delimiter, t_shell *shell)
 {
-	char	*input;
-	char	**messages;
-	int		capacity;
-	int		size;
-	t_context *ctx;
-	int index;
-
+	char		*input;
+	char		**messages;
+	int			capacity;
+	int			size;
+	t_context	*ctx;
+	int			index;
 
 	size = 0;
 	capacity = 10;
@@ -144,41 +149,41 @@ char	**create_message_array(char *delimiter, t_shell *shell)
 	return (messages);
 }
 
-t_context *init_context(t_shell *shell)
+t_context	*init_context(t_shell *shell)
 {
-    t_context *ctx;
+	t_context	*ctx;
 
-    ctx = (t_context *)malloc(sizeof(t_context));
-    if (!ctx)
-        return (NULL);
-    ctx->new_content = (char **)malloc(sizeof(char *));
-    if (!ctx->new_content)
-    {
-        free(ctx);
-        return (NULL);
-    }
-    *(ctx->new_content) = NULL;
-    ctx->output_index = (int *)malloc(sizeof(int));
-    if (!ctx->output_index)
-    {
-        free(ctx->new_content);
-        free(ctx);
-        return (NULL);
-    }
-    *(ctx->output_index) = 0;
-    ctx->shell = shell;
-    return (ctx);
+	ctx = (t_context *)malloc(sizeof(t_context));
+	if (!ctx)
+		return (NULL);
+	ctx->new_content = (char **)malloc(sizeof(char *));
+	if (!ctx->new_content)
+	{
+		free(ctx);
+		return (NULL);
+	}
+	*(ctx->new_content) = NULL;
+	ctx->output_index = (int *)malloc(sizeof(int));
+	if (!ctx->output_index)
+	{
+		free(ctx->new_content);
+		free(ctx);
+		return (NULL);
+	}
+	*(ctx->output_index) = 0;
+	ctx->shell = shell;
+	return (ctx);
 }
 
-void free_context(t_context *ctx)
+void	free_context(t_context *ctx)
 {
-    if (!ctx)
-        return;
-    if (ctx->new_content)
-        free(ctx->new_content);
-    if (ctx->output_index)
-        free(ctx->output_index);
-    free(ctx);
+	if (!ctx)
+		return ;
+	if (ctx->new_content)
+		free(ctx->new_content);
+	if (ctx->output_index)
+		free(ctx->output_index);
+	free(ctx);
 }
 
 void	write_and_wait(t_heredoc *data, t_shell *shell)
@@ -187,7 +192,7 @@ void	write_and_wait(t_heredoc *data, t_shell *shell)
 	char	**messages;
 	t_list	*process;
 	t_list	*check_last;
-	int i;
+	int		i;
 
 	i = 0;
 	check_last = last_token(&shell->tokens);

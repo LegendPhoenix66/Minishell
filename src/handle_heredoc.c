@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:43:38 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/29 10:58:38 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 13:04:56 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ t_list	*cmd_after_heredoc(t_list **top)
 		return (NULL);
 	while (current != NULL)
 	{
-		if (ft_strcmp(current->content, "<<") == 0 )
+		if (ft_strcmp(current->content, "<<") == 0)
 		{
 			add_token(&after, current->next->content,
 				ft_strlen(current->next->content));
@@ -102,16 +102,17 @@ t_list	*cmd_after_heredoc(t_list **top)
 	}
 	return (after);
 }
-t_list *last_token(t_list **top)
+
+t_list	*last_token(t_list **top)
 {
-	t_list *current;
-	t_list *last;
+	t_list	*current;
+	t_list	*last;
 
 	last = NULL;
 	current = *top;
 	if (top == NULL || *top == NULL)
 		return (NULL);
-	while(current != NULL)
+	while (current != NULL)
 	{
 		last = current;
 		current = current->next;
