@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 15:06:36 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/30 14:01:03 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 14:12:27 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,66 +262,100 @@ static void	handle_child(t_pipeline_ctx *ctx, t_cmd *cmd, int i)
 	exit(ctx->shell->last_status);
 }
 
-void	execute_pipeline(t_shell *shell)
+void	initialize_context(t_pipeline_ctx *ctx, t_shell *shell)
 {
-	t_pipeline_ctx	ctx;
-	int				i;
-	t_cmd			*cmd;
-	const char		*cmd_end;
-	t_list			*new_tokens_end;
-	t_list			*new_current_end;
+	ctx->shell = shell;
+	ctx->tokens = shell->tokens;
+	initialize_pipeline_data(&ctx->data);
+	ctx->nb_pipe = count_pipe(&ctx->tokens);
+	ctx->nb_child = count_processes(&ctx->tokens);
+}
 
-	ctx.shell = shell;
-	initialize_pipeline_data(&ctx.data);
-	ctx.tokens = shell->tokens;
-	ctx.nb_pipe = count_pipe(&ctx.tokens);
-	ctx.nb_child = count_processes(&ctx.tokens);
-	while (ctx.nb_pipe == ctx.nb_child && last_is_pipe(&ctx.tokens))
+void	handle_additional_input(t_pipeline_ctx *ctx)
+{
+	const char	*cmd_end;
+	t_list		*new_tokens_end;
+	t_list		*current_token;
+
+	while (ctx->nb_pipe == ctx->nb_child && last_is_pipe(&ctx->tokens))
 	{
 		cmd_end = get_input1();
 		if (cmd_end == NULL)
 			return ;
 		new_tokens_end = tokenize_input(cmd_end);
 		free((char *)cmd_end);
-		new_current_end = new_tokens_end;
-		while (new_current_end != NULL)
+		current_token = new_tokens_end;
+		while (current_token != NULL)
 		{
-			add_token(&ctx.tokens, new_current_end->content,
-				ft_strlen(new_current_end->content));
-			new_current_end = new_current_end->next;
+			add_token(&ctx->tokens, current_token->content,
+				ft_strlen(current_token->content));
+			current_token = current_token->next;
 		}
 		ft_lstclear(&new_tokens_end, free);
-		ctx.nb_pipe = count_pipe(&ctx.tokens);
-		ctx.nb_child = count_processes(&ctx.tokens);
+		ctx->nb_pipe = count_pipe(&ctx->tokens);
+		ctx->nb_child = count_processes(&ctx->tokens);
 	}
-	ctx.pipes = create_pipe_array(ctx.nb_pipe);
-	ctx.pids = create_pid_array(ctx.nb_child);
-	if (ctx.pipes == NULL || ctx.pids == NULL)
+}
+
+int	initialize_pipes_and_pids(t_pipeline_ctx *ctx)
+{
+	ctx->pipes = create_pipe_array(ctx->nb_pipe);
+	ctx->pids = create_pid_array(ctx->nb_child);
+	if (ctx->pipes == NULL || ctx->pids == NULL)
 	{
-		free_pipe_array(ctx.pipes, ctx.nb_pipe);
-		free_pid_array(ctx.pids);
-		return ;
+		free_pipe_array(ctx->pipes, ctx->nb_pipe);
+		free_pid_array(ctx->pids);
+		return (0);
 	}
+	return (1);
+}
+
+int	process_child(t_pipeline_ctx *ctx, int i)
+{
+	t_cmd	*cmd;
+
+	cmd = process_command1(&ctx->data, &ctx->tokens, ctx->shell);
+	if (cmd == NULL)
+		return (0);
+	ctx->pids[i] = fork();
+	if (ctx->pids[i] < 0)
+	{
+		perror("Fork failed");
+		ctx->shell->last_status = 1;
+		free_cmd(cmd);
+		return (0);
+	}
+	if (ctx->pids[i] == 0)
+		handle_child(ctx, cmd, i);
+	free_cmd(cmd);
+	return (1);
+}
+
+void	finalize_pipeline(t_pipeline_ctx *ctx)
+{
+	close_pipes(ctx->pipes, ctx->nb_pipe);
+	wait_for_children(ctx);
+	free_pipe_array(ctx->pipes, ctx->nb_pipe);
+	free_pid_array(ctx->pids);
+}
+
+void	execute_pipeline(t_shell *shell)
+{
+	t_pipeline_ctx	ctx;
+	int				i;
+
+	initialize_context(&ctx, shell);
+	if (ctx.nb_pipe == 0 || ctx.nb_child == 0)
+		return ;
+	handle_additional_input(&ctx);
+	if (initialize_pipes_and_pids(&ctx) == 0)
+		return ;
 	i = 0;
 	while (ctx.tokens != NULL && i < ctx.nb_child)
 	{
-		cmd = process_command1(&ctx.data, &ctx.tokens, ctx.shell);
-		if (cmd == NULL)
+		if (process_child(&ctx, i) == 0)
 			break ;
-		ctx.pids[i] = fork();
-		if (ctx.pids[i] < 0)
-		{
-			perror("Fork failed");
-			ctx.shell->last_status = 1;
-			break ;
-		}
-		if (ctx.pids[i] == 0)
-			handle_child(&ctx, cmd, i);
-		free_cmd(cmd);
 		i++;
 	}
-	close_pipes(ctx.pipes, ctx.nb_pipe);
-	wait_for_children(&ctx);
-	free_pipe_array(ctx.pipes, ctx.nb_pipe);
-	free_pid_array(ctx.pids);
+	finalize_pipeline(&ctx);
 }
