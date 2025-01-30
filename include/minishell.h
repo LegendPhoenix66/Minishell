@@ -167,7 +167,7 @@ int					handle_heredoc1(t_cmd *cmd, t_list **tokens);
 char				*find_executable(t_shell *shell, const char *command);
 
 // execute_simple_command and simple_cmd_utils
-void				execute_simple_command(t_cmd *cmd, t_shell *shell);
+int					execute_simple_command(t_cmd *cmd, t_shell *shell);
 void				wait_for_child(pid_t pid, int *status, t_shell *shell);
 void				handle_io_redirection(t_cmd *cmd);
 int					handle_fd_error(t_cmd *cmd, int mode);

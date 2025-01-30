@@ -115,36 +115,44 @@ int	handle_fd_error(t_cmd *cmd, int mode)
 	return (fd);
 }
 
-void	execute_simple_command(t_cmd *cmd, t_shell *shell)
+int	manage_child_process(t_cmd *cmd, t_shell *shell)
 {
-	pid_t		pid;
-	int			status;
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		handle_io_redirection(cmd);
+		execute_command(cmd, shell);
+		exit(shell->last_status);
+	}
+	if (pid > 0)
+	{
+		wait_for_child(pid, &status, shell);
+		shell->last_status = WEXITSTATUS(status);
+		return (shell->last_status);
+	}
+	perror("fork failed");
+	shell->last_status = 1;
+	free_cmd(cmd);
+	exit(EXIT_FAILURE);
+}
+
+int	execute_simple_command(t_cmd *cmd, t_shell *shell)
+{
 	t_heredoc	*data;
 
 	data = NULL;
 	if (check_for_heredoc(shell->tokens))
 	{
 		execute_heredoc(data, cmd, shell);
-		return ;
+		return (0);
 	}
 	if (is_builtin(cmd->args[0]))
 	{
 		shell->last_status = execute_builtin(cmd, shell);
-		return ;
+		return (0);
 	}
-	pid = fork();
-	if (pid == 0)
-	{
-		handle_io_redirection(cmd);
-		execute_command(cmd, shell);
-	}
-	else if (pid > 0)
-		wait_for_child(pid, &status, shell);
-	else
-	{
-		perror("fork failed");
-		shell->last_status = 1;
-		free_cmd(cmd);
-		exit(EXIT_FAILURE);
-	}
+	return (manage_child_process(cmd, shell));
 }
