@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 15:06:36 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/30 13:05:05 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 13:29:42 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,37 +30,42 @@ int	count_pipe(t_list **top)
 	return (nb_pipe);
 }
 
-int	**create_pipe_array(int pipe_count)
+void	free_partial_pipe_array(int **pipes, int pipe_idx)
 {
-	int	**pipe_array;
-	int	i;
-
-	if (pipe_count <= 0)
-		return (NULL);
-	pipe_array = (int **)malloc(sizeof(int *) * pipe_count);
-	if (!pipe_array)
-		return (NULL);
-	i = 0;
-	while (i < pipe_count)
+	while (--pipe_idx >= 0)
 	{
-		pipe_array[i] = (int *)malloc(sizeof(int) * 2);
-		if (!pipe_array[i])
-		{
-			while (--i >= 0)
-				free(pipe_array[i]);
-			free(pipe_array);
-			return (NULL);
-		}
-		if (pipe(pipe_array[i]) == -1)
-		{
-			while (i >= 0)
-				free(pipe_array[i]);
-			free(pipe_array);
-			return (NULL);
-		}
-		i++;
+		free(pipes[pipe_idx]);
 	}
-	return (pipe_array);
+	free(pipes);
+}
+
+int	**create_pipe_array(int num_pipes)
+{
+	int	**pipes;
+	int	pipe_idx;
+
+	if (num_pipes <= 0)
+		return (NULL);
+	pipes = (int **)malloc(sizeof(int *) * num_pipes);
+	if (!pipes)
+		return (NULL);
+	pipe_idx = 0;
+	while (pipe_idx < num_pipes)
+	{
+		pipes[pipe_idx] = (int *)malloc(sizeof(int) * 2);
+		if (!pipes[pipe_idx])
+		{
+			free_partial_pipe_array(pipes, pipe_idx);
+			return (NULL);
+		}
+		if (pipe(pipes[pipe_idx]) == -1)
+		{
+			free_partial_pipe_array(pipes, pipe_idx + 1);
+			return (NULL);
+		}
+		pipe_idx++;
+	}
+	return (pipes);
 }
 
 int	count_processes(t_list **tokens)
