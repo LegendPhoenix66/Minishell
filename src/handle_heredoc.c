@@ -89,10 +89,10 @@ t_list	*cmd_after_heredoc(t_list **top)
 	after = NULL;
 	current = *top;
 	if (top == NULL || *top == NULL)
-		return (0);
+		return (NULL);
 	while (current != NULL)
 	{
-		if (ft_strcmp(current->content, "<<") == 0 && current->next)
+		if (ft_strcmp(current->content, "<<") == 0 )
 		{
 			add_token(&after, current->next->content,
 				ft_strlen(current->next->content));
@@ -101,4 +101,20 @@ t_list	*cmd_after_heredoc(t_list **top)
 		current = current->next;
 	}
 	return (after);
+}
+t_list *last_token(t_list **top)
+{
+	t_list *current;
+	t_list *last;
+
+	last = NULL;
+	current = *top;
+	if (top == NULL || *top == NULL)
+		return (NULL);
+	while(current != NULL)
+	{
+		last = current;
+		current = current->next;
+	}
+	return (last);
 }

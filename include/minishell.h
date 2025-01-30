@@ -144,6 +144,7 @@ void				execute_heredoc(t_heredoc *data, t_cmd *cmd,
 						t_shell *shell);
 t_list				*cmd_befor_heredoc(t_list **top);
 t_list				*cmd_after_heredoc(t_list **top);
+t_list				*last_token(t_list **top);
 
 // parse red and pipe
 t_cmd				*parse_command(t_shell *shell, t_list *tokens);
