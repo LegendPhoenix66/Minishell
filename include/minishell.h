@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/29 12:10:00 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 14:01:23 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ typedef enum e_builtin_type
 	BUILTIN_NONE
 }					t_builtin_type;
 
-// for manipulation of environment variable
 typedef struct s_node
 {
 	char			*content;
@@ -121,6 +120,17 @@ typedef struct s_p
 	char			*exec_path;
 	int				ret;
 }					t_p;
+
+typedef struct s_pipeline_ctx
+{
+	t_shell			*shell;
+	t_p				data;
+	t_list			*tokens;
+	int				nb_pipe;
+	int				nb_child;
+	int				**pipes;
+	pid_t			*pids;
+}					t_pipeline_ctx;
 
 // main
 char				*get_input(void);

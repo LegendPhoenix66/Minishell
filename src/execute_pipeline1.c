@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 15:06:36 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/30 13:29:42 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 14:01:03 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,91 +211,10 @@ char	*get_input1(void)
 	return (line);
 }
 
-void	execute_pipeline(t_shell *shell)
+static void	close_pipes(int **pipes, int nb_pipe)
 {
-	t_p			data;
-	t_list		*tokens;
-	t_cmd		*cmd;
-	int			nb_pipe;
-	int			nb_child;
-	int			**pipes;
-	pid_t		*pids;
-	int			i;
-	int			status;
-	const char	*cmd_end;
-	t_list		*new_tokens_end;
-	t_list		*new_current_end;
-	int			j;
+	int	i;
 
-	initialize_pipeline_data(&data);
-	tokens = shell->tokens;
-	nb_pipe = count_pipe(&shell->tokens);
-	nb_child = count_processes(&shell->tokens);
-	i = 0;
-	while (nb_pipe == nb_child && last_is_pipe(&shell->tokens))
-	{
-		cmd_end = get_input1();
-		if (cmd_end == NULL)
-			return ;
-		new_tokens_end = tokenize_input(cmd_end);
-		free((char *)cmd_end);
-		new_current_end = new_tokens_end;
-		while (new_current_end)
-		{
-			add_token(&shell->tokens, new_current_end->content,
-				ft_strlen(new_current_end->content));
-			new_current_end = new_current_end->next;
-		}
-		ft_lstclear(&new_tokens_end, free);
-		nb_pipe = count_pipe(&shell->tokens);
-		nb_child = count_processes(&shell->tokens);
-	}
-	pipes = create_pipe_array(nb_pipe);
-	pids = create_pid_array(nb_child);
-	if (!pipes || !pids)
-	{
-		free_pipe_array(pipes, nb_pipe);
-		free_pid_array(pids);
-		return ;
-	}
-	while (tokens && i < nb_child)
-	{
-		cmd = process_command1(&data, &tokens, shell);
-		if (cmd == NULL)
-			break ;
-		pids[i] = fork();
-		if (pids[i] < 0)
-		{
-			perror("Fork failed");
-			shell->last_status = 1;
-			break ;
-		}
-		if (pids[i] == 0)
-		{
-			if (i == 0)
-			{
-				if (nb_pipe > 0)
-					dup2(pipes[0][1], STDOUT_FILENO);
-			}
-			else if (i == nb_child - 1)
-				dup2(pipes[i - 1][0], STDIN_FILENO);
-			else
-			{
-				dup2(pipes[i - 1][0], STDIN_FILENO);
-				dup2(pipes[i][1], STDOUT_FILENO);
-			}
-			j = 0;
-			while (j < nb_pipe)
-			{
-				close(pipes[j][0]);
-				close(pipes[j][1]);
-				j++;
-			}
-			handle_child_process(&data, cmd, shell);
-		}
-		free_cmd(cmd);
-		i++;
-	}
 	i = 0;
 	while (i < nb_pipe)
 	{
@@ -303,21 +222,106 @@ void	execute_pipeline(t_shell *shell)
 		close(pipes[i][1]);
 		i++;
 	}
+}
+
+static void	wait_for_children(t_pipeline_ctx *ctx)
+{
+	int	i;
+	int	status;
+
 	i = 0;
-	while (i < nb_child)
+	while (i < ctx->nb_child)
 	{
-		waitpid(pids[i], &status, 0);
-		if (i == nb_child - 1)
+		waitpid(ctx->pids[i], &status, 0);
+		if (i == ctx->nb_child - 1)
 		{
 			if (WIFEXITED(status))
-				shell->last_status = WEXITSTATUS(status);
+				ctx->shell->last_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-				shell->last_status = 128 + WTERMSIG(status);
+				ctx->shell->last_status = 128 + WTERMSIG(status);
 			else
-				shell->last_status = 1;
+				ctx->shell->last_status = 1;
 		}
 		i++;
 	}
-	free_pipe_array(pipes, nb_pipe);
-	free_pid_array(pids);
+}
+
+static void	handle_child(t_pipeline_ctx *ctx, t_cmd *cmd, int i)
+{
+	if (i == 0 && ctx->nb_pipe > 0)
+		dup2(ctx->pipes[0][1], STDOUT_FILENO);
+	else if (i == ctx->nb_child - 1)
+		dup2(ctx->pipes[i - 1][0], STDIN_FILENO);
+	else
+	{
+		dup2(ctx->pipes[i - 1][0], STDIN_FILENO);
+		dup2(ctx->pipes[i][1], STDOUT_FILENO);
+	}
+	close_pipes(ctx->pipes, ctx->nb_pipe);
+	handle_child_process(&ctx->data, cmd, ctx->shell);
+	exit(ctx->shell->last_status);
+}
+
+void	execute_pipeline(t_shell *shell)
+{
+	t_pipeline_ctx	ctx;
+	int				i;
+	t_cmd			*cmd;
+	const char		*cmd_end;
+	t_list			*new_tokens_end;
+	t_list			*new_current_end;
+
+	ctx.shell = shell;
+	initialize_pipeline_data(&ctx.data);
+	ctx.tokens = shell->tokens;
+	ctx.nb_pipe = count_pipe(&ctx.tokens);
+	ctx.nb_child = count_processes(&ctx.tokens);
+	while (ctx.nb_pipe == ctx.nb_child && last_is_pipe(&ctx.tokens))
+	{
+		cmd_end = get_input1();
+		if (cmd_end == NULL)
+			return ;
+		new_tokens_end = tokenize_input(cmd_end);
+		free((char *)cmd_end);
+		new_current_end = new_tokens_end;
+		while (new_current_end != NULL)
+		{
+			add_token(&ctx.tokens, new_current_end->content,
+				ft_strlen(new_current_end->content));
+			new_current_end = new_current_end->next;
+		}
+		ft_lstclear(&new_tokens_end, free);
+		ctx.nb_pipe = count_pipe(&ctx.tokens);
+		ctx.nb_child = count_processes(&ctx.tokens);
+	}
+	ctx.pipes = create_pipe_array(ctx.nb_pipe);
+	ctx.pids = create_pid_array(ctx.nb_child);
+	if (ctx.pipes == NULL || ctx.pids == NULL)
+	{
+		free_pipe_array(ctx.pipes, ctx.nb_pipe);
+		free_pid_array(ctx.pids);
+		return ;
+	}
+	i = 0;
+	while (ctx.tokens != NULL && i < ctx.nb_child)
+	{
+		cmd = process_command1(&ctx.data, &ctx.tokens, ctx.shell);
+		if (cmd == NULL)
+			break ;
+		ctx.pids[i] = fork();
+		if (ctx.pids[i] < 0)
+		{
+			perror("Fork failed");
+			ctx.shell->last_status = 1;
+			break ;
+		}
+		if (ctx.pids[i] == 0)
+			handle_child(&ctx, cmd, i);
+		free_cmd(cmd);
+		i++;
+	}
+	close_pipes(ctx.pipes, ctx.nb_pipe);
+	wait_for_children(&ctx);
+	free_pipe_array(ctx.pipes, ctx.nb_pipe);
+	free_pid_array(ctx.pids);
 }
