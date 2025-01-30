@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 19:33:28 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/25 22:51:56 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 21:00:41 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,25 @@ t_cmd	*process_command1(t_p *data, t_list **tokens, t_shell *shell)
 		return (NULL);
 	}
 	return (cmd);
+}
+
+void	execute_pipeline(t_shell *shell)
+{
+	t_pipeline_ctx	ctx;
+	int				i;
+
+	initialize_context(&ctx, shell);
+	if (ctx.nb_pipe == 0 || ctx.nb_child == 0)
+		return ;
+	handle_additional_input(&ctx);
+	if (initialize_pipes_and_pids(&ctx) == 0)
+		return ;
+	i = 0;
+	while (ctx.tokens != NULL && i < ctx.nb_child)
+	{
+		if (process_child(&ctx, i) == 0)
+			break ;
+		i++;
+	}
+	finalize_pipeline(&ctx);
 }

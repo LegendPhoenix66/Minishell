@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 19:55:46 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/06 19:55:46 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/30 21:27:07 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,12 @@ t_shell	*initialize_shell(char **env)
 	init_args(args);
 	args->environ = env;
 	return (args);
+}
+
+int	ft_isspace(int c)
+{
+	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
+		|| c == '\r')
+		return (1);
+	return (0);
 }

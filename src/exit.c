@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 21:50:16 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/29 11:51:07 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 21:27:07 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,6 @@ int	is_numeric_argument(const char *arg)
 		i++;
 	}
 	return (1);
-}
-
-int	ft_isspace(int c)
-{
-	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
-		|| c == '\r')
-		return (1);
-	return (0);
 }
 
 long long	ft_atoll(const char *str)

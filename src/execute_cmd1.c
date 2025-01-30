@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/31 16:10:33 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/29 12:10:00 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 21:23:15 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,4 +97,18 @@ int	execute_builtin(t_cmd *cmd, t_shell *shell)
 		close(saved_stdout);
 	}
 	return (ret);
+}
+
+void	handle_io_redirection(t_cmd *cmd)
+{
+	if (cmd->input_mode == 1 && cmd->input_file)
+	{
+		if (setup_redirection(cmd, 1, STDIN_FILENO) == -1)
+			exit(1);
+	}
+	if (cmd->output_mode)
+	{
+		if (setup_redirection(cmd, 2, STDOUT_FILENO) == -1)
+			exit(1);
+	}
 }

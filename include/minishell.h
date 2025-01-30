@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/30 14:01:23 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/30 21:27:07 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ char				*get_input(void);
 void				set_upsignals(void);
 t_shell				*initialize_shell(char **env);
 size_t				calculate_size(char **elements);
+int					ft_isspace(int c);
 
 // handle heredoc
 t_cmd				*init_cmd(void);
@@ -170,21 +171,27 @@ char				*find_executable(t_shell *shell, const char *command);
 int					execute_simple_command(t_cmd *cmd, t_shell *shell);
 void				wait_for_child(pid_t pid, int *status, t_shell *shell);
 void				handle_io_redirection(t_cmd *cmd);
-int					handle_fd_error(t_cmd *cmd, int mode);
-int					is_executable(const char *path);
-char				*resolve_command_path(t_shell *shell, const char *cmd);
 void				execute_command(t_cmd *cmd, t_shell *shell);
+int					setup_redirection(t_cmd *cmd, int mode, int target_fd);
 
 // execute_pipeline
 void				execute_pipeline(t_shell *shell);
 void				handle_child_process(t_p *data, t_cmd *cmd, t_shell *shell);
 void				initialize_pipeline_data(t_p *data);
 void				process_tokens1(t_list **tokens, t_p *data);
-// int					create_pipe(t_p *data, t_cmd *cmd);
-// void				handle_parent_process(t_p *data, t_shell *shell);
+int					initialize_pipes_and_pids(t_pipeline_ctx *ctx);
 t_cmd				*process_command1(t_p *data, t_list **tokens,
 						t_shell *shell);
 char				*get_input1(void);
+int					process_child(t_pipeline_ctx *ctx, int i);
+void				initialize_context(t_pipeline_ctx *ctx, t_shell *shell);
+void				handle_additional_input(t_pipeline_ctx *ctx);
+
+// finalize_pipeline
+void				close_pipes(int **pipes, int nb_pipe);
+void				free_pipe_array(int **pipe_array, int pipe_count);
+void				free_pid_array(pid_t *pid_array);
+void				finalize_pipeline(t_pipeline_ctx *ctx);
 
 // cd_utils
 char				*get_cd_path(t_shell *shell, t_cmd *cmd);
