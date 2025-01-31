@@ -70,33 +70,33 @@ void	free_message_array(char **messages)
 	messages = NULL;
 }
 
-char	*create_string_from_array(char **messages)
+char	*concat_strings(char *s1, char *s2)
 {
 	char	*result;
 	char	*temp;
+
+	if (!s1)
+		return (ft_strdup(s2));
+	temp = s1;
+	result = ft_strjoin(s1, s2);
+	free(temp);
+	return (result);
+}
+
+char	*create_string_from_array(char **messages)
+{
+	char	*result;
 	int		i;
 
 	result = NULL;
-	temp = NULL;
 	i = 0;
 	if (!messages)
 		return (NULL);
 	while (messages[i])
 	{
+		result = concat_strings(result, messages[i]);
 		if (!result)
-		{
-			result = ft_strdup(messages[i]);
-			if (!result)
-				return (NULL);
-		}
-		else
-		{
-			temp = result;
-			result = ft_strjoin(result, messages[i]);
-			free(temp);
-			if (!result)
-				return (NULL);
-		}
+			return (NULL);
 		i++;
 	}
 	messages[i] = NULL;
@@ -105,11 +105,15 @@ char	*create_string_from_array(char **messages)
 
 void	free_tokens(char **tokens)
 {
+	int	j;
+
 	if (tokens)
 	{
-		for (int j = 0; tokens[j] != NULL; j++)
+		j = 0;
+		while (tokens[j] != NULL)
 		{
 			free(tokens[j]);
+			j++;
 		}
 		free(tokens);
 	}
@@ -125,9 +129,7 @@ char	*process_line(char *input, t_context *ctx)
 	tokens = tokenize_input_test(input);
 	free(input);
 	if (!tokens)
-	{
 		return (NULL);
-	}
 	i = 0;
 	while (tokens[i] != NULL)
 	{
