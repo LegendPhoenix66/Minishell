@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_heredoc2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
+/*   By: drenquin <drenquin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 15:26:11 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/30 13:05:23 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/31 16:46:52 by drenquin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,80 +147,6 @@ char	*process_line(char *input, t_context *ctx)
 	return (result);
 }
 
-char	**create_message_array(char *delimiter, t_shell *shell)
-{
-	char		**messages;
-	int			capacity;
-	int			size;
-	t_context	*ctx;
-	char		*input;
-	char		*processed_input;
-	char		**temp;
-
-	messages = NULL;
-	capacity = 10;
-	size = 0;
-	ctx = init_context(shell);
-	if (!ctx)
-	{
-		return (NULL);
-	}
-	messages = malloc(sizeof(char *) * (capacity + 1));
-	if (!messages)
-	{
-		free_context(ctx);
-		return (NULL);
-	}
-	messages[0] = NULL;
-	while (1)
-	{
-		input = get_input1();
-		if (!input)
-		{
-			free_message_array(messages);
-			free_context(ctx);
-			return (NULL);
-		}
-		if (ft_strcmp(input, delimiter) == 0)
-		{
-			free(input);
-			break ;
-		}
-		processed_input = process_line(input, ctx);
-		if (!processed_input)
-		{
-			free_message_array(messages);
-			free_context(ctx);
-			return (NULL);
-		}
-		if (size >= capacity)
-		{
-			capacity *= 2;
-			temp = realloc(messages, sizeof(char *) * (capacity + 1));
-			if (!temp)
-			{
-				free(processed_input);
-				free_message_array(messages);
-				free_context(ctx);
-				return (NULL);
-			}
-			messages = temp;
-		}
-		messages[size] = ft_strjoin(processed_input, "\n");
-		free(processed_input);
-		if (!messages[size])
-		{
-			free_message_array(messages);
-			free_context(ctx);
-			return (NULL);
-		}
-		size++;
-		messages[size] = NULL;
-	}
-	free_context(ctx);
-	return (messages);
-}
-
 t_context	*init_context(t_shell *shell)
 {
 	t_context	*ctx;
@@ -258,15 +184,27 @@ void	free_context(t_context *ctx)
 	free(ctx);
 }
 
+void	write_messages(t_heredoc *data, char **messages)
+{
+	int	i;
+
+	i = 0;
+	while (messages[i])
+	{
+		write(data->pipe_fd[1], messages[i], strlen(messages[i]));
+		i++;
+	}
+	free_message_array(messages);
+	close(data->pipe_fd[1]);
+}
+
 void	write_and_wait(t_heredoc *data, t_shell *shell)
 {
 	char	*delimiter;
 	char	**messages;
 	t_list	*process;
 	t_list	*check_last;
-	int		i;
 
-	i = 0;
 	check_last = last_token(&shell->tokens);
 	if (ft_strcmp(check_last->content, "<<") == 0)
 	{
@@ -279,14 +217,8 @@ void	write_and_wait(t_heredoc *data, t_shell *shell)
 	messages = create_message_array(delimiter, shell);
 	if (messages == NULL)
 		return ;
-	while (messages[i])
-	{
-		write(data->pipe_fd[1], messages[i], strlen(messages[i]));
-		i++;
-	}
-	free_message_array(messages);
+	write_messages(data, messages);
 	ft_lstclear(&process, free);
-	close(data->pipe_fd[1]);
 	waitpid(data->process_pid, NULL, 0);
 }
 
