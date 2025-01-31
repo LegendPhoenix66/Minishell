@@ -67,55 +67,116 @@ void	free_message_array(char **messages)
 		i++;
 	}
 	free(messages);
+	messages = NULL;
 }
 
-int	find_index(char *input)
+char	*create_string_from_array(char **messages)
 {
-	int	i;
+	char	*result;
+	char	*temp;
+	int		i;
 
+	result = NULL;
+	temp = NULL;
 	i = 0;
-	if (input[0] == '$')
-		return (0);
-	while (input[i] != '$' && input[i] != '\0')
+	if (!messages)
+		return (NULL);
+	while (messages[i])
+	{
+		if (!result)
+		{
+			result = ft_strdup(messages[i]);
+			if (!result)
+				return (NULL);
+		}
+		else
+		{
+			temp = result;
+			result = ft_strjoin(result, messages[i]);
+			free(temp);
+			if (!result)
+				return (NULL);
+		}
 		i++;
-	if (input[i] == '$')
-		return (i);
-	if (input[i] == '\0')
-		return (-1);
-	return (-1);
+	}
+	messages[i] = NULL;
+	return (result);
+}
+
+void	free_tokens(char **tokens)
+{
+	if (tokens)
+	{
+		for (int j = 0; tokens[j] != NULL; j++)
+		{
+			free(tokens[j]);
+		}
+		free(tokens);
+	}
+}
+
+char	*process_line(char *input, t_context *ctx)
+{
+	char	**tokens;
+	int		i;
+	int		index;
+	char	*result;
+
+	tokens = tokenize_input_test(input);
+	free(input);
+	if (!tokens)
+	{
+		return (NULL);
+	}
+	i = 0;
+	while (tokens[i] != NULL)
+	{
+		if (tokens[i][0] == '$' && tokens[i][1] != '\0' && tokens[i][1] != '$')
+		{
+			index = find_index(tokens[i]);
+			process_variable_substitution(tokens[i], &index, ctx);
+			free(tokens[i]);
+			tokens[i] = *ctx->new_content;
+		}
+		i++;
+	}
+	result = create_string_from_array(tokens);
+	free_tokens(tokens);
+	return (result);
 }
 
 char	**create_message_array(char *delimiter, t_shell *shell)
 {
-	char		*input;
 	char		**messages;
 	int			capacity;
 	int			size;
 	t_context	*ctx;
-	int			index;
+	char		*input;
+	char		*processed_input;
+	char		**temp;
 
-	size = 0;
+	messages = NULL;
 	capacity = 10;
+	size = 0;
 	ctx = init_context(shell);
 	if (!ctx)
+	{
 		return (NULL);
+	}
 	messages = malloc(sizeof(char *) * (capacity + 1));
 	if (!messages)
+	{
+		free_context(ctx);
 		return (NULL);
+	}
 	messages[0] = NULL;
 	while (1)
 	{
 		input = get_input1();
-		index = find_index(input);
-		if (index != -1)
-		{
-			process_variable_substitution(input, &index, ctx);
-			free(input);
-			input = *ctx->new_content;
-		}
 		if (!input)
 		{
 			free_message_array(messages);
+			free_context(ctx);
 			return (NULL);
 		}
 		if (ft_strcmp(input, delimiter) == 0)
@@ -123,27 +184,36 @@ char	**create_message_array(char *delimiter, t_shell *shell)
 			free(input);
 			break ;
 		}
+		processed_input = process_line(input, ctx);
+		if (!processed_input)
+		{
+			free_message_array(messages);
+			free_context(ctx);
+			return (NULL);
+		}
 		if (size >= capacity)
 		{
 			capacity *= 2;
-			ft_realloc((void **)&messages, sizeof(char *) * (capacity / 2 + 1),
-				sizeof(char *) * (capacity + 1));
-			if (!messages)
+			temp = realloc(messages, sizeof(char *) * (capacity + 1));
+			if (!temp)
 			{
-				free(input);
+				free(processed_input);
+				free_message_array(messages);
+				free_context(ctx);
 				return (NULL);
 			}
+			messages = temp;
 		}
-		messages[size] = ft_strjoin(input, "\n");
+		messages[size] = ft_strjoin(processed_input, "\n");
+		free(processed_input);
 		if (!messages[size])
 		{
-			free(input);
 			free_message_array(messages);
+			free_context(ctx);
 			return (NULL);
 		}
 		size++;
 		messages[size] = NULL;
-		free(input);
 	}
 	free_context(ctx);
 	return (messages);

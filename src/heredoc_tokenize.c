@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-int	find_var_end(const char *str, int start)
+int	find_var_end(char *str, int start)
 {
 	int	i;
 
@@ -23,7 +23,7 @@ int	find_var_end(const char *str, int start)
 	return (i);
 }
 
-static char	*get_next_token(const char *input, int *i, int len)
+static char	*get_next_token(char *input, int *i, int len)
 {
 	int	start;
 
@@ -49,7 +49,7 @@ static void	free_tokens(char **tokens, int token_count)
 	free(tokens);
 }
 
-static char	**allocate_and_tokenize(const char *input, int len,
+static char	**allocate_and_tokenize(char *input, int len,
 		int *token_count)
 {
 	char	**tokens;
@@ -73,7 +73,7 @@ static char	**allocate_and_tokenize(const char *input, int len,
 	return (tokens);
 }
 
-char	**tokenize_input_test(const char *input)
+char	**tokenize_input_test(char *input)
 {
 	int		len;
 	int		token_count;

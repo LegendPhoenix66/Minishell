@@ -25,11 +25,6 @@ static int	handle_token(t_cmd *cmd, t_list **tokens, int *status,
 		*status = handle_output(cmd, tokens);
 	else if (ft_strcmp(token, ">>") == 0)
 		*status = handle_append(cmd, tokens);
-	else if (ft_strcmp(token, "<<") == 0)
-	{
-		printf("handle token go to handle heredoc\n");
-		*status = handle_heredoc1(cmd, tokens);
-	}
 	else
 	{
 		add_arg(cmd, token, shell);

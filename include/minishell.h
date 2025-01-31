@@ -144,18 +144,17 @@ t_cmd				*init_cmd(void);
 void				free_cmd(t_cmd *cmd);
 int					is_builtin(char *token);
 void				add_arg(t_cmd *cmd, char *arg, t_shell *shell);
-void				handle_heredoc(t_cmd *cmd, char *delimiter);
 int					ft_strcmp(char *str1, char *str2);
-int					setup_heredoc_pipe(int pipe_fd[2]);
-void				process_heredoc_input(int fd, char *delimiter);
-void				write_heredoc_line(int fd, const char *line);
-int					process_heredoc_line(char *line, char *delimiter, int fd);
 int					check_for_heredoc(t_list *tokens);
 void				execute_heredoc(t_heredoc *data, t_cmd *cmd,
 						t_shell *shell);
 t_list				*cmd_befor_heredoc(t_list **top);
 t_list				*cmd_after_heredoc(t_list **top);
 t_list				*last_token(t_list **top);
+int					find_index(char *input);
+char				**tokenize_input1(char *input);
+int					find_var_end(char *str, int start);
+char				**tokenize_input_test(char *input);
 
 // parse red and pipe
 t_cmd				*parse_command(t_shell *shell, t_list *tokens);

@@ -77,6 +77,5 @@ int	handle_heredoc1(t_cmd *cmd, t_list **tokens)
 		return (0);
 	}
 	cmd->input_mode = 2;
-	handle_heredoc(cmd, (*tokens)->content);
 	return (1);
 }
