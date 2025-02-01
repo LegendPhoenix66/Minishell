@@ -6,7 +6,7 @@
 /*   By: drenquin <drenquin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 15:26:11 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/31 16:46:52 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/02/01 10:36:37 by drenquin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,37 @@ void	free_tokens(char **tokens)
 }
 
 char	*process_line(char *input, t_context *ctx)
+
+{
+	char	**tokens;
+	int		i;
+	char	*result;
+
+	tokens = tokenize_input_test(input);
+	free(input);
+	if (!tokens)
+		return (NULL);
+	i = 0;
+	while (tokens[i] != NULL)
+	{
+		if (tokens[i][0] == '$' && tokens[i][1] != '\0' && tokens[i][1] != '$')
+		{
+			char *variable = get_node(&ctx->shell->env, tokens[i] + 1);
+			free(tokens[i]);
+			tokens[i] = NULL;
+			if (variable != NULL)
+				tokens[i] = ft_strdup(variable);
+			else
+				tokens[i] = ft_strdup("");
+		}
+		i++;
+	}
+	result = create_string_from_array(tokens);
+	free_tokens(tokens);
+	return (result);
+}
+
+/*char	*process_line(char *input, t_context *ctx)
 {
 	char	**tokens;
 	int		i;
@@ -133,7 +164,8 @@ char	*process_line(char *input, t_context *ctx)
 	i = 0;
 	while (tokens[i] != NULL)
 	{
-		if (tokens[i][0] == '$' && tokens[i][1] != '\0' && tokens[i][1] != '$')
+		if (tokens[i][0] == '$' && tokens[i][1] != '\0' && tokens[i][1] != '$' &&
+				 get_node(&ctx->shell->env, tokens[i] + 1) != NULL)
 		{
 			index = find_index(tokens[i]);
 			process_variable_substitution(tokens[i], &index, ctx);
@@ -145,7 +177,8 @@ char	*process_line(char *input, t_context *ctx)
 	result = create_string_from_array(tokens);
 	free_tokens(tokens);
 	return (result);
-}
+}*/
+
 
 t_context	*init_context(t_shell *shell)
 {

@@ -3,124 +3,126 @@
 /*                                                        :::      ::::::::   */
 /*   create_msg_array.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
+/*   By: drenquin <drenquin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:44:47 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/31 17:25:30 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/01 07:36:35 by drenquin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-typedef struct s_input_data
+static void *cleanup_and_exit(char **messages, t_context *ctx)
 {
-	char		**message_array;
-	int			size;
-	int			capacity;
-	t_context	*context;
-}				t_input_data;
-
-static char	**resize_message_array(char **messages, int *capacity)
-{
-	char	**new_messages;
-
-	*capacity *= 2;
-	new_messages = realloc(messages, sizeof(char *) * (*capacity + 1));
-	return (new_messages);
+    if (messages)
+        free_message_array(messages);
+    if (ctx)
+        free_context(ctx);
+    return (NULL);
 }
 
-int	resize_if_needed(char ***message_array, int size, int *capacity)
+static void *cleanup_and_exit1(char **messages, t_context *ctx, char *str)
 {
-	char	**resized_array;
-
-	if (size >= *capacity)
-	{
-		*capacity += 10;
-		resized_array = resize_message_array(*message_array, capacity);
-		if (!resized_array)
-		{
-			return (0);
-		}
-		*message_array = resized_array;
-	}
-	return (1);
+	if (str)
+		free(str);
+    if (messages)
+        free_message_array(messages);
+    if (ctx)
+        free_context(ctx);
+    return (NULL);
 }
 
-static int	handle_heredoc_input(t_input_data *data, char *user_input)
+static char **expand_messages_array(char **messages, int size,
+                                  t_context *ctx, char *processed_input)
 {
-	char	*processed_input;
+    char    **new_messages;
+    int     old_capacity;
+    int     new_capacity;
+    int     i;
 
-	processed_input = process_line(user_input, data->context);
-	if (!processed_input)
-	{
-		return (0);
-	}
-	if (!resize_if_needed(&data->message_array, data->size, &data->capacity))
-	{
-		free(processed_input);
-		return (0);
-	}
-	data->message_array[data->size] = ft_strjoin(processed_input, "\n");
-	free(processed_input);
-	if (!data->message_array[data->size])
-	{
-		return (0);
-	}
-	data->size++;
-	data->message_array[data->size] = NULL;
-	return (1);
+    if (size == 0)
+        old_capacity = 10;
+    else
+        old_capacity = size * 2;
+    new_capacity = old_capacity * 2;
+    new_messages = malloc(sizeof(char *) * (new_capacity + 1));
+    if (!new_messages)
+        return (cleanup_and_exit1(messages, ctx, processed_input));
+    i = 0;
+    while (i < size && messages[i])
+    {
+        new_messages[i] = messages[i];
+        i++;
+    }
+    while (i <= new_capacity)
+        new_messages[i++] = NULL;
+    free(messages);
+    return (new_messages);
 }
 
-static int	process_input_loop(t_input_data *data, char *delimiter)
+char **short_loop(char **messages, int *size, t_context *ctx,
+	char *processed_input)
 {
-	char	*user_input;
-	int		result;
-
-	while (1)
-	{
-		user_input = get_input1();
-		if (!user_input)
-		{
-			return (0);
-		}
-		if (ft_strcmp(user_input, delimiter) == 0)
-		{
-			free(user_input);
-			return (2);
-		}
-		result = handle_heredoc_input(data, user_input);
-		if (result == 0)
-		{
-			return (0);
-		}
-	}
+	  if (*size >= 10)
+        {
+            messages = expand_messages_array(messages, *size, ctx,
+                                          processed_input);
+            if (!messages)
+                return (NULL);
+        }
+		return (messages);
 }
 
-char	**create_message_array(char *delimiter, t_shell *shell)
+static char    **process_message_loop(char **messages, int *size,
+                                    t_context *ctx, char *delimiter)
 {
-	t_input_data	data;
-	int				result;
+    char    *input;
+    char    *processed_input;
 
-	data.context = init_context(shell);
-	if (!data.context)
-	{
-		return (NULL);
-	}
-	data.capacity = 10;
-	data.size = 0;
-	data.message_array = malloc(sizeof(char *) * (data.capacity + 1));
-	if (!data.message_array)
-	{
-		free_context(data.context);
-		return (NULL);
-	}
-	data.message_array[0] = NULL;
-	result = process_input_loop(&data, delimiter);
-	free_context(data.context);
-	if (result == 0)
-	{
-		free_message_array(data.message_array);
-		return (NULL);
-	}
-	return (data.message_array);
+    while (1)
+    {
+        input = get_input1();
+        if (!input)
+            return (cleanup_and_exit(messages, ctx));
+        if (ft_strcmp(input, delimiter) == 0)
+        {
+            free(input);
+            return (messages);
+        }
+        processed_input = process_line(input, ctx);
+        if (!processed_input)
+            return (cleanup_and_exit(messages, ctx));
+		messages = short_loop(messages, size, ctx, processed_input);
+        messages[*size] = ft_strjoin(processed_input, "\n");
+        free(processed_input);
+        if (!messages[*size])
+            return (cleanup_and_exit(messages, ctx));
+        (*size)++;
+        messages[*size] = NULL;
+    }
+    return (messages);
+}
+
+char    **create_message_array(char *delimiter, t_shell *shell)
+{
+    char        **messages;
+    t_context   *ctx;
+    int         size;
+
+    messages = NULL;
+    size = 0;
+    ctx = init_context(shell);
+    if (!ctx)
+        return (NULL);
+    messages = malloc(sizeof(char *) * (11));
+    if (!messages)
+    {
+        free_context(ctx);
+        return (NULL);
+    }
+    messages[0] = NULL;
+    messages = process_message_loop(messages, &size, ctx,
+		delimiter);
+    free_context(ctx);
+    return (messages);
 }
