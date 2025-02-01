@@ -3,17 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   handle_heredoc2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <drenquin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 15:26:11 by drenquin          #+#    #+#             */
-/*   Updated: 2025/02/01 10:36:37 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/02/01 10:42:42 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-t_context	*init_context(t_shell *shell);
-void		free_context(t_context *ctx);
 
 t_heredoc	*init_pipe_data(void)
 {
@@ -120,11 +117,11 @@ void	free_tokens(char **tokens)
 }
 
 char	*process_line(char *input, t_context *ctx)
-
 {
 	char	**tokens;
 	int		i;
 	char	*result;
+	char	*variable;
 
 	tokens = tokenize_input_test(input);
 	free(input);
@@ -135,7 +132,7 @@ char	*process_line(char *input, t_context *ctx)
 	{
 		if (tokens[i][0] == '$' && tokens[i][1] != '\0' && tokens[i][1] != '$')
 		{
-			char *variable = get_node(&ctx->shell->env, tokens[i] + 1);
+			variable = get_node(&ctx->shell->env, tokens[i] + 1);
 			free(tokens[i]);
 			tokens[i] = NULL;
 			if (variable != NULL)
@@ -150,40 +147,8 @@ char	*process_line(char *input, t_context *ctx)
 	return (result);
 }
 
-/*char	*process_line(char *input, t_context *ctx)
-{
-	char	**tokens;
-	int		i;
-	int		index;
-	char	*result;
-
-	tokens = tokenize_input_test(input);
-	free(input);
-	if (!tokens)
-		return (NULL);
-	i = 0;
-	while (tokens[i] != NULL)
-	{
-		if (tokens[i][0] == '$' && tokens[i][1] != '\0' && tokens[i][1] != '$' &&
-				 get_node(&ctx->shell->env, tokens[i] + 1) != NULL)
-		{
-			index = find_index(tokens[i]);
-			process_variable_substitution(tokens[i], &index, ctx);
-			free(tokens[i]);
-			tokens[i] = *ctx->new_content;
-		}
-		i++;
-	}
-	result = create_string_from_array(tokens);
-	free_tokens(tokens);
-	return (result);
-}*/
-
-
 t_context	*init_context(t_shell *shell)
 {
-	t_context	*ctx;
-
 	ctx = (t_context *)malloc(sizeof(t_context));
 	if (!ctx)
 		return (NULL);

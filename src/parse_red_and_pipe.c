@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parse_red_and_pipe.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <drenquin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 20:36:15 by drenquin          #+#    #+#             */
-/*   Updated: 2025/02/01 03:19:16 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/02/01 10:43:47 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static int is_redirection(char *token)
+static int	is_redirection(char *token)
 {
 	if (ft_strcmp(token, "<") == 0)
 		return (1);

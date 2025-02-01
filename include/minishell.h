@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drenquin <drenquin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/02/01 00:51:45 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/02/01 10:43:12 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,12 +155,12 @@ int					find_index(char *input);
 char				**tokenize_input1(char *input);
 int					find_var_end(char *str, int start);
 char				**tokenize_input_test(char *input);
-t_context	*init_context(t_shell *shell);
-void	free_context(t_context *ctx);
-void	free_message_array(char **messages);
-char	*process_line(char *input, t_context *ctx);
-char	**create_message_array(char *delimiter, t_shell *shell);
-char	*create_string_from_array(char **messages);
+t_context			*init_context(t_shell *shell);
+void				free_context(t_context *ctx);
+void				free_message_array(char **messages);
+char				*process_line(char *input, t_context *ctx);
+char				**create_message_array(char *delimiter, t_shell *shell);
+char				*create_string_from_array(char **messages);
 
 // parse red and pipe
 t_cmd				*parse_command(t_shell *shell, t_list *tokens);
