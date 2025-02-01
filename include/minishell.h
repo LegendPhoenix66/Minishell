@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/02/01 10:43:12 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/01 11:09:40 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,11 +156,19 @@ char				**tokenize_input1(char *input);
 int					find_var_end(char *str, int start);
 char				**tokenize_input_test(char *input);
 t_context			*init_context(t_shell *shell);
+t_heredoc			*init_pipe_data(void);
 void				free_context(t_context *ctx);
+void				free_tokens(char **tokens);
 void				free_message_array(char **messages);
+int					start_process(t_heredoc *data, t_cmd *cmd, t_shell *shell);
 char				*process_line(char *input, t_context *ctx);
 char				**create_message_array(char *delimiter, t_shell *shell);
 char				*create_string_from_array(char **messages);
+void				write_and_wait(t_heredoc *data, t_shell *shell);
+void				write_nothing(t_shell *shell);
+void				*cleanup_and_exit(char **messages, t_context *ctx);
+void				*cleanup_and_exit1(char **messages, t_context *ctx,
+						char *str);
 
 // parse red and pipe
 t_cmd				*parse_command(t_shell *shell, t_list *tokens);
@@ -226,7 +234,7 @@ void				free_lst(t_node *top);
 void				add_node(t_node **top, const char *env);
 char				*get_node(t_node **top, const char *var_name);
 
-// tokenize fonctions
+// tokenize functions
 void				error(const char *msg);
 t_list				*add_token(t_list **list, const char *token, int length);
 t_list				*tokenize_input(const char *input);

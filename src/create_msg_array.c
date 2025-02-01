@@ -12,26 +12,6 @@
 
 #include "../include/minishell.h"
 
-static void	*cleanup_and_exit(char **messages, t_context *ctx)
-{
-	if (messages)
-		free_message_array(messages);
-	if (ctx)
-		free_context(ctx);
-	return (NULL);
-}
-
-static void	*cleanup_and_exit1(char **messages, t_context *ctx, char *str)
-{
-	if (str)
-		free(str);
-	if (messages)
-		free_message_array(messages);
-	if (ctx)
-		free_context(ctx);
-	return (NULL);
-}
-
 static char	**expand_messages_array(char **messages, int size, t_context *ctx,
 		char *processed_input)
 {

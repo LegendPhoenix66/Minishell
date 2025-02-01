@@ -36,7 +36,7 @@ static char	*get_next_token(char *input, int *i, int len)
 	return (ft_substr(input, start, *i - start));
 }
 
-static void	free_tokens(char **tokens, int token_count)
+static void	free_local_tokens(char **tokens, int token_count)
 {
 	int	j;
 
@@ -65,7 +65,7 @@ static char	**allocate_and_tokenize(char *input, int len,
 		token = get_next_token(input, &i, len);
 		if (!token)
 		{
-			free_tokens(tokens, *token_count);
+			free_local_tokens(tokens, *token_count);
 			return (NULL);
 		}
 		tokens[(*token_count)++] = token;
