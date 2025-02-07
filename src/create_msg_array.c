@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 16:44:47 by drenquin          #+#    #+#             */
-/*   Updated: 2025/02/01 10:42:07 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:19:05 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static char	**expand_messages_array(char **messages, int size, t_context *ctx,
 	return (new_messages);
 }
 
-char	**short_loop(char **messages, int *size, t_context *ctx,
+char	**short_loop(char **messages, const int *size, t_context *ctx,
 		char *processed_input)
 {
 	if (*size >= 10)
@@ -79,7 +79,6 @@ static char	**process_message_loop(char **messages, int *size, t_context *ctx,
 		(*size)++;
 		messages[*size] = NULL;
 	}
-	return (messages);
 }
 
 char	**create_message_array(char *delimiter, t_shell *shell)

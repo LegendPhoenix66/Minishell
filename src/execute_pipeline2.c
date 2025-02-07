@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 20:36:10 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/30 20:56:42 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 19:48:14 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,5 +109,4 @@ void	initialize_pipeline_data(t_p *data)
 	data->fd = -1;
 	data->exec_path = NULL;
 	data->ret = 0;
-	data->status = 0;
 }

@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 21:50:16 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/30 21:27:07 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:15:32 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	is_out_of_range(const char *arg)
 	}
 	else if (*arg == '+')
 		arg++;
-	input_len = strlen(arg);
+	input_len = ft_strlen(arg);
 	if (sign == 1)
 		long_str = long_max_str;
 	else
@@ -108,6 +108,6 @@ int	builtin_exit(t_shell *shell, t_cmd *cmd)
 		shell->exit = 2;
 		return (2);
 	}
-	shell->exit = ft_atoll(arg) % 256;
+	shell->exit = (int)(ft_atoll(arg) % 256);
 	return (shell->exit);
 }

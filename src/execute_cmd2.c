@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 16:18:30 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/24 11:21:19 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:21:02 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,6 @@ t_cmd	*init_cmd(void)
 	cmd->args = NULL;
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
-	cmd->input_fd = 0;
-	cmd->output_fd = 1;
 	cmd->input_mode = 0;
 	cmd->output_mode = 0;
 	return (cmd);

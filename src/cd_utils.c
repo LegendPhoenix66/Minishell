@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 18:23:35 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/27 14:30:40 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:21:06 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,4 @@ void	update_directory(t_shell *shell)
 	add_node(&shell->env, pwd);
 	free(pwd);
 	shell->last_status = 0;
-}
-
-int	set_error(t_shell *shell, int status)
-{
-	shell->last_status = status;
-	return (status);
 }

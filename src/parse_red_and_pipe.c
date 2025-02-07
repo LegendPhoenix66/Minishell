@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 20:36:15 by drenquin          #+#    #+#             */
-/*   Updated: 2025/02/01 10:43:47 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 19:57:06 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,7 @@ static int	process_tokens(t_cmd *cmd, t_list **tokens, t_shell *shell)
 			break ;
 		if (is_first && is_redirection(token))
 			return (0);
-		if (!handle_token(cmd, tokens, &status, shell))
-			return (0);
+		handle_token(cmd, tokens, &status, shell);
 		if (!status)
 			return (0);
 		*tokens = (*tokens)->next;

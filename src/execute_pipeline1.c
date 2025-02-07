@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/25 15:06:36 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/30 21:01:26 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:20:56 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	handle_additional_input(t_pipeline_ctx *ctx)
 		while (current_token != NULL)
 		{
 			add_token(&ctx->tokens, current_token->content,
-				ft_strlen(current_token->content));
+				(int)ft_strlen(current_token->content));
 			current_token = current_token->next;
 		}
 		ft_lstclear(&new_tokens_end, free);

@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 22:09:03 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/25 22:45:03 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:19:05 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	append_to_new_content(char **new_content, int *output_index,
 	if (!*new_content)
 		return ;
 	ft_memcpy(&(*new_content)[*output_index], str, len);
-	*output_index += len;
+	*output_index += (int)len;
 	(*new_content)[*output_index] = '\0';
 }
 

@@ -6,13 +6,13 @@
 /*   By: lhopp <lhopp@student.1337.ma>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 12:36:11 by lhopp             #+#    #+#             */
-/*   Updated: 2025/01/31 12:36:32 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:19:05 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	find_var_end(char *str, int start)
+int	find_var_end(const char *str, int start)
 {
 	int	i;
 
@@ -79,7 +79,7 @@ char	**tokenize_input_test(char *input)
 	int		token_count;
 	char	**tokens;
 
-	len = strlen(input);
+	len = (int)ft_strlen(input);
 	token_count = 0;
 	tokens = allocate_and_tokenize(input, len, &token_count);
 	if (tokens)

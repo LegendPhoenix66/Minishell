@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 22:08:55 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/21 10:31:53 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:20:23 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	process_token_line(const char *token_content,
 	}
 	if (current_index > last_special_char_pos + 1)
 		add_token(tokens_with_pipes, token_content + last_special_char_pos + 1,
-			ft_strlen(token_content) - last_special_char_pos - 1);
+			(int)ft_strlen(token_content) - last_special_char_pos - 1);
 }
 
 void	correct_pipes_and_redirects(t_list **parsed_tokens)

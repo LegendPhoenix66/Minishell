@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.1337.ma>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 11:02:51 by lhopp             #+#    #+#             */
-/*   Updated: 2025/02/01 11:02:51 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:02:46 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	write_messages(t_heredoc *data, char **messages)
 	i = 0;
 	while (messages[i])
 	{
-		write(data->pipe_fd[1], messages[i], strlen(messages[i]));
+		write(data->pipe_fd[1], messages[i], ft_strlen(messages[i]));
 		i++;
 	}
 	free_message_array(messages);

@@ -6,7 +6,7 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/16 19:30:38 by lhopp             #+#    #+#             */
-/*   Updated: 2025/02/01 11:09:40 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:21:17 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,30 +25,12 @@
 # include <unistd.h>
 # define COLOR_RESET "\033[0m"
 # define COLOR_GREEN "\033[0;32m"
-# define ERR_INVALID_IDENTIFIER "minishell: export: `%s': not valid\n"
 # define MAX_FD 1024
-
-typedef enum e_dir
-{
-	STDOUT,
-	APPEND,
-	STDIN,
-	HEREDOC,
-	NO_DIR
-}					t_dir;
-
-typedef struct s_redir
-{
-	pid_t			pid;
-	char			*delimiter;
-	int				fd[2];
-}					t_redir;
 
 typedef struct s_heredoc
 {
 	int				pipe_fd[2];
 	pid_t			process_pid;
-	char			*delimiter;
 }					t_heredoc;
 
 typedef struct s_cmd
@@ -56,9 +38,6 @@ typedef struct s_cmd
 	char			**args;
 	char			*input_file;
 	char			*output_file;
-	char			*delimiter;
-	int				input_fd;
-	int				output_fd;
 	int				input_mode;
 	int				output_mode;
 }					t_cmd;
@@ -78,12 +57,6 @@ typedef enum e_builtin_type
 typedef struct s_node
 {
 	char			*content;
-	int				in_single;
-	int				in_double;
-	int				no_quotes;
-	int				is_cmd;
-	int				is_out;
-	t_dir			type;
 	struct s_node	*next;
 }					t_node;
 
@@ -95,9 +68,6 @@ typedef struct s_shell
 	char			*current_directory;
 	t_list			*tokens;
 	t_node			*export;
-	int				saved_stdin;
-	int				saved_stdout;
-	t_redir			*redirections;
 	int				last_status;
 }					t_shell;
 
@@ -110,9 +80,6 @@ typedef struct s_context
 
 typedef struct s_p
 {
-	int				pipefd[2];
-	pid_t			pid;
-	int				status;
 	int				input_fd;
 	int				is_last_command;
 	int				saved_stdin;
@@ -148,12 +115,10 @@ int					ft_strcmp(char *str1, char *str2);
 int					check_for_heredoc(t_list *tokens);
 void				execute_heredoc(t_heredoc *data, t_cmd *cmd,
 						t_shell *shell);
-t_list				*cmd_befor_heredoc(t_list **top);
 t_list				*cmd_after_heredoc(t_list **top);
 t_list				*last_token(t_list **top);
-int					find_index(char *input);
-char				**tokenize_input1(char *input);
-int					find_var_end(char *str, int start);
+
+int					find_var_end(const char *str, int start);
 char				**tokenize_input_test(char *input);
 t_context			*init_context(t_shell *shell);
 t_heredoc			*init_pipe_data(void);
@@ -175,7 +140,6 @@ t_cmd				*parse_command(t_shell *shell, t_list *tokens);
 int					handle_input(t_cmd *cmd, t_list **tokens);
 int					handle_output(t_cmd *cmd, t_list **tokens);
 int					handle_append(t_cmd *cmd, t_list **tokens);
-int					handle_heredoc1(t_cmd *cmd, t_list **tokens);
 
 // find executable
 char				*find_executable(t_shell *shell, const char *command);
@@ -210,7 +174,6 @@ void				finalize_pipeline(t_pipeline_ctx *ctx);
 char				*get_cd_path(t_shell *shell, t_cmd *cmd);
 int					execute_cd(char *path, t_shell *shell);
 void				update_directory(t_shell *shell);
-int					set_error(t_shell *shell, int status);
 
 // export_utils
 int					check_in(char *var, t_shell *shell);
@@ -224,7 +187,6 @@ char				*get_next_line(int fd);
 void				append_line(char **line, const char *buffer);
 
 // linked_utils and linked_utils1
-int					count_node(t_list **top);
 t_node				*init_lst(void);
 void				print_lst(t_node **top);
 t_node				*copy_list(t_node *original);
@@ -252,14 +214,10 @@ char				*clean_arg(char *token, t_shell *shell);
 
 // parse_input
 void				parse_input(char *input, t_shell *shell);
-char				*find_command_in_path(t_shell *shell, char *cmd);
 
 // execute_cmd
 void				execute_command1(t_shell *shell);
 int					execute_builtin(t_cmd *cmd, t_shell *shell);
-
-// print_export
-void				print_export(t_shell **args);
 
 // builtins
 int					builtin_echo(t_cmd *cmd);

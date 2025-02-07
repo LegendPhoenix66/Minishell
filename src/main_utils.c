@@ -6,7 +6,7 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 19:55:46 by drenquin          #+#    #+#             */
-/*   Updated: 2025/01/30 21:27:07 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/02/07 20:20:39 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	init_args(t_shell *args)
 	args->current_directory = getcwd(NULL, 0);
 	args->tokens = NULL;
 	args->export = NULL;
-	args->redirections = NULL;
 	args->last_status = 0;
 }
 
