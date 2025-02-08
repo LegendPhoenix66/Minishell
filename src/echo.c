@@ -3,32 +3,65 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lhopp <lhopp@student.42luxembourg.lu>      +#+  +:+       +#+        */
+/*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 15:50:15 by lhopp             #+#    #+#             */
-/*   Updated: 2024/12/01 15:50:20 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/29 12:10:00 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void builtin_echo(const t_list *tokens)
+int	builtin_echo(t_cmd *cmd)
 {
-	int newline = 1;
-	// Check for the -n flag
-	if (tokens && strcmp(tokens->content, "-n") == 0)
+	int	i;
+	int	newline;
+
+	i = 1;
+	newline = 1;
+	while (cmd->args[i] && !ft_strncmp(cmd->args[i], "-n", ft_strlen("-n") + 1))
 	{
 		newline = 0;
-		tokens = tokens->next; // Move to the next flag if any
+		i++;
 	}
-	// Print the arguments
-	while (tokens)
+	while (cmd->args[i])
 	{
-		printf("%s", (char *)tokens->content);
-		if (tokens->next)
-			printf(" ");
-		tokens = tokens->next;
+		ft_putstr_fd(cmd->args[i], STDOUT_FILENO);
+		if (cmd->args[i + 1])
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		i++;
 	}
 	if (newline)
-		printf("\n");
+		ft_putchar_fd('\n', STDOUT_FILENO);
+	return (0);
+}
+
+int	builtin_pwd(t_shell *shell)
+{
+	ft_putendl_fd(shell->current_directory, STDOUT_FILENO);
+	return (0);
+}
+
+static int	check_cd_args(t_cmd *cmd, t_shell *shell)
+{
+	if (cmd->args[1] && cmd->args[2])
+	{
+		ft_putendl_fd("cd: too many arguments", STDERR_FILENO);
+		shell->last_status = 1;
+		return (1);
+	}
+	return (0);
+}
+
+int	builtin_cd(t_shell *shell, t_cmd *cmd)
+{
+	char	*path;
+
+	if (check_cd_args(cmd, shell))
+		return (1);
+	path = get_cd_path(shell, cmd);
+	if (execute_cd(path, shell))
+		return (1);
+	update_directory(shell);
+	return (0);
 }

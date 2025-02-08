@@ -6,181 +6,85 @@
 /*   By: drenquin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 12:16:46 by drenquin          #+#    #+#             */
-/*   Updated: 2024/12/06 12:16:46 by drenquin         ###   ########.fr       */
+/*   Updated: 2025/01/13 17:08:50 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int     find_equal(const char *var)
+void	handle_value_variable(t_shell *shell, const char *input,
+		const char *equal_pos)
 {
-        int     i;
+	char	*var_name;
+	char	*var_value;
+	char	*full_var;
+	char	*complete_var;
 
-        i = 0;
-        while (var[i] != '=' && var[i])
-                i++;
-        if (var[i] == '=')
-        {
-                printf("i vaut %d\n", i);
-                return (i);
-        }
-        else
-                return (-1);
-}
-// check the validity of export arg (first charactere of argument)
-int     check_in(const char *var)
-{
-        if (ft_isalpha(var[0]))
-                return (1);
-        else if (var[0] == '_')
-                return (1);
-        else if ((var[0]) == '"' && var[ft_strlen(var) - 1] == '"')
-                return (1);
-        return (0);
-}
-void    add_double_quotes(char *var)
-{
-        int     i;
-
-        i = 0;
-		write(1,"declare -x ",11);
-        while (var[i] != '\0')
-        {
-                write(1, &var[i], 1);
-                if (var[i] == '=')
-                        write(1, "\"", 1);
-                i++;
-        }
-        write(1, "\"", 1);
-        write(1, "\n", 1);
-}
-void    print_export(t_shell **args)
-{
-        t_node  *copy;
-        t_node  *head;
-		t_node  *copy_exp;
-		t_node	*head_exp;
-
-        copy = copy_list((*args)->env);
-        sort_lst(&copy);
-        head = copy;
-        while (copy != NULL)
-        {
-                add_double_quotes(copy->content);
-                copy = copy->next;
-        }
-		copy_exp = copy_list((*args)->export);
-		head_exp = copy_exp;
-		while (copy_exp != NULL)
-		{
-			write(1,"declare -x ",11);
-			printf("%s\n", copy_exp->content);
-			copy_exp = copy_exp->next;
-		}
-        free_lst(head);
-		free_lst(head_exp);
-}
-/*int		builtin_export(t_shell *args)
-{
-	t_list *current;
-	t_list *prev;
-	char *new_var;
-	int egale;
-
-	egale = 0;
-	current = args->tokens;
-	prev = NULL;
-	//export cmd is alone
-	if(current->next == NULL)
+	var_name = ft_substr(input, 0, equal_pos - input);
+	var_value = ft_strdup(equal_pos + 1);
+	if (var_name && var_value)
 	{
-		print_export(&args);
-	}
-	else if(check_in(current->next->content))
-	{
-		while (current != NULL)
+		full_var = ft_strjoin(var_name, "=");
+		if (full_var)
 		{
-			//in both cases the variable have to be add at env variable
-			if(strcmp(current->content, "=") == 0)
+			complete_var = ft_strjoin(full_var, var_value);
+			if (complete_var)
 			{
-				if(current->next == NULL)
-				{
-					printf("pas de valeur donner a la variable\n");
-					new_var = ft_strjoin(prev->content,current->content);
-					return(1);
-				}
-				else if (current->next != NULL)
-				{
-					printf("presence d' une valeur apres le egale\n");
-					return(1);
-				}
-				egale++;
+				remove_if(&shell->env, var_name);
+				add_node(&shell->env, complete_var);
+				free(complete_var);
 			}
-			else if(current->next == NULL && egale == 0)
-			{
-				printf("pas de egale\n");
-				return(1);
-			}
-			prev = current;
-			current = current->next;
+			free(full_var);
 		}
 	}
-	return (0);
-}*/
+	free(var_name);
+	free(var_value);
+}
 
-//works with display and sorting
-int		builtin_export(t_shell *args)
+void	handle_no_value_variable(t_shell *shell, const char *input)
 {
-	t_list *current;
-	t_list *prev;
-	char *new_var;
-	char *var_value;
-	int egale;
+	char	*no_value;
 
-	egale = 0;
-	current = args->tokens;
-	prev = NULL;
-	//export cmd is alone
-	if(current->next == NULL)
+	no_value = ft_strdup(input);
+	if (no_value)
 	{
-		print_export(&args);
+		add_node(&shell->export, no_value);
+		free(no_value);
 	}
-	else if(check_in(current->next->content))
+}
+
+void	handle_variable_input(t_shell *shell, char *input)
+{
+	char	*equal_pos;
+
+	equal_pos = ft_strchr(input, '=');
+	if (!equal_pos)
+		handle_no_value_variable(shell, input);
+	else
+		handle_value_variable(shell, input, equal_pos);
+}
+
+int	builtin_export(t_shell *shell, char **args)
+{
+	int		i;
+	char	*input;
+
+	if (!args[1])
 	{
-		while (current != NULL)
+		print_export(&shell);
+		return (0);
+	}
+	i = 1;
+	while (args[i])
+	{
+		input = args[i];
+		if (!check_in(input, shell))
 		{
-			//in both cases the variable have to be add at env variable
-			if(strcmp(current->content, "=") == 0)
-			{
-				//no value after equal
-				if(current->next == NULL)
-				{
-					new_var = ft_strjoin(prev->content,current->content);
-					remove_if(&args->env, new_var);
-					add_node(&args->env, new_var);
-					free(new_var);
-					return(1);
-				}
-				//variable had a value after equal
-				else if (current->next != NULL)
-				{
-					new_var = ft_strjoin(prev->content,current->content);
-					var_value = ft_strjoin(new_var, current->next->content);
-					remove_if(&args->env, new_var);
-					add_node(&args->env, var_value);
-					free(new_var);
-					free(var_value);
-					return(1);
-				}
-				egale++;
-			}
-			else if(current->next == NULL && egale == 0)
-			{
-				add_node(&args->export, current->content);
-				return(1);
-			}
-			prev = current;
-			current = current->next;
+			i++;
+			continue ;
 		}
+		handle_variable_input(shell, input);
+		i++;
 	}
 	return (0);
 }

@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = cc
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -g
 AR = ar rcs
 RM = /bin/rm -f
 

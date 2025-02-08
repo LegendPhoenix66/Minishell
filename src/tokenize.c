@@ -6,159 +6,98 @@
 /*   By: lhopp <lhopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 15:49:31 by lhopp             #+#    #+#             */
-/*   Updated: 2024/11/27 11:31:23 by lhopp            ###   ########.fr       */
+/*   Updated: 2025/01/25 22:46:22 by lhopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void error(const char *msg)
+void	ft_realloc(void **ptr, size_t old_size, size_t new_size)
 {
-	fprintf(stderr, "Error: %s\n", msg);
-	exit(EXIT_FAILURE);
-}
+	void	*new_ptr;
 
-t_list	*add_token(t_list **list, const char *token, int length)
-{
-	t_list	*new_node;
-
-	new_node = ft_lstnew(strndup(token, length));
-	if( new_node == NULL)
+	if (new_size == 0)
 	{
-		error("malloc token");
-		return (NULL);
+		if (*ptr)
+			free(*ptr);
+		ptr = NULL;
+		return ;
 	}
-	ft_lstadd_back(list, new_node);
-	return (new_node);
-}
-
-// Function to split input by spaces
-t_list *split_by_spaces(const char *input) {
-	t_list *parsed_tokens = NULL;
-	int i = 0;
-	while (input[i]) {
-		if (input[i] == ' ') {
-			add_token(&parsed_tokens, input, i);
-			input += i + 1;
-			i = 0;
-		} else if (input[i] == '\"' || input[i] == '\'') {
-			char quote = input[i];
-			int j = i + 1;
-			while (input[j] && input[j] != quote) {
-				j++;
-			}
-			if (!input[j]) {
-				fprintf(stderr, "Unmatched quote");
-				return NULL;
-			}
-			i = j + 1;
-		} else {
-			i++;
-		}
+	new_ptr = malloc(new_size);
+	if (!new_ptr)
+		return ;
+	if (*ptr)
+	{
+		ft_memcpy(new_ptr, *ptr, old_size);
+		free(*ptr);
 	}
-	add_token(&parsed_tokens, input, i);
-	return parsed_tokens;
+	*ptr = new_ptr;
 }
 
-// Function to correct pipes and redirects
-t_list *correct_pipes_and_redirects(t_list *parsed_tokens) {
-	t_list *tokens_with_pipes = NULL;
-	t_list *current = parsed_tokens;
-	while (current) {
-		int i = 0;
-		int pipe_pos = -1;
-		char *content = current->content;
-		while (content[i]) {
-			if (content[i] == '\"' || content[i] == '\'') {
-				char quote = content[i];
-				i++;
-				while (content[i] != quote) {
-					i++;
-				}
-				i++;
-			}
-			if (content[i] == '|' || content[i] == '<' || content[i] == '>') {
-				int length = (content[i + 1] == content[i]) ? 2 : 1;
-				add_token(&tokens_with_pipes, current->content, i);
-				add_token(&tokens_with_pipes, current->content + i, length);
-				pipe_pos = i + length - 1;
-				i += length;
-			} else {
-				i++;
-			}
-		}
-		add_token(&tokens_with_pipes, content + pipe_pos + 1, strlen(content) - pipe_pos - 1);
-		current = current->next;
-	}
-	return tokens_with_pipes;
-}
-
-// Function to remove quotes and substitute variables
-void remove_quotes_and_substitute_variables(t_list *tokens) {
-    t_list *current = tokens;
-    while (current) {
-        char *new_content = NULL;
-        int i = 0, j = 0;
-        char *content = current->content;
-        while (content[i]) {
-            if (content[i] == '\"' || content[i] == '\'') {
-                char quote = content[i++];
-                while (content[i] && content[i] != quote) {
-                    if (content[i] == '$' && quote == '\"') {
-                        // Variable substitution
-                        int var_start = ++i;
-                        while (content[i] && content[i] != ' ' && content[i] != quote) {
-                            i++;
-                        }
-                        char var_name[i - var_start + 1];
-                        strncpy(var_name, &content[var_start], i - var_start);
-                        var_name[i - var_start] = '\0';
-                        char *var_value = getenv(var_name);
-                        if (var_value) {
-                            new_content = realloc(new_content, j + strlen(var_value) + 1);
-                            strcpy(&new_content[j], var_value);
-                            j += strlen(var_value);
-                        }
-                    } else {
-                        new_content = realloc(new_content, j + 2);
-                        new_content[j++] = content[i++];
-                    }
-                }
-                i++;
-            } else if (content[i] == '$') {
-                int var_start = ++i;
-                while (content[i] && content[i] != ' ' && content[i] != '\"' && content[i] != '\'') {
-                    i++;
-                }
-                char var_name[i - var_start + 1];
-                strncpy(var_name, &content[var_start], i - var_start);
-                var_name[i - var_start] = '\0';
-                char *var_value = getenv(var_name);
-                if (var_value) {
-                    new_content = realloc(new_content, j + strlen(var_value) + 1);
-                    strcpy(&new_content[j], var_value);
-                    j += strlen(var_value);
-                }
-            } else {
-                new_content = realloc(new_content, j + 2);
-                new_content[j++] = content[i++];
-            }
-        }
-        if (new_content) {
-            new_content[j] = '\0';
-            free(current->content);
-            current->content = new_content;
-        }
-        current = current->next;
-    }
-}
-
-t_list *tokenize_input(const char *input)
+static void	process_character(const char current_char,
+		const char *input_content, int *current_char_index, t_context *ctx)
 {
-	t_list *parsed_tokens = split_by_spaces(input);
+	if (current_char == '"' || current_char == '\'')
+	{
+		process_quoted_content(input_content, current_char_index, ctx,
+			current_char);
+	}
+	else if (current_char == '$')
+	{
+		process_variable_substitution(input_content, current_char_index, ctx);
+	}
+	else
+	{
+		ft_realloc((void **)ctx->new_content, *(ctx->output_index),
+			*(ctx->output_index) + 2);
+		if (!*(ctx->new_content))
+			return ;
+		(*(ctx->new_content))[(*(ctx->output_index))++] = current_char;
+		(*current_char_index)++;
+	}
+}
+
+void	process_token_content(char *input_content, t_context *ctx)
+{
+	int		char_index;
+	char	char_to_process;
+
+	char_index = 0;
+	while (input_content[char_index])
+	{
+		char_to_process = input_content[char_index];
+		process_character(char_to_process, input_content, &char_index, ctx);
+	}
+	if (*(ctx->new_content))
+	{
+		(*(ctx->new_content))[*(ctx->output_index)] = '\0';
+	}
+}
+
+char	*clean_arg(char *token, t_shell *shell)
+{
+	t_context	ctx;
+	char		*processed_content;
+	int			processed_length;
+
+	processed_content = NULL;
+	processed_length = 0;
+	if (!token)
+		return (NULL);
+	ctx.shell = shell;
+	ctx.new_content = &processed_content;
+	ctx.output_index = &processed_length;
+	process_token_content(token, &ctx);
+	return (processed_content);
+}
+
+t_list	*tokenize_input(const char *input)
+{
+	t_list	*parsed_tokens;
+
+	parsed_tokens = split_by_spaces(input);
 	if (!parsed_tokens)
-		return NULL;
-	t_list *tokens_with_pipes = correct_pipes_and_redirects(parsed_tokens);
-	remove_quotes_and_substitute_variables(tokens_with_pipes);
-	return tokens_with_pipes;
+		return (NULL);
+	correct_pipes_and_redirects(&parsed_tokens);
+	return (parsed_tokens);
 }
